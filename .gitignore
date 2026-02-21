@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+secrets.yaml
+# Node
+node_modules/
+# Blender
+*.blend1
+*.blend2
+# 3D资产
+*.fbx
+*.obj
+*.glb
+!/examples/*.glb
+# OS
+.DS_Store
+Thumbs.db
