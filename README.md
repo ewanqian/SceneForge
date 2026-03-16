@@ -1,5 +1,7 @@
 # SceneForge
 
+中文 | [English](./README-en.md)
+
 SceneForge 是当前唯一核心产品仓。
 
 它的目标不是再讲“生态中台”，而是做一个明确、可验证、可发布的工具：
