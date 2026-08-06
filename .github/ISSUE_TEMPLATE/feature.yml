@@ -1,0 +1,40 @@
+name: SceneForge implementation task
+description: A bounded feature that can be delegated to a coding agent.
+title: "[Feature]: "
+labels: ["feature"]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: User outcome
+      description: What can a user do after this is complete?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Use observable, testable statements.
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Primary runtime
+      options:
+        - Desktop browser
+        - Mobile browser
+        - Meta Quest WebXR
+        - Apple Vision Pro WebXR
+        - Backend / media bridge
+        - Cross-platform
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints and assets
+      description: Include performance budget, browser versions, scene files and references.
