@@ -15,19 +15,21 @@ Use **Three.js as the rendering substrate** and **React Three Fiber as the produ
 | `webgl2-xr` | Three.js `WebGLRenderer` through R3F | Vision Pro Safari, Quest Browser, desktop/mobile fallback | Stable baseline |
 | `webgpu-flat` | Three.js `WebGPURenderer` + TSL | Desktop Safari/Chrome/Edge | Planned experiment |
 | `webgpu-xr` | WebGPU + WebXR binding | visionOS Safari and engines with verified support | Evaluation gate |
+| `apple-immersive-model` | HTML `<model>` + USDZ + `requestImmersive()` | visionOS 27 Safari | Apple-specific asset path |
 | `native-openxr` | Native engine adapter | PC VR / installation runtime | Future, outside browser bundle |
 
 Three.js WebGPU can fall back to WebGL2, but its TSL/post-processing path is not a drop-in replacement for existing `ShaderMaterial` and EffectComposer code. The current R3F stable branch is therefore kept on WebGL2 for WebXR. WebGPU work should be isolated behind a renderer adapter and tested separately.
 
 ## Apple Vision Pro strategy
 
-SceneForge has three layers rather than one claimed “Vision Pro mode”:
+SceneForge has four layers rather than one claimed “Vision Pro mode”:
 
 1. **Standard web window** — catalog, metadata, video, controls and 3D canvas.
-2. **WebXR immersive VR** — a venue-scale space entered from Safari, using WebXR input that works with gaze + pinch/transient pointer behavior.
-3. **Apple asset fallback** — optional USDZ/HTML `<model>`/Quick Look links for object-centric scenes and marketing/product views.
+2. **WebXR immersive VR** — a venue-scale interactive application entered from Safari, using WebXR input that works with gaze + pinch/transient pointer behavior.
+3. **Immersive website environment** — on visionOS 27, an optimized USDZ environment can be previewed with HTML `<model>` and opened around the Safari window with `requestImmersive()`; this is useful for venue tours and seat/stage viewpoints, but is not a replacement for the interactive R3F runtime.
+4. **Apple object fallback** — USDZ/HTML `<model>`/Quick Look links for object-centric scenes, products and marketing views across Apple platforms.
 
-Do not promise browser passthrough AR until Apple exposes a production `immersive-ar` path. Keep the non-XR and Quick Look fallbacks usable.
+Do not promise browser passthrough AR until Apple exposes a production `immersive-ar` path. Keep the non-XR, model-element and Quick Look fallbacks usable.
 
 ## Scene catalog
 
@@ -36,7 +38,7 @@ The current `VenueManifest` is the first version of a headless scene catalog. A 
 - manifest JSON and revisions;
 - GLB/glTF geometry with Meshopt/Draco where appropriate;
 - KTX2/Basis textures;
-- optional USDZ exports for Apple surfaces;
+- optional USDZ exports for Apple surfaces and immersive website environments;
 - HLS/WebRTC media descriptors rather than raw NDI addresses;
 - camera presets, cue/state data and access policy;
 - measured/surveyed provenance for venue dimensions.
@@ -61,6 +63,7 @@ The browser cannot directly discover NDI sources. A show-network bridge must run
 - Treat planar reflection as a preview effect, not physically accurate SSR.
 - Reserve true SSR/SSGI/compute effects for a WebGPU desktop profile with explicit benchmarks.
 - XR UI must be rendered in 3D or use platform-supported interaction; do not rely on dense DOM overlays in immersive mode.
+- USDZ immersive environments need separate vertex/entity, texture and decode budgets; they should be exported from the same source scene but optimized independently from GLB.
 
 ## Automation and approval
 
@@ -84,6 +87,7 @@ SceneForge should not compete with Spline as a general 3D authoring tool. Its de
 - cue/state comparison and version review;
 - local show-network media bridging;
 - WebXR review on Vision Pro/Quest from the same URL;
+- Apple immersive website environment exports from the same venue source;
 - future OSC/MIDI/DMX/NDI adapters;
 - project archive and communication workflow around each venue.
 
