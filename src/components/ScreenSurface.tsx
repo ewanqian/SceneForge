@@ -46,7 +46,7 @@ export function ScreenSurface({ color, emissiveIntensity, videoUrl, side }: Scre
     <meshStandardMaterial
       color={videoUrl ? "#ffffff" : color}
       emissive={videoUrl ? "#ffffff" : color}
-      emissiveIntensity={videoUrl ? 1.35 : emissiveIntensity}
+      emissiveIntensity={emissiveIntensity}
       map={texture}
       roughness={0.34}
       toneMapped={!videoUrl}

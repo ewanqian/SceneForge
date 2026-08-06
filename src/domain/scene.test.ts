@@ -24,4 +24,29 @@ describe("venueManifestSchema", () => {
   it("rejects a venue without a camera", () => {
     expect(venueManifestSchema.safeParse({ ...validManifest, cameras: [] }).success).toBe(false);
   });
+
+  it("rejects duplicate camera preset IDs", () => {
+    const duplicateCamera = { ...validManifest.cameras[0], name: "Duplicate" };
+    expect(
+      venueManifestSchema.safeParse({
+        ...validManifest,
+        cameras: [...validManifest.cameras, duplicateCamera],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects invalid cue colors", () => {
+    expect(
+      venueManifestSchema.safeParse({
+        ...validManifest,
+        cues: [
+          {
+            id: "invalid-color",
+            name: "Invalid color",
+            actions: [{ type: "set-screen", color: "#ff00zz", emissiveIntensity: 1 }],
+          },
+        ],
+      }).success,
+    ).toBe(false);
+  });
 });

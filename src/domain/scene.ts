@@ -1,11 +1,14 @@
 import { z } from "zod";
 
 const vec3Schema = z.tuple([z.number(), z.number(), z.number()]);
+const colorSchema = z
+  .string()
+  .regex(/^#[0-9a-f]{6}$/i, "Expected a six-digit hexadecimal color such as #5f78ff");
 
 const cueActionSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("set-screen"),
-    color: z.string(),
+    color: colorSchema,
     emissiveIntensity: z.number().min(0).max(12),
   }),
   z.object({
@@ -50,7 +53,12 @@ export const venueManifestSchema = z.object({
     position: vec3Schema,
     curvature: z.number().min(0).max(1),
   }),
-  cameras: z.array(cameraPresetSchema).min(1),
+  cameras: z
+    .array(cameraPresetSchema)
+    .min(1)
+    .refine((cameras) => new Set(cameras.map((camera) => camera.id)).size === cameras.length, {
+      message: "Camera preset IDs must be unique",
+    }),
   cues: z.array(
     z.object({
       id: z.string().min(1),

@@ -14,8 +14,8 @@ const manifests = [
     screen: { width: 14, height: 7, position: [0, 6.2, -13.7], curvature: 0 },
     cameras: [
       { id: "front", name: "Front of house", position: [0, 7, 18], target: [0, 4, -10] },
-      { id: "stage-left", name: "Stage left", position: [-13, 5, -2], target: [0, 4, -10] },
-      { id: "wide", name: "Wide overview", position: [19, 14, 22], target: [0, 3, -5] },
+      { id: "stage-left", name: "Stage left", position: [-10, 5, -2], target: [0, 4, -10] },
+      { id: "wide", name: "Wide overview", position: [10, 10, 12], target: [0, 3, -5] },
     ],
     cues: [
       {
@@ -60,7 +60,7 @@ const manifests = [
     screen: { width: 13.8, height: 4.9, position: [0, 3.5, 0], curvature: 0.72 },
     cameras: [
       { id: "center", name: "Center", position: [0, 3.8, 5.8], target: [0, 2.8, -3] },
-      { id: "orbit", name: "Tank orbit", position: [7.4, 5.2, 4.2], target: [0, 2.5, -2] },
+      { id: "orbit", name: "Tank orbit", position: [6.2, 5.2, 3.5], target: [0, 2.5, -2] },
       { id: "stage", name: "On stage", position: [-3.5, 2.3, -1.4], target: [3, 2.8, -4] },
     ],
     cues: [
