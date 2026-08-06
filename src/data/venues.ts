@@ -1,4 +1,4 @@
-import { venueManifestSchema, type VenueManifest } from "../domain/scene";
+import { type VenueManifest, venueManifestSchema } from "../domain/scene";
 
 const manifests = [
   {
@@ -57,7 +57,7 @@ const manifests = [
     layout: "arena",
     dimensions: { width: 15.6, depth: 15.6, height: 6.5 },
     stage: { width: 8.5, depth: 4.2, height: 0.7, position: [0, 0.35, -3.2] },
-    screen: { width: 13.8, height: 4.9, position: [0, 3.5, -6.7], curvature: 0.72 },
+    screen: { width: 13.8, height: 4.9, position: [0, 3.5, 0], curvature: 0.72 },
     cameras: [
       { id: "center", name: "Center", position: [0, 3.8, 5.8], target: [0, 2.8, -3] },
       { id: "orbit", name: "Tank orbit", position: [7.4, 5.2, 4.2], target: [0, 2.5, -2] },
