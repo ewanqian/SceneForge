@@ -13,7 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -b --pretty false",
-    "lint": "biome check --formatter-enabled=false --enforce-assist=false .",
+    "lint": "biome lint .",
     "format": "biome check --write .",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run build"
   },
