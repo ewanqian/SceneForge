@@ -22,5 +22,13 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-      - run: npm install --no-audit --no-fund
-      - run: npm run verify
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm run test
+      - name: Production build
+        run: npm run build
