@@ -23,6 +23,17 @@ button:focus-visible, select:focus-visible, input:focus-visible {
   outline-offset: 2px;
 }
 button:disabled { cursor: not-allowed; opacity: 0.48; }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 .app-shell {
   display: grid;
@@ -138,6 +149,10 @@ select, input[type="file"] { width: 100%; min-height: 42px; margin-top: 9px; pad
   justify-content: flex-end;
   gap: 6px;
   max-width: 420px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 .capability {
   padding: 5px 8px;
