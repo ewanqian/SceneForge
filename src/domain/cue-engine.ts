@@ -1,18 +1,22 @@
 import type { Cue, ViewerState } from "./scene";
 
 export function applyCue(state: ViewerState, cue: Cue): ViewerState {
-  return cue.actions.reduce<ViewerState>((next, action) => {
+  const next: ViewerState = { ...state };
+
+  for (const action of cue.actions) {
     switch (action.type) {
       case "set-screen":
-        return {
-          ...next,
-          screenColor: action.color,
-          screenIntensity: action.emissiveIntensity,
-        };
+        next.screenColor = action.color;
+        next.screenIntensity = action.emissiveIntensity;
+        break;
       case "set-house-lights":
-        return { ...next, houseLightIntensity: action.intensity };
+        next.houseLightIntensity = action.intensity;
+        break;
       case "set-reflection":
-        return { ...next, reflections: action.enabled };
+        next.reflections = action.enabled;
+        break;
     }
-  }, state);
+  }
+
+  return next;
 }
