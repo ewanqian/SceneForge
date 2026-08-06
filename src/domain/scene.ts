@@ -18,6 +18,13 @@ const cueActionSchema = z.discriminatedUnion("type", [
   }),
 ]);
 
+const cameraPresetSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  position: vec3Schema,
+  target: vec3Schema,
+});
+
 export const venueManifestSchema = z.object({
   schemaVersion: z.literal(1),
   id: z.string().min(1),
@@ -43,14 +50,7 @@ export const venueManifestSchema = z.object({
     position: vec3Schema,
     curvature: z.number().min(0).max(1),
   }),
-  cameras: z.array(
-    z.object({
-      id: z.string().min(1),
-      name: z.string().min(1),
-      position: vec3Schema,
-      target: vec3Schema,
-    }),
-  ),
+  cameras: z.array(cameraPresetSchema).min(1),
   cues: z.array(
     z.object({
       id: z.string().min(1),
