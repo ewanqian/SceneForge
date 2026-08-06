@@ -13,7 +13,8 @@ export function CapabilityBadges({ capabilities }: CapabilityBadgesProps) {
   ] as const;
 
   return (
-    <div className="capability-row" role="group" aria-label="Runtime capabilities">
+    <fieldset className="capability-row">
+      <legend className="sr-only">Runtime capabilities</legend>
       {entries.map(([label, enabled]) => (
         <span
           className={`capability ${enabled ? "capability--on" : "capability--off"}`}
@@ -25,6 +26,6 @@ export function CapabilityBadges({ capabilities }: CapabilityBadgesProps) {
       {capabilities?.likelyVisionOS && (
         <span className="capability capability--vision">visionOS</span>
       )}
-    </div>
+    </fieldset>
   );
 }
