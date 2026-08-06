@@ -1,72 +1,26 @@
 # SceneForge
 
-[中文](./README.md) | English
+SceneForge is a browser-first venue catalog and stage previsualization tool for live performance, installations and immersive media.
 
-SceneForge is the current core product repository.
+The first runnable foundation includes venue switching, camera presets, cue/state changes, local video mapped onto a stage screen, optional planar floor reflection, runtime capability detection and a WebXR entry point for Apple Vision Pro and Meta Quest.
 
-It is not being framed as a vague ecosystem platform. Its job is much narrower and more real:
+The current BO Live House and UFO Terminal scenes are illustrative geometry, not construction surveys.
 
-- web-based scene viewer
-- stage preview tool
-- cue / event-based sequencing layer
-- lightweight web sharing for review and communication
+## Stack
 
-## First Read
+- Three.js rendering foundation
+- React + React Three Fiber application layer
+- WebGL2 as the stable WebXR profile
+- WebGPU as progressive enhancement behind a future renderer adapter
+- WebXR for browser XR; OpenXR belongs to a future native adapter
+- WebRTC/HLS/local files for browser media; NDI requires a trusted local bridge
 
-If this is your first time here, read in this order:
+## Run
 
-1. current product boundary
-2. first concrete use case
-3. near-term route
-4. documentation plan
+```bash
+npm install
+npm run dev
+npm run verify
+```
 
-## Current Position
-
-SceneForge is a lightweight tool for turning performance spaces, installation scenes, and spatial flow into something viewable, previewable, and discussable on the web.
-
-## What It Does Not Try To Be
-
-It is not currently being positioned as:
-
-- a total immersive publishing platform
-- an all-scenarios content mother system
-- a full technical control center
-
-Those claims would blur the real product boundary.
-
-## Current Product Boundary
-
-Right now it focuses on four things:
-
-1. scene viewing
-2. stage preview
-3. cue / event-based sequencing
-4. web preview and lightweight sharing
-
-## Current Status
-
-As of 2026-03-16, SceneForge is still in the phase of tightening product definition and aligning around a minimal working prototype.
-
-The repository is meant to clarify direction, not pretend that a large platform is already finished.
-
-## First Concrete Use Case
-
-The clearest current use case is:
-
-**Drop Flow performance scene viewer**
-
-This is the current reality check for the repository. If this use case cannot run, it is too early to expand the product story.
-
-## Related Repositories
-
-- [VIRTURA-SpacePort](https://github.com/ewanqian/VIRTURA-SpacePort): public front desk and archive layer
-- [VIRTURA-Newsroom](https://github.com/ewanqian/VIRTURA-Newsroom): publication outlet
-- [VIRTURA-Collective](https://github.com/ewanqian/VIRTURA-Collective): team entry point
-
-## Next Useful Step
-
-The next useful move is still to run one real workflow end to end:
-
-- load one real scene
-- switch versions with cue / event logic
-- publish a shareable web preview
+See [the August 2026 architecture decision](docs/platform-architecture-2026.md) and [the media bridge design](docs/media-bridge.md).
