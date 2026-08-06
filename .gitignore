@@ -5,16 +5,22 @@ __pycache__/
 *.pyd
 .env
 secrets.yaml
-# Node
+
+# Node / Vite
 node_modules/
-# Blender
+dist/
+*.tsbuildinfo
+.vite/
+coverage/
+
+# Blender / large source assets
 *.blend1
 *.blend2
-# 3D资产
 *.fbx
 *.obj
 *.glb
 !/examples/*.glb
+
 # OS
 .DS_Store
 Thumbs.db
