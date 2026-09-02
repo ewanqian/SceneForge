@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#05070a" />
+    <title>SceneForge · ENTROPY Stage Preview</title>
+    <style>
+      :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #05070a; color: #f4f6f8; }
+      needle-engine { position: fixed; inset: 0; width: 100%; height: 100%; }
+      .hud { position: fixed; z-index: 10; top: max(16px, env(safe-area-inset-top)); left: max(16px, env(safe-area-inset-left)); width: min(410px, calc(100vw - 32px)); padding: 14px; border: 1px solid rgba(255,255,255,.16); border-radius: 14px; background: rgba(6,8,12,.78); backdrop-filter: blur(18px); box-shadow: 0 18px 50px rgba(0,0,0,.28); }
+      .row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+      .row > * { flex: 1 1 auto; }
+      .meta { display: grid; grid-template-columns: 92px 1fr; gap: 5px 10px; margin: 8px 0 12px; font-size: 12px; color: #a9b0ba; }
+      .meta strong { color: #eef1f4; font-weight: 600; overflow-wrap: anywhere; }
+      h1 { font-size: 15px; margin: 0; letter-spacing: .01em; }
+      p { margin: 6px 0 0; font-size: 12px; line-height: 1.45; color: #a9b0ba; }
+      button { min-height: 38px; border-radius: 9px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.07); color: #f4f6f8; padding: 8px 10px; font: inherit; cursor: pointer; }
+      button:hover { background: rgba(255,255,255,.12); }
+      button.primary { background: #f3f5f7; color: #07090d; border-color: transparent; font-weight: 650; }
+      .status { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.1); font-size: 11px; line-height: 1.45; color: #9ca5b1; }
+      .status[data-level="warn"] { color: #f1c878; }
+      .status[data-level="error"] { color: #ff8c8c; }
+      .badge { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,.08); font-size: 10px; color: #c7ccd3; }
+      .note { margin-top: 8px; padding: 8px 10px; border-radius: 9px; background: rgba(255,255,255,.045); color: #9ca5b1; font-size: 11px; line-height: 1.45; }
+      @media (max-width: 640px) { .hud { padding: 12px; } }
+    </style>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@needle-tools/engine@5.1.5/dist/needle-engine.min.js"></script>
+  </head>
+  <body>
+    <needle-engine
+      src="../needle-room/scene.gltf"
+      camera-controls
+      background-color="#05070a"
+      environment-image="studio"
+      contact-shadows="0.45"
+      autoplay
+    ></needle-engine>
+
+    <section class="hud" aria-label="ENTROPY stage preview controls">
+      <h1>SceneForge · ENTROPY Stage <span class="badge">WebRTC prototype</span></h1>
+      <p>Pick a desktop window → WebRTC room → curved main LED + ceiling core crop → WebXR.</p>
+      <div class="meta">
+        <span>Room</span><strong id="room-id">—</strong>
+        <span>Main LED</span><strong>15.2 m arc · 12.4 m chord · 5.5 m high</strong>
+        <span>Canvas</span><strong>9600 × 3456 · 25:9</strong>
+        <span>Ceiling</span><strong>35 m² · center 960 × 1080 crop</strong>
+        <span>Secure</span><strong id="secure-state">—</strong>
+      </div>
+
+      <div class="row">
+        <button class="primary" id="share-screen" type="button">Pick Window / Screen</button>
+        <button id="stop-share" type="button">Stop Share</button>
+        <button id="copy-link" type="button">Copy Room Link</button>
+      </div>
+      <div class="row">
+        <button id="view-front" type="button">Front View</button>
+        <button id="view-wide" type="button">Wide View</button>
+        <button id="view-stage" type="button">Stage View</button>
+      </div>
+      <div class="row">
+        <button id="reset-stage" type="button">Reset Stage</button>
+        <button id="toggle-ceiling" type="button">Toggle Ceiling</button>
+      </div>
+
+      <div class="note">Ceiling geometry is an estimated 5.58 × 6.27 m rectangle derived from the supplied 35 m² area and 960:1080 content ratio. Replace it when measured dimensions arrive.</div>
+      <div class="status" id="status" role="status" aria-live="polite">Booting ENTROPY stage preview…</div>
+    </section>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
