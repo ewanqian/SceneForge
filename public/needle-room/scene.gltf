@@ -1,0 +1,31 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "SceneForge Needle XR Room v0.2.0"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "SceneForge Needle Room",
+      "nodes": [0]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "ViewerCamera",
+      "camera": 0,
+      "translation": [0, 1.65, 4.6]
+    }
+  ],
+  "cameras": [
+    {
+      "name": "ViewerCamera",
+      "type": "perspective",
+      "perspective": {
+        "yfov": 0.7853981633974483,
+        "znear": 0.05,
+        "zfar": 120
+      }
+    }
+  ]
+}
