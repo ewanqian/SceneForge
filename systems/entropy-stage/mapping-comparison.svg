@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050">
+  <title>ENTROPY main and ceiling screen mapping comparison</title>
+  <defs>
+    <style>
+      .title{font:700 42px Arial,sans-serif;fill:#f8fafc}.h{font:700 28px Arial,sans-serif;fill:#f8fafc}.p{font:22px Arial,sans-serif;fill:#cbd5e1}.small{font:18px Arial,sans-serif;fill:#94a3b8}.label{font:700 22px Arial,sans-serif;fill:#fff}.ok{fill:#22c55e}.bad{fill:#ef4444}.line{stroke:#94a3b8;stroke-width:3;fill:none}.dash{stroke:#fff;stroke-width:5;stroke-dasharray:18 12;fill:none}
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12Z" fill="#94a3b8"/></marker>
+  </defs>
+  <rect width="1600" height="1050" fill="#090c12"/>
+  <text x="70" y="72" class="title">ENTROPY 屏幕映射复查</text>
+  <text x="70" y="110" class="p">输入 1920×1080 → 主曲面屏完整画面；顶屏取中央 960×1080，并翻转 V</text>
+
+  <text x="70" y="168" class="h">1. 原始输入 / UV</text>
+  <g transform="translate(70 195)">
+    <rect width="720" height="405" rx="8" fill="#111827" stroke="#64748b" stroke-width="3"/>
+    <rect width="360" height="202.5" fill="#ef4444" opacity=".82"/><rect x="360" width="360" height="202.5" fill="#22c55e" opacity=".82"/>
+    <rect y="202.5" width="360" height="202.5" fill="#2563eb" opacity=".82"/><rect x="360" y="202.5" width="360" height="202.5" fill="#eab308" opacity=".82"/>
+    <text x="24" y="42" class="label">TL 左上</text><text x="696" y="42" text-anchor="end" class="label">TR 右上</text>
+    <text x="24" y="382" class="label">BL 左下</text><text x="696" y="382" text-anchor="end" class="label">BR 右下</text>
+    <text x="360" y="62" text-anchor="middle" class="h">TOP / 上</text><text x="360" y="376" text-anchor="middle" class="h">BOTTOM / 下</text>
+    <rect x="180" y="6" width="360" height="393" class="dash"/>
+    <text x="360" y="218" text-anchor="middle" class="label">顶屏中央 50%</text>
+    <text x="360" y="246" text-anchor="middle" class="label">U 0.25–0.75</text>
+  </g>
+  <g transform="translate(850 210)">
+    <text class="h">主曲面屏</text><text y="42" class="p">U：左 → 右</text><text y="76" class="p">V：下 → 上</text>
+    <text y="126" class="ok h">✓ 完整画面，无翻转</text>
+    <path d="M0 170H560" class="line" marker-end="url(#arrow)"/><text x="280" y="205" text-anchor="middle" class="small">主屏左右</text>
+    <path d="M280 340V230" class="line" marker-end="url(#arrow)"/><text x="305" y="290" class="small">TOP</text>
+  </g>
+
+  <line x1="70" y1="650" x2="1530" y2="650" stroke="#334155" stroke-width="2"/>
+  <text x="70" y="705" class="h">2. 顶屏方向对比（观众位在 +Z，曲面屏在 -Z）</text>
+
+  <g transform="translate(70 745)">
+    <rect width="650" height="235" rx="14" fill="#151922" stroke="#ef4444" stroke-width="4"/>
+    <text x="28" y="45" class="bad h">修正前 ✕</text>
+    <text x="28" y="82" class="p">TOP 朝观众 +Z</text><text x="28" y="114" class="p">BOTTOM 朝曲面屏 -Z</text>
+    <path d="M390 175V70" stroke="#ef4444" stroke-width="8" marker-end="url(#arrow)"/>
+    <text x="420" y="82" class="label">观众 +Z</text><text x="420" y="202" class="label">曲面屏 -Z</text>
+    <text x="28" y="202" class="bad h">上下颠倒</text>
+  </g>
+
+  <g transform="translate(880 745)">
+    <rect width="650" height="235" rx="14" fill="#151922" stroke="#22c55e" stroke-width="4"/>
+    <text x="28" y="45" class="ok h">修正后 ✓</text>
+    <text x="28" y="82" class="p">TOP 朝曲面屏 -Z</text><text x="28" y="114" class="p">BOTTOM 朝观众 +Z</text>
+    <path d="M390 70V175" stroke="#22c55e" stroke-width="8" marker-end="url(#arrow)"/>
+    <text x="420" y="82" class="label">观众 +Z</text><text x="420" y="202" class="label">曲面屏 -Z</text>
+    <text x="28" y="202" class="ok h">V′ = 1 − V</text>
+  </g>
+</svg>

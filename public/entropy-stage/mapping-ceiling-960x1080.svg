@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="1080" viewBox="0 0 960 1080">
+  <title>ENTROPY ceiling screen calibration grid 960 by 1080</title>
+  <defs>
+    <pattern id="grid" width="160" height="135" patternUnits="userSpaceOnUse">
+      <path d="M160 0H0V135" fill="none" stroke="#525866" stroke-width="3"/>
+    </pattern>
+  </defs>
+  <rect width="960" height="1080" fill="#05070a"/>
+  <rect width="960" height="1080" fill="url(#grid)"/>
+  <path d="M480 0V1080M0 540H960" stroke="#fff" stroke-width="6"/>
+  <rect x="4" y="4" width="952" height="1072" fill="none" stroke="#fff" stroke-width="8"/>
+  <rect x="48" y="54" width="864" height="972" fill="none" stroke="#aab2c0" stroke-width="5" stroke-dasharray="24 16"/>
+  <rect x="96" y="108" width="768" height="864" fill="none" stroke="#5f6877" stroke-width="4" stroke-dasharray="16 14"/>
+  <g fill="none" stroke="#d8dee9" stroke-width="5">
+    <circle cx="240" cy="540" r="67"/><circle cx="480" cy="540" r="67"/><circle cx="720" cy="540" r="67"/>
+  </g>
+  <g fill="#fff" font-family="ui-monospace, monospace" font-weight="700">
+    <text x="28" y="48" font-size="28">CEILING / 960×1080 / 8:9</text>
+    <text x="28" y="105" font-size="24">TL 左上</text><text x="932" y="105" font-size="24" text-anchor="end">TR 右上</text>
+    <text x="28" y="1035" font-size="24">BL 左下</text><text x="932" y="1035" font-size="24" text-anchor="end">BR 右下</text>
+    <text x="480" y="175" font-size="38" text-anchor="middle">↑ TOP / 上 ↑</text>
+    <text x="480" y="950" font-size="38" text-anchor="middle">↓ BOTTOM / 下 ↓</text>
+    <text x="480" y="520" font-size="32" text-anchor="middle">CENTER</text>
+    <text x="480" y="565" font-size="24" text-anchor="middle">PROVISIONAL VERTICAL PROJECTION</text>
+  </g>
+</svg>

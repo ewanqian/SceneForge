@@ -1,0 +1,224 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ENTROPY 3.0 — Spatial System Study</title><style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:#aaa;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+#wrap{position:fixed;inset:0;display:flex;flex-direction:column;background:#000}
+.stage{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000}
+#ceilingStage{height:35%;flex:none}
+#mainStage{flex:1;min-height:0}
+canvas{display:block;max-width:100%;max-height:100%;object-fit:contain;background:#000}
+.sep{height:1px;background:#202020;flex:none}
+.tag{position:absolute;right:10px;top:7px;font-size:10px;letter-spacing:.14em;color:#555}
+#hud{position:fixed;left:10px;top:9px;z-index:10;background:#030303;border:1px solid #222;padding:8px 10px;white-space:pre;font-size:10px;line-height:1.38;color:#aaa;pointer-events:none;max-width:78vw}
+</style></head><body>
+<div id="wrap"><div class="stage" id="ceilingStage"><span class="tag">CEILING / PROJECTION</span><canvas id="ceiling"></canvas></div><div class="sep" id="sep"></div><div class="stage" id="mainStage"><span class="tag">MAIN / 25:9</span><canvas id="main"></canvas></div></div><div id="hud"></div>
+<script>
+const mainC=document.getElementById('main'), ceilC=document.getElementById('ceiling');
+const main=mainC.getContext('2d',{alpha:false}), ceil=ceilC.getContext('2d',{alpha:false});
+const hud=document.getElementById('hud'), mainStage=document.getElementById('mainStage'), ceilingStage=document.getElementById('ceilingStage'), sep=document.getElementById('sep');
+const MW=2500,MH=900,CW=800,CH=900; mainC.width=MW;mainC.height=MH;ceilC.width=CW;ceilC.height=CH;
+const TAU=Math.PI*2, clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), lerp=(a,b,t)=>a+(b-a)*t, smooth=t=>t*t*(3-2*t), easeOut=t=>1-Math.pow(1-clamp(t,0,1),3), gray=v=>`rgb(${v|0},${v|0},${v|0})`;
+let bank=0,bpm=78,motion=1,density=.46,showHud=true,layout=0,time=0,last=performance.now(),beat=0,beatPhase=0,accent=0,eventId=1;
+const HOLD=.38, REFRACT=.16;
+const bankNames=['SPATIAL / PRESSURE','SYNC / SIGNAL','DATA / SYMBOL'];
+const keyPos={Q:[0,0],W:[1,0],E:[2,0],R:[3,0],T:[4,0],Y:[5,0],U:[6,0],I:[7,0],O:[8,0],P:[9,0],'[':[10,0],']':[11,0],A:[.25,1],S:[1.25,1],D:[2.25,1],F:[3.25,1],G:[4.25,1],H:[5.25,1],J:[6.25,1],K:[7.25,1],L:[8.25,1],Z:[.75,2],X:[1.75,2],C:[2.75,2],V:[3.75,2],B:[4.75,2],N:[5.75,2],M:[6.75,2]};
+const CENTER_X=4.75;
+function topo(k){const p=keyPos[k]||[CENTER_X,1],x=clamp((p[0]-CENTER_X)/6.25,-1,1);return{x,row:p[1],edge:Math.abs(x),side:x<-.12?-1:x>.12?1:0}}
+function lane(k){const t=topo(k),z=t.x<-.66?'FL':t.x<-.22?'L':t.x<.22?'C':t.x<.66?'R':'FR';return z+'_'+t.row}
+const voices={},events=[];
+function V(k){if(!voices[k])voices[k]={down:false,t0:-9,t1:-9,last:-9,id:0,seed:(k.charCodeAt(0)||91)*0.731};return voices[k]}
+function state(k){
+ const v=V(k),age=time-v.t0;
+ if(v.down){
+  if(age<HOLD)return{p:'press',e:smooth(age/HOLD),age};
+  const a=.5+.65*topo(k).edge,u=clamp((age-HOLD)/a,0,1);
+  return{p:u<1?'attack':'hold',e:smooth(u),age};
+ }
+ if(v.t1>-8){
+  const tapped=(v.t1-v.t0)<HOLD;
+  if(tapped){
+   const d=.68+.28*topo(k).edge,u=clamp((time-v.t0)/d,0,1);
+   if(u<1)return{p:'tap',e:Math.sin(Math.PI*u),age:time-v.t0};
+  }else{
+   const d=2.0+2.0*topo(k).edge,u=clamp((time-v.t1)/d,0,1);
+   if(u<1)return{p:'outro',e:1-smooth(u),age:time-v.t0,out:u};
+  }
+ }
+ return{p:'off',e:0,age:0};
+}
+function start(k){
+ const v=V(k);if(time-v.last<REFRACT)return;v.last=time;
+ const ln=bank+'_'+lane(k);
+ for(const kk of Object.keys(voices)){if(kk!==k&&voices[kk].down&&bank+'_'+lane(kk)===ln){voices[kk].down=false;voices[kk].t1=time}}
+ v.down=true;v.t0=time;v.t1=-9;v.id=eventId++;
+ events.push({id:v.id,k,t0:time,bank,seed:v.seed});if(events.length>80)events.shift();
+}
+function end(k){const v=V(k);if(v.down){v.down=false;v.t1=time}}
+function active(){return Object.keys(voices).filter(k=>state(k).e>.002)}
+function clear(ctx,w,h){ctx.fillStyle='#000';ctx.fillRect(0,0,w,h)}
+function line(ctx,x1,y1,x2,y2,v=100,w=1){ctx.strokeStyle=gray(clamp(v,0,255));ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function circle(ctx,x,y,r,v=120,w=1){ctx.strokeStyle=gray(clamp(v,0,255));ctx.lineWidth=w;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke()}
+function dot(ctx,x,y,r=2,v=180){ctx.fillStyle=gray(clamp(v,0,255));ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill()}
+function fillRect(ctx,x,y,w,h,v=120){ctx.fillStyle=gray(clamp(v,0,255));ctx.fillRect(x,y,w,h)}
+function rect(ctx,x,y,w,h,v=100,lw=1){ctx.strokeStyle=gray(clamp(v,0,255));ctx.lineWidth=lw;ctx.strokeRect(x,y,w,h)}
+function txt(ctx,s,x,y,v=120,size=12,align='center'){ctx.fillStyle=gray(clamp(v,0,255));ctx.font=`${size}px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(s,x,y)}
+function lfo(rate,phase=0){return .5+.5*Math.sin(time*TAU*rate*motion+phase)}
+function mainX(k){return lerp(220,2280,(topo(k).x+1)/2)}
+function ceilingAngle(k){return -Math.PI/2+topo(k).x*Math.PI*.72}
+function updateLayout(){ceilingStage.style.height=layout===2?'100%':'35%';if(layout===0){ceilingStage.style.display='flex';mainStage.style.display='flex';sep.style.display='block'}if(layout===1){ceilingStage.style.display='none';mainStage.style.display='flex';sep.style.display='none'}if(layout===2){ceilingStage.style.display='flex';mainStage.style.display='none';sep.style.display='none'}}
+updateLayout();
+addEventListener('keydown',e=>{
+ const k=e.key.length===1?e.key.toUpperCase():e.key;
+ if(!e.shiftKey&&['1','2','3'].includes(e.key)){bank=+e.key-1;return}
+ if(e.shiftKey&&e.key==='['){bpm=Math.max(40,bpm-2);e.preventDefault();return}
+ if(e.shiftKey&&e.key===']'){bpm=Math.min(180,bpm+2);e.preventDefault();return}
+ if(e.shiftKey&&e.key===','){motion=clamp(motion-.08,.2,2);e.preventDefault();return}
+ if(e.shiftKey&&e.key==='.'){motion=clamp(motion+.08,.2,2);e.preventDefault();return}
+ if(e.shiftKey&&e.key==='-'){density=clamp(density-.05,.08,1);e.preventDefault();return}
+ if(e.shiftKey&&e.key==='='){density=clamp(density+.05,.08,1);e.preventDefault();return}
+ if(e.shiftKey&&k==='M'){layout=(layout+1)%3;updateLayout();e.preventDefault();return}
+ if(e.shiftKey&&k==='H'){showHud=!showHud;e.preventDefault();return}
+ if(e.shiftKey&&k==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();e.preventDefault();return}
+ if(e.shiftKey&&k==='R'){Object.values(voices).forEach(v=>{v.down=false;v.t0=-9;v.t1=-9});events.length=0;e.preventDefault();return}
+ if(e.key===' '){accent=1;e.preventDefault();return}
+ if((/^[A-Z]$/.test(k)||k==='['||k===']')&&!e.shiftKey){if(!e.repeat)start(k);e.preventDefault();return}
+});
+addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toUpperCase():e.key;if((/^[A-Z]$/.test(k)||k==='['||k===']')&&!e.shiftKey)end(k)});
+
+
+const histories={};
+function H(k){if(!histories[k])histories[k]=[];return histories[k]}
+function base(){
+ clear(main,MW,MH);clear(ceil,CW,CH);
+ // quieter baseline, asymmetric
+ line(main,150,455,2350,455,22,1);
+ for(let i=0;i<9;i++){const x=250+i*250;line(main,x,448,x,462,26,1)}
+ circle(main,1250,455,42,34,1);
+ line(ceil,400,100,400,810,22,1);
+ circle(ceil,400,455,42,34,1);
+}
+function macroField(k,s){
+ const t=topo(k),x=mainX(k),E=s.e,age=s.age,b=95+130*E;
+ const seed=V(k).seed;
+ // slow structural envelope with 3 time scales
+ const slow=lfo(.006+0.002*t.edge,seed),mid=lfo(.018,seed+1.3),micro=lfo(.09,seed+2.7);
+ const primaryW=120+420*slow*E, primaryH=130+260*mid*E;
+ if(s.p==='tap'){
+  const u=clamp(age/.82,0,1),px=lerp(1250,x,easeOut(u));
+  fillRect(main,px-50*(1-u),350+u*80,100*(1-u)+16,200*(1-u)+40,b);
+  line(main,1250,455,px,455,70,2);
+ }else{
+  // large silhouette, intentionally asymmetric
+  fillRect(main,x-primaryW/2,455-primaryH/2,primaryW,primaryH,72+115*E);
+  // black incision cut-out for stronger graphic identity
+  main.fillStyle='#000';
+  const cut=30+80*mid;
+  main.fillRect(x-cut/2,455-primaryH*.55,cut,primaryH*1.1);
+  // thin structural frame around mass
+  rect(main,x-primaryW*.58,455-primaryH*.58,primaryW*1.16,primaryH*1.16,82+70*E,1);
+  // sparse micro accents
+  for(let i=0;i<4;i++){
+    const yy=455-primaryH*.5+i*(primaryH/3);
+    line(main,x-primaryW*.7,yy,x-primaryW*.58,yy,80+60*micro,1);
+  }
+ }
+ // shared ceiling field: convert lateral location into orbit sector
+ const a=ceilingAngle(k),rr=115+165*t.edge,cx=400+Math.cos(a)*rr,cy=455+Math.sin(a)*rr;
+ circle(ceil,cx,cy,32+78*slow*E,90+110*E,2);
+ line(ceil,400,820,cx,cy,50,1);
+ if(t.edge>.55){rect(ceil,cx-35,cy-35,70,70,72+70*E,1)}
+ // history only as actual stored points, not fake frame trails
+ const h=H(k); if(s.e>.2){h.push({x,y:455,t:time});if(h.length>18)h.shift()}
+ for(let i=1;i<h.length;i++){const a1=h[i-1],a2=h[i];line(main,a1.x,a1.y,a2.x,a2.y,35+i*2,1)}
+}
+function signalField(k,s){
+ const t=topo(k),x=mainX(k),E=s.e,age=s.age,seed=V(k).seed;
+ const phase=((age*bpm/60)/4)%1;
+ // signal spine
+ line(main,240,455,2260,455,32,1);
+ const px=lerp(1250,x,smooth(phase));
+ dot(main,px,455,4,210);circle(main,px,455,16+36*(1-phase),115+95*E,1.5);
+ // data brackets and lock planes
+ if(Math.abs(t.x)<.22 || s.p==='hold'){
+  const gate=70+120*lfo(.014,seed);
+  rect(main,1250-gate,455-gate,gate*2,gate*2,80+70*E,1.2);
+ }
+ // sparse packet constellation
+ for(let i=0;i<8;i++){
+  const q=(phase+i*.125)%1, xx=lerp(1250,x,q), yy=455+Math.sin(i*1.7+age*.21)*70;
+  if(i%2===0)rect(main,xx-5,yy-5,10,10,70+i*10,1); else dot(main,xx,yy,2,90+i*10);
+ }
+ if((beat%4)===0 && beatPhase<.12) txt(main,'LOCK',1250,395,145,11);
+ const a=ceilingAngle(k),rr=140+70*t.edge,cx=400+Math.cos(a)*rr,cy=455+Math.sin(a)*rr;
+ circle(ceil,cx,cy,26+30*(1-phase),105+100*E,1.5);
+ line(ceil,400,820,cx,cy,52,1);
+ for(let i=0;i<4;i++)circle(ceil,400,455,70+i*45,38+i*10,1);
+}
+function dataField(k,s){
+ const t=topo(k),E=s.e,age=s.age,seed=V(k).seed;
+ const cols=54,rows=16,left=220,top=150,ww=2060,hh=610,cw=ww/cols,ch=hh/rows;
+ // deterministic field with topology-linked origin
+ const cx=((t.x+1)/2)*(cols-1);
+ for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){
+  const d=Math.hypot((i-cx)*.9,(j-rows/2)*1.25);
+  const val=.5+.5*Math.sin(d*.53-age*.18+seed);
+  if(val>.84 && d<16+16*E){
+   const q=65+Math.floor((1-d/(32))*110*E);
+   if((i+j)%3===0)fillRect(main,left+i*cw+5,top+j*ch+5,cw-10,ch-10,q);
+   else rect(main,left+i*cw+5,top+j*ch+5,cw-10,ch-10,q,1);
+  }
+ }
+ // contour envelope
+ for(let j=0;j<6;j++){
+  main.beginPath();
+  for(let i=0;i<90;i++){
+   const xx=lerp(260,2240,i/89),yy=690-j*40+Math.sin(i*.17+j*.8+age*.08+seed)*22*(.5+E);
+   if(i===0)main.moveTo(xx,yy);else main.lineTo(xx,yy);
+  }
+  main.strokeStyle=gray(42+j*7);main.lineWidth=1;main.stroke();
+ }
+ const glyphs=['1','2','4','8','16','32','○','△','□','∞'];
+ for(let i=0;i<8;i++){const xx=360+i*260,yy=245+((i+Math.round(cx))%3)*46;txt(main,glyphs[(i+k.charCodeAt(0))%glyphs.length],xx,yy,80+65*E,11+(i%2)*2)}
+ const a=ceilingAngle(k),rr=95+145*t.edge,px=400+Math.cos(a)*rr,py=455+Math.sin(a)*rr;
+ for(let i=0;i<5;i++)circle(ceil,px,py,22+i*24,45+i*13,1);
+}
+function renderTransfer(){
+ for(const ev of events){
+  const age=time-ev.t0;if(age>1.7)continue;const u=clamp(age/1.7,0,1),t=topo(ev.k),x=mainX(ev.k);
+  const mx=lerp(x,1250+t.x*260,u),my=lerp(455,80,smooth(u));
+  dot(main,mx,my,3,180);line(main,x,455,mx,my,48,1);
+  const a=ceilingAngle(ev.k),rr=120+90*t.edge,cx=400+Math.cos(a)*rr,cy=455+Math.sin(a)*rr;
+  dot(ceil,cx,lerp(830,cy,smooth(u)),3,190);
+ }
+}
+function render(){
+ base();
+ for(const k of active()){const s=state(k);if(bank===0)macroField(k,s);else if(bank===1)signalField(k,s);else dataField(k,s)}
+ renderTransfer();
+ if(accent>.02){
+  // cinematic punctuation: alternating bar / inversion window
+  if((Math.floor(time*20)%2)===0){fillRect(main,0,0,MW,38,130+110*accent);fillRect(ceil,0,CH-34,CW,34,130+110*accent)}
+ }
+}
+function loop(n){
+ const dt=Math.min(.05,(n-last)/1000);last=n;time=n/1000;beatPhase+=dt*bpm/60;if(beatPhase>=1){beatPhase%=1;beat=(beat+1)%16}accent*=Math.pow(.07,dt);while(events.length&&time-events[0].t0>2.2)events.shift();render();
+ hud.textContent=showHud?`ENTROPY 3.0 / SPATIAL SYSTEM STUDY
+BANK ${bank+1} ${bankNames[bank]}
+BPM ${bpm}  ACTIVE ${active().map(k=>k+':'+state(k).p).join(' | ')||'-'}
+
+3.0 focus:
+shared world / projection
+macro + meso + micro time scales
+stored trajectory history
+asymmetric silhouette
+hard graphic mass + sparse data
+cinematic punctuation
+quiet baseline
+
+G/H CORE   Q/A/Z ←   P/L/] →
+
+1/2/3 banks   A-Z [ ] play
+Shift+[ ] BPM   Shift+M view
+Shift+F full   Shift+H HUD
+Shift+R reset   Space accent`:'';requestAnimationFrame(loop)
+}
+requestAnimationFrame(loop);
+</script></body></html>

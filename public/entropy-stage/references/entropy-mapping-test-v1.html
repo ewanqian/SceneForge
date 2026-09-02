@@ -1,0 +1,78 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ENTROPY Mapping Test v1</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080808;color:#fff;font-family:monospace}
+#wrap{height:100%;display:flex;flex-direction:column}
+.stage{position:relative;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden}
+#ceilStage{height:36%;flex:none}.sep{height:2px;background:#fff;flex:none}#mainStage{flex:1;min-height:0}
+canvas{display:block;max-width:100%;max-height:100%;object-fit:contain;background:#000}
+#hud{position:fixed;left:10px;top:10px;background:#000;padding:8px;border:1px solid #777;font-size:11px;line-height:1.45}
+</style></head>
+<body><div id="wrap"><div class="stage" id="ceilStage"><canvas id="c"></canvas></div><div class="sep"></div><div class="stage" id="mainStage"><canvas id="m"></canvas></div></div><div id="hud"></div>
+<script>
+const M=document.getElementById('m'),C=document.getElementById('c'),m=M.getContext('2d'),c=C.getContext('2d'),hud=document.getElementById('hud');
+M.width=2500;M.height=900;C.width=960;C.height=1080;
+let mode=0,labels=true;
+function grid(ctx,w,h,cols,rows,title){
+ ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);
+ ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.strokeRect(2,2,w-4,h-4);
+ ctx.lineWidth=1;
+ for(let i=1;i<cols;i++){let x=w*i/cols;ctx.strokeStyle=i===cols/2?'#fff':'#555';ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+ for(let j=1;j<rows;j++){let y=h*j/rows;ctx.strokeStyle=j===rows/2?'#fff':'#555';ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+ ctx.strokeStyle='#fff';ctx.beginPath();ctx.moveTo(w/2-30,h/2);ctx.lineTo(w/2+30,h/2);ctx.moveTo(w/2,h/2-30);ctx.lineTo(w/2,h/2+30);ctx.stroke();
+ ctx.font=`${Math.max(16,w/80)}px monospace`;ctx.fillStyle='#fff';ctx.textBaseline='top';ctx.textAlign='left';ctx.fillText(title,18,16);
+ if(labels){
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  for(let i=0;i<cols;i++)ctx.fillText(String(i+1),w*(i+.5)/cols,35);
+  for(let j=0;j<rows;j++)ctx.fillText(String.fromCharCode(65+j),25,h*(j+.5)/rows);
+ }
+ // safe areas 5% and 10%
+ ctx.strokeStyle='#888';ctx.setLineDash([14,12]);ctx.strokeRect(w*.05,h*.05,w*.9,h*.9);
+ ctx.strokeStyle='#444';ctx.strokeRect(w*.1,h*.1,w*.8,h*.8);ctx.setLineDash([]);
+ // calibration circles must remain circular
+ for(const [x,y] of [[.25,.5],[.5,.5],[.75,.5]]){ctx.strokeStyle='#aaa';ctx.beginPath();ctx.arc(w*x,h*y,Math.min(w,h)*.07,0,Math.PI*2);ctx.stroke()}
+}
+function bars(ctx,w,h,title){
+ ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);
+ const vals=[0,32,64,96,128,160,192,224,255],bw=w/vals.length;
+ vals.forEach((v,i)=>{ctx.fillStyle=`rgb(${v},${v},${v})`;ctx.fillRect(i*bw,0,bw,h*.45)});
+ ctx.fillStyle='#fff';ctx.fillRect(0,h*.48,w,h*.05);
+ ctx.fillStyle='#777';ctx.fillRect(0,h*.56,w,h*.05);
+ ctx.fillStyle='#333';ctx.fillRect(0,h*.64,w,h*.05);
+ ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.strokeRect(2,2,w-4,h-4);
+ ctx.fillStyle='#fff';ctx.font=`${Math.max(16,w/80)}px monospace`;ctx.fillText(title,18,h*.76);
+}
+function zones(ctx,w,h,title){
+ ctx.fillStyle='#000';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.strokeRect(2,2,w-4,h-4);
+ const names=['FAR L','LEFT','CORE','RIGHT','FAR R'];
+ names.forEach((n,i)=>{let x=w*i/5;ctx.strokeStyle=i===2?'#aaa':'#555';ctx.strokeRect(x+2,h*.18,w/5-4,h*.64);ctx.fillStyle='#fff';ctx.font=`${Math.max(16,w/75)}px monospace`;ctx.textAlign='center';ctx.fillText(n,x+w/10,h*.5)});
+ ctx.textAlign='left';ctx.fillText(title,18,30);
+}
+function draw(){
+ if(mode===0){grid(m,2500,900,10,6,'MAIN / LOGICAL TEST 2500×900 / 25:9');grid(c,960,1080,6,8,'CEILING TEST 960×1080 / 8:9')}
+ if(mode===1){zones(m,2500,900,'MAIN SPATIAL ZONES');grid(c,960,1080,6,8,'CEILING / VERTICAL PROJECTION')}
+ if(mode===2){bars(m,2500,900,'MAIN GRAYSCALE / BLACK LEVEL');bars(c,960,1080,'CEILING GRAYSCALE / BLACK LEVEL')}
+ hud.textContent=`ENTROPY MAPPING TEST v1
+MODE ${mode+1}/3
+Main logical: 2500×900 (25:9)
+Ceiling working test: 960×1080 (8:9)
+NOTE: ceiling routing is provisional until onsite confirmation.
+
+1 Grid / geometry
+2 Spatial zones
+3 Grayscale / black level
+L labels
+F fullscreen
+S export PNGs`;
+}
+draw();
+addEventListener('keydown',e=>{
+ if(['1','2','3'].includes(e.key)){mode=+e.key-1;draw()}
+ if(e.key.toLowerCase()==='l'){labels=!labels;draw()}
+ if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+ if(e.key.toLowerCase()==='s'){
+  draw(); for(const [cv,name] of [[M,'entropy-main-mapping.png'],[C,'entropy-ceiling-mapping.png']]){let a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download=name;a.click()}
+ }
+});
+</script></body></html>
