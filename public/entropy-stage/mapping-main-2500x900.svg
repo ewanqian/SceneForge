@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2500" height="900" viewBox="0 0 2500 900">
+  <title>ENTROPY main screen calibration grid 2500 by 900</title>
+  <defs>
+    <pattern id="grid" width="250" height="150" patternUnits="userSpaceOnUse">
+      <path d="M250 0H0V150" fill="none" stroke="#525866" stroke-width="3"/>
+    </pattern>
+  </defs>
+  <rect width="2500" height="900" fill="#05070a"/>
+  <rect width="2500" height="900" fill="url(#grid)"/>
+  <path d="M1250 0V900M0 450H2500" stroke="#fff" stroke-width="6"/>
+  <rect x="4" y="4" width="2492" height="892" fill="none" stroke="#fff" stroke-width="8"/>
+  <rect x="125" y="45" width="2250" height="810" fill="none" stroke="#aab2c0" stroke-width="5" stroke-dasharray="28 18"/>
+  <rect x="250" y="90" width="2000" height="720" fill="none" stroke="#5f6877" stroke-width="4" stroke-dasharray="18 16"/>
+  <g fill="none" stroke="#d8dee9" stroke-width="6">
+    <circle cx="625" cy="450" r="63"/><circle cx="1250" cy="450" r="63"/><circle cx="1875" cy="450" r="63"/>
+  </g>
+  <g fill="#fff" font-family="ui-monospace, monospace" font-weight="700">
+    <text x="32" y="60" font-size="38">MAIN / 2500×900 / 25:9</text>
+    <text x="48" y="132" font-size="32">TL 左上</text><text x="2452" y="132" font-size="32" text-anchor="end">TR 右上</text>
+    <text x="48" y="850" font-size="32">BL 左下</text><text x="2452" y="850" font-size="32" text-anchor="end">BR 右下</text>
+    <text x="1250" y="115" font-size="46" text-anchor="middle">↑ TOP / 上 ↑</text>
+    <text x="1250" y="840" font-size="46" text-anchor="middle">↓ BOTTOM / 下 ↓</text>
+    <text x="1250" y="430" font-size="34" text-anchor="middle">CENTER</text>
+    <text x="1250" y="475" font-size="26" text-anchor="middle">NO STRETCH · FULL UV 0–1</text>
+  </g>
+</svg>

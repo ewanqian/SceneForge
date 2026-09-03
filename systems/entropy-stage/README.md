@@ -32,9 +32,18 @@ Confirmed:
 - area: `35 m²`
 - supplied content mapping: `1920×1080 input → 960×1080 output`
 
-Measured physical width/depth were not supplied. The prototype therefore estimates a `5.58 × 6.27 m` rectangle by combining the 35 m² area with the 960:1080 aspect ratio. Replace these numbers when measured dimensions arrive.
+Measured physical width/depth were not supplied. The prototype uses a photo-matched `6.6 × 4.4 m` visual footprint, with the long edge running left-to-right and the rear edge close to the curved screen. This preview footprint does not reconcile exactly with the supplied 35 m² area; replace it when measured dimensions arrive.
 
 ## Media mapping
+
+The supplied reference files define two logical output surfaces fed by one shared source:
+
+- main: `2500×900` (`25:9`), mapped uniformly to the native `9600×3456` screen;
+- ceiling: `960×1080` (`8:9`), kept as a separate provisional vertical projection.
+
+**Show Mapping Test** loads the same calibration texture on both surfaces. Main uses the full texture; ceiling uses the central crop and its own UV transform. The original files are preserved under `public/entropy-stage/references/`.
+
+The current live screen-share path remains provisional:
 
 ```text
 Mac / Windows selected window or display
@@ -50,7 +59,19 @@ Ceiling LED (centre-half crop: U 0.25–0.75)
 Desktop viewer / Vision Pro WebXR
 ```
 
-The ceiling screen intentionally receives the centre half of the shared source, matching the supplied `1920→960` horizontal crop concept. It does not run an independent live-media pipeline.
+The ceiling screen receives the centre half of the shared source, matching the supplied `1920→960` routing reference. It does not yet run an independent live-media pipeline.
+
+Orientation is explicit:
+
+- main screen: full frame, `U` left-to-right and `V` bottom-to-top;
+- ceiling screen: `U 0.25–0.75`, with `V` inverted so source TOP points toward the curved screen (`-Z`) and source BOTTOM points toward the audience (`+Z`).
+
+Calibration assets:
+
+- `/entropy-stage/mapping-main-2500x900.svg`
+- `/entropy-stage/mapping-ceiling-960x1080.svg`
+
+The UV Mapping Editor applies per-surface offset, scale, rotation, and flip adjustments after the source routing transform. **Reset Selected UV** restores the supplied-file baseline.
 
 ## Runtime entry
 
@@ -66,6 +87,9 @@ The room URL is stable through the `?room=` parameter. Open the same room URL on
 - **Wide View** — venue/surface relationship check.
 - **Stage View** — stage-side/parallax check.
 - **Toggle Ceiling** — isolate the curved main screen when needed.
+- **Screen brightness** — adjusts both emissive screen materials.
+- **UV Mapping Editor** — adjusts one surface without changing the other.
+- **Show Mapping Test** — loads one shared calibration source on both surfaces.
 - **Copy Room Link** — sends the exact room URL to another device.
 
 ## Acceptance harness

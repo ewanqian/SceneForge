@@ -1,11 +1,11 @@
 import {
   MeshRenderer,
+  onStart,
   ScreenCapture,
   SyncedRoom,
   VideoPlayer,
   WebXR,
   XRRig,
-  onStart,
 } from "https://cdn.jsdelivr.net/npm/@needle-tools/engine@5.1.5/dist/needle-engine.min.js";
 import * as THREE from "https://cdn.jsdelivr.net/npm/@needle-tools/engine@5.1.5/dist/three.min.js";
 
@@ -28,6 +28,30 @@ const ui = {
   viewStage: document.querySelector("#view-stage"),
   resetStage: document.querySelector("#reset-stage"),
   toggleCeiling: document.querySelector("#toggle-ceiling"),
+  brightness: document.querySelector("#screen-brightness"),
+  brightnessValue: document.querySelector("#brightness-value"),
+  hud: document.querySelector(".hud"),
+  hideHud: document.querySelector("#hide-hud"),
+  showHud: document.querySelector("#show-hud"),
+  toggleMappingTest: document.querySelector("#toggle-mapping-test"),
+  mappingSurface: document.querySelector("#mapping-surface"),
+  mappingUOffset: document.querySelector("#mapping-u-offset"),
+  mappingUOffsetValue: document.querySelector("#mapping-u-offset-value"),
+  mappingVOffset: document.querySelector("#mapping-v-offset"),
+  mappingVOffsetValue: document.querySelector("#mapping-v-offset-value"),
+  mappingUScale: document.querySelector("#mapping-u-scale"),
+  mappingUScaleValue: document.querySelector("#mapping-u-scale-value"),
+  mappingVScale: document.querySelector("#mapping-v-scale"),
+  mappingVScaleValue: document.querySelector("#mapping-v-scale-value"),
+  mappingRotation: document.querySelector("#mapping-rotation"),
+  mappingFlipU: document.querySelector("#mapping-flip-u"),
+  mappingFlipV: document.querySelector("#mapping-flip-v"),
+  resetMapping: document.querySelector("#reset-mapping"),
+  uvCanvas: document.querySelector("#uv-canvas"),
+  uvSelection: document.querySelector("#uv-selection"),
+  uvHandles: document.querySelector("#uv-handles"),
+  uvTopLabel: document.querySelector("#uv-top-label"),
+  uvSurfaceLabel: document.querySelector("#uv-surface-label"),
 };
 
 ui.room.textContent = roomId;
@@ -38,7 +62,12 @@ function setStatus(message, level = "info") {
   ui.status.dataset.level = level;
 }
 
-function createCurvedScreenGeometry({ chord = 12.4, arc = 15.2, height = 5.5, segments = 96 } = {}) {
+function createCurvedScreenGeometry({
+  chord = 12.4,
+  arc = 15.2,
+  height = 5.5,
+  segments = 96,
+} = {}) {
   // Solve the supplied arc/chord proportions approximately: 123.2° / R ≈ 7.06 m.
   const theta = 2.15;
   const radius = arc / theta;
@@ -92,7 +121,7 @@ function makeVenueGeometry(context) {
   context.scene.add(grid);
 
   const mainMaterial = new THREE.MeshBasicMaterial({
-    color: 0x161a20,
+    color: 0xffffff,
     side: THREE.DoubleSide,
     toneMapped: false,
   });
@@ -101,21 +130,20 @@ function makeVenueGeometry(context) {
   mainScreen.position.set(0, 3.25, -4.7);
   context.scene.add(mainScreen);
 
-  // 35 m² and supplied 960:1080 centre-crop ratio -> approx 5.58 × 6.27 m.
-  const ceilingWidth = Math.sqrt(35 * (960 / 1080));
-  const ceilingDepth = 35 / ceilingWidth;
+  // Photo-matched preview footprint: long axis runs left-to-right and the rear edge
+  // sits close to the curved screen. Dimensions remain estimated until measured.
+  const ceilingWidth = 6.6;
+  const ceilingDepth = 4.4;
   const ceilingMaterial = new THREE.MeshBasicMaterial({
-    color: 0x11151a,
+    color: 0xffffff,
     side: THREE.DoubleSide,
     toneMapped: false,
   });
-  const ceilingScreen = new THREE.Mesh(
-    new THREE.PlaneGeometry(ceilingWidth, ceilingDepth),
-    ceilingMaterial,
-  );
+  const ceilingGeometry = new THREE.PlaneGeometry(ceilingWidth, ceilingDepth);
+  const ceilingScreen = new THREE.Mesh(ceilingGeometry, ceilingMaterial);
   ceilingScreen.name = "EntropyCeilingLED";
   ceilingScreen.rotation.x = Math.PI / 2;
-  ceilingScreen.position.set(0, 5.55, -1.15);
+  ceilingScreen.position.set(0, 5.55, -2.45);
   context.scene.add(ceilingScreen);
 
   // Stage reference slab, not claimed as measured geometry.
@@ -131,7 +159,7 @@ function makeVenueGeometry(context) {
   key.position.set(2, 7, 5);
   context.scene.add(key);
 
-  return { mainScreen, mainMaterial, ceilingScreen, ceilingMaterial };
+  return { mainScreen, ceilingScreen };
 }
 
 function setCameraPose(context, position, target) {
@@ -142,8 +170,34 @@ function setCameraPose(context, position, target) {
   camera.updateMatrixWorld(true);
 }
 
+function applyUvMapping(geometry, baseUvs, route, adjustment) {
+  const uvs = geometry.getAttribute("uv");
+  const rotation = THREE.MathUtils.degToRad(adjustment.rotation);
+  const cosine = Math.cos(rotation);
+  const sine = Math.sin(rotation);
+
+  for (let index = 0; index < uvs.count; index += 1) {
+    let u = (baseUvs[index * 2] - 0.5) * route.uScale;
+    let v = (baseUvs[index * 2 + 1] - 0.5) * route.vScale;
+    if (route.flipU) u *= -1;
+    if (route.flipV) v *= -1;
+
+    u *= adjustment.uScale;
+    v *= adjustment.vScale;
+    const rotatedU = u * cosine - v * sine;
+    const rotatedV = u * sine + v * cosine;
+    uvs.setXY(
+      index,
+      0.5 + rotatedU * (adjustment.flipU ? -1 : 1) + adjustment.uOffset,
+      0.5 + rotatedV * (adjustment.flipV ? -1 : 1) + adjustment.vOffset,
+    );
+  }
+
+  uvs.needsUpdate = true;
+}
+
 onStart((context) => {
-  const { mainScreen, mainMaterial, ceilingScreen, ceilingMaterial } = makeVenueGeometry(context);
+  const { mainScreen, ceilingScreen } = makeVenueGeometry(context);
 
   context.scene.addComponent(SyncedRoom, {
     roomName: roomId,
@@ -180,21 +234,180 @@ onStart((context) => {
 
   let ceilingVisible = true;
   let raf = 0;
+  let mappingTestActive = false;
+  let mainMappingTexture = null;
+  let texturesBeforeMappingTest = null;
+  let localFallbackStream = null;
 
-  // Mirror the shared WebRTC/video texture onto the ceiling, with a centre-half crop.
-  const syncCeilingTexture = () => {
-    const source = mainMaterial.map;
-    if (source && ceilingMaterial.map !== source) {
-      ceilingMaterial.map = source;
-      ceilingMaterial.needsUpdate = true;
-      source.wrapS = THREE.ClampToEdgeWrapping;
-      source.wrapT = THREE.ClampToEdgeWrapping;
+  const mappingDefaults = {
+    main: {
+      uOffset: 0,
+      vOffset: 0,
+      uScale: 1,
+      vScale: 1,
+      rotation: 0,
+      flipU: false,
+      flipV: false,
+    },
+    ceiling: {
+      uOffset: 0,
+      vOffset: 0,
+      uScale: 1,
+      vScale: 1,
+      rotation: 0,
+      flipU: false,
+      flipV: false,
+    },
+  };
+  const mappingSettings = structuredClone(mappingDefaults);
+  const mappingSurfaces = {
+    main: {
+      geometry: mainScreen.geometry,
+      baseUvs: Float32Array.from(mainScreen.geometry.getAttribute("uv").array),
+    },
+    ceiling: {
+      geometry: ceilingScreen.geometry,
+      baseUvs: Float32Array.from(ceilingScreen.geometry.getAttribute("uv").array),
+    },
+  };
+
+  const getSourceRoute = (surfaceName) => {
+    if (surfaceName === "main") {
+      return { uScale: 1, vScale: 1, flipU: false, flipV: false };
     }
-    if (ceilingMaterial.map) {
-      // Supplied mapping: 1920×1080 input -> 960×1080 output = centre half horizontally.
-      ceilingMaterial.map.repeat.set(0.5, 1.0);
-      ceilingMaterial.map.offset.set(0.25, 0.0);
-      ceilingMaterial.map.needsUpdate = true;
+    return { uScale: 0.5, vScale: 1, flipU: false, flipV: true };
+  };
+
+  const updateSurfaceMapping = (surfaceName) => {
+    const surface = mappingSurfaces[surfaceName];
+    applyUvMapping(
+      surface.geometry,
+      surface.baseUvs,
+      getSourceRoute(surfaceName),
+      mappingSettings[surfaceName],
+    );
+  };
+
+  const updateAllMappings = () => {
+    updateSurfaceMapping("main");
+    updateSurfaceMapping("ceiling");
+  };
+
+  const getMainDisplayMaterial = () => mainScreen.material;
+  const getCeilingDisplayMaterial = () => ceilingScreen.material;
+
+  const setScreenBrightness = (percent) => {
+    const multiplier = Number(percent) / 100;
+    const activeMainMaterial = getMainDisplayMaterial();
+    const activeCeilingMaterial = getCeilingDisplayMaterial();
+    activeMainMaterial.color.setRGB(multiplier, multiplier, multiplier);
+    activeCeilingMaterial.color.setRGB(multiplier, multiplier, multiplier);
+    activeMainMaterial.needsUpdate = true;
+    activeCeilingMaterial.needsUpdate = true;
+    ui.brightnessValue.value = `${percent}%`;
+  };
+
+  const renderUvEditor = () => {
+    const surfaceName = ui.mappingSurface.value;
+    const mapping = mappingSettings[surfaceName];
+    const centerX = 20 + 360 * (0.5 + mapping.uOffset);
+    const centerY = 25 + 200 * (0.5 - mapping.vOffset);
+    const halfWidth = 180 * mapping.uScale;
+    const halfHeight = 100 * mapping.vScale;
+    const angle = THREE.MathUtils.degToRad(-mapping.rotation);
+    const cosine = Math.cos(angle);
+    const sine = Math.sin(angle);
+    const transformPoint = (x, y) => [
+      centerX + x * cosine - y * sine,
+      centerY + x * sine + y * cosine,
+    ];
+    const corners = [
+      transformPoint(-halfWidth, -halfHeight),
+      transformPoint(halfWidth, -halfHeight),
+      transformPoint(halfWidth, halfHeight),
+      transformPoint(-halfWidth, halfHeight),
+    ];
+    ui.uvSelection.setAttribute(
+      "points",
+      corners.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" "),
+    );
+    const handles = ui.uvHandles.querySelectorAll("[data-corner]");
+    for (let index = 0; index < handles.length; index += 1) {
+      handles[index].setAttribute("cx", corners[index][0]);
+      handles[index].setAttribute("cy", corners[index][1]);
+    }
+    const rotatePoint = transformPoint(0, -halfHeight - 22);
+    const rotateHandle = ui.uvHandles.querySelector("[data-action='rotate']");
+    rotateHandle.setAttribute("cx", rotatePoint[0]);
+    rotateHandle.setAttribute("cy", rotatePoint[1]);
+    const topPoint = transformPoint(0, -halfHeight + 20);
+    ui.uvTopLabel.setAttribute("x", topPoint[0]);
+    ui.uvTopLabel.setAttribute("y", topPoint[1]);
+    const effectiveFlipV = getSourceRoute(surfaceName).flipV !== mapping.flipV;
+    ui.uvTopLabel.textContent = effectiveFlipV ? "BOTTOM ↕" : "TOP ↑";
+    ui.uvSurfaceLabel.setAttribute("x", centerX);
+    ui.uvSurfaceLabel.setAttribute("y", centerY + 5);
+    ui.uvSurfaceLabel.textContent = surfaceName === "main" ? "MAIN 25:9" : "CEILING 8:9";
+  };
+
+  const syncMappingEditor = () => {
+    const mapping = mappingSettings[ui.mappingSurface.value];
+    ui.mappingUOffset.value = mapping.uOffset;
+    ui.mappingVOffset.value = mapping.vOffset;
+    ui.mappingUScale.value = mapping.uScale;
+    ui.mappingVScale.value = mapping.vScale;
+    ui.mappingRotation.value = mapping.rotation;
+    ui.mappingFlipU.checked = mapping.flipU;
+    ui.mappingFlipV.checked = mapping.flipV;
+    ui.mappingUOffsetValue.value = mapping.uOffset.toFixed(2);
+    ui.mappingVOffsetValue.value = mapping.vOffset.toFixed(2);
+    ui.mappingUScaleValue.value = mapping.uScale.toFixed(2);
+    ui.mappingVScaleValue.value = mapping.vScale.toFixed(2);
+    renderUvEditor();
+  };
+
+  const updateSelectedMapping = () => {
+    const surfaceName = ui.mappingSurface.value;
+    const mapping = mappingSettings[surfaceName];
+    mapping.uOffset = Number(ui.mappingUOffset.value);
+    mapping.vOffset = Number(ui.mappingVOffset.value);
+    mapping.uScale = Number(ui.mappingUScale.value);
+    mapping.vScale = Number(ui.mappingVScale.value);
+    mapping.rotation = Number(ui.mappingRotation.value);
+    mapping.flipU = ui.mappingFlipU.checked;
+    mapping.flipV = ui.mappingFlipV.checked;
+    updateSurfaceMapping(surfaceName);
+    syncMappingEditor();
+    setStatus(`${surfaceName === "main" ? "Main" : "Ceiling"} UV mapping updated.`);
+  };
+
+  const commitGraphicalMapping = (surfaceName) => {
+    updateSurfaceMapping(surfaceName);
+    syncMappingEditor();
+    setStatus(`${surfaceName === "main" ? "Main" : "Ceiling"} UV mapping updated.`);
+  };
+
+  const hideMappingTest = () => {
+    if (!mappingTestActive) return;
+    const activeMainMaterial = getMainDisplayMaterial();
+    const activeCeilingMaterial = getCeilingDisplayMaterial();
+    activeMainMaterial.map = texturesBeforeMappingTest.main;
+    activeCeilingMaterial.map = texturesBeforeMappingTest.ceiling;
+    activeMainMaterial.needsUpdate = true;
+    activeCeilingMaterial.needsUpdate = true;
+    mappingTestActive = false;
+    updateAllMappings();
+    ui.toggleMappingTest.textContent = "Show Mapping Test";
+  };
+
+  // Mirror the shared WebRTC/video texture. Ceiling geometry UVs apply the centre-half crop
+  // without changing texture transforms used by the full-frame main screen.
+  const syncCeilingTexture = () => {
+    const source = getMainDisplayMaterial().map;
+    const activeCeilingMaterial = getCeilingDisplayMaterial();
+    if (!mappingTestActive && source && activeCeilingMaterial.map !== source) {
+      activeCeilingMaterial.map = source;
+      activeCeilingMaterial.needsUpdate = true;
     }
     raf = requestAnimationFrame(syncCeilingTexture);
   };
@@ -204,7 +417,7 @@ onStart((context) => {
     mainScreen.position.set(0, 3.25, -4.7);
     mainScreen.quaternion.identity();
     ceilingScreen.rotation.set(Math.PI / 2, 0, 0);
-    ceilingScreen.position.set(0, 5.55, -1.15);
+    ceilingScreen.position.set(0, 5.55, -2.45);
     setCameraPose(context, [0, 3.1, 7.8], [0, 2.7, -3.0]);
     setStatus("Stage reset to the ENTROPY preview origin.");
   };
@@ -214,18 +427,56 @@ onStart((context) => {
       setStatus("Window/screen capture requires HTTPS or localhost.", "warn");
       return;
     }
-    setStatus("Waiting for the browser window/screen picker…");
+    if (!navigator.mediaDevices?.getDisplayMedia) {
+      setStatus("This browser does not support window/screen capture.", "error");
+      return;
+    }
+    ui.shareScreen.disabled = true;
+    setStatus("Opening the system window/screen picker…");
     try {
-      await capture.share({ device: "Screen" });
-      setStatus("Live share started. Main curved LED uses the full source; ceiling uses its centre half.");
+      hideMappingTest();
+      const selectedStream = await navigator.mediaDevices.getDisplayMedia({
+        video: { frameRate: { ideal: 24 }, width: { max: 2560 }, height: { max: 1440 } },
+        audio: false,
+      });
+      if (context.connection.isInRoom && typeof capture.setStream === "function") {
+        // ScreenCapture blocks its own picker until networking is ready. Starting native
+        // capture first keeps window selection responsive, then hands the stream to Needle.
+        capture.setStream(selectedStream, 1);
+        setStatus("Live share started. Both screens read the same source.");
+      } else {
+        localFallbackStream = selectedStream;
+        player.setVideo(localFallbackStream);
+        player.muted = true;
+        for (const track of localFallbackStream.getTracks()) {
+          track.addEventListener("ended", () => {
+            localFallbackStream = null;
+            setStatus("Window share stopped.");
+          });
+        }
+        setStatus("Local window share started. Networking room is still connecting.", "warn");
+      }
     } catch (error) {
-      console.error(error);
-      setStatus(`Capture did not start: ${error instanceof Error ? error.message : String(error)}`, "error");
+      if (error instanceof DOMException && error.name === "NotAllowedError") {
+        setStatus("Window selection cancelled or permission denied.", "warn");
+      } else {
+        console.error(error);
+        setStatus(
+          `Capture did not start: ${error instanceof Error ? error.message : String(error)}`,
+          "error",
+        );
+      }
+    } finally {
+      ui.shareScreen.disabled = false;
     }
   });
 
   ui.stopShare.addEventListener("click", () => {
     capture.close();
+    if (localFallbackStream) {
+      for (const track of localFallbackStream.getTracks()) track.stop();
+      localFallbackStream = null;
+    }
     setStatus("Live share stopped.");
   });
 
@@ -261,9 +512,154 @@ onStart((context) => {
     setStatus(ceilingVisible ? "Ceiling LED visible." : "Ceiling LED hidden.");
   });
 
+  ui.brightness.addEventListener("input", () => {
+    setScreenBrightness(ui.brightness.value);
+  });
+
+  ui.hideHud.addEventListener("click", () => {
+    ui.hud.hidden = true;
+    ui.showHud.hidden = false;
+  });
+
+  ui.showHud.addEventListener("click", () => {
+    ui.hud.hidden = false;
+    ui.showHud.hidden = true;
+  });
+
+  ui.toggleMappingTest.addEventListener("click", async () => {
+    if (mappingTestActive) {
+      hideMappingTest();
+      setStatus("Mapping test hidden.");
+      return;
+    }
+
+    try {
+      const loader = new THREE.TextureLoader();
+      mainMappingTexture ??= await loader.loadAsync(
+        new URL("./mapping-main-2500x900.svg", import.meta.url).href,
+      );
+      mainMappingTexture.colorSpace = THREE.SRGBColorSpace;
+      const activeMainMaterial = getMainDisplayMaterial();
+      const activeCeilingMaterial = getCeilingDisplayMaterial();
+      texturesBeforeMappingTest = {
+        main: activeMainMaterial.map,
+        ceiling: activeCeilingMaterial.map,
+      };
+      activeMainMaterial.map = mainMappingTexture;
+      activeCeilingMaterial.map = mainMappingTexture;
+      activeMainMaterial.needsUpdate = true;
+      activeCeilingMaterial.needsUpdate = true;
+      mappingTestActive = true;
+      updateAllMappings();
+      ui.toggleMappingTest.textContent = "Hide Mapping Test";
+      setStatus(
+        "Mapping test active: both screens read the same source; ceiling uses center crop.",
+      );
+    } catch (error) {
+      setStatus(
+        `Mapping test failed: ${error instanceof Error ? error.message : String(error)}`,
+        "error",
+      );
+    }
+  });
+
+  ui.mappingSurface.addEventListener("change", syncMappingEditor);
+  for (const control of [
+    ui.mappingUOffset,
+    ui.mappingVOffset,
+    ui.mappingUScale,
+    ui.mappingVScale,
+    ui.mappingRotation,
+    ui.mappingFlipU,
+    ui.mappingFlipV,
+  ]) {
+    control.addEventListener("input", updateSelectedMapping);
+  }
+
+  ui.resetMapping.addEventListener("click", () => {
+    const surfaceName = ui.mappingSurface.value;
+    mappingSettings[surfaceName] = structuredClone(mappingDefaults[surfaceName]);
+    updateSurfaceMapping(surfaceName);
+    syncMappingEditor();
+    setStatus(`${surfaceName === "main" ? "Main" : "Ceiling"} UV mapping reset.`);
+  });
+
+  let uvDrag = null;
+  const getUvCanvasPoint = (event) => {
+    const bounds = ui.uvCanvas.getBoundingClientRect();
+    return {
+      x: ((event.clientX - bounds.left) / bounds.width) * 400,
+      y: ((event.clientY - bounds.top) / bounds.height) * 250,
+    };
+  };
+
+  ui.uvCanvas.addEventListener("pointerdown", (event) => {
+    const action = event.target.dataset.action;
+    if (!action) return;
+    const surfaceName = ui.mappingSurface.value;
+    const point = getUvCanvasPoint(event);
+    uvDrag = {
+      action,
+      pointerId: event.pointerId,
+      surfaceName,
+      startPoint: point,
+      startMapping: structuredClone(mappingSettings[surfaceName]),
+    };
+    ui.uvCanvas.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+
+  ui.uvCanvas.addEventListener("pointermove", (event) => {
+    if (!uvDrag || uvDrag.pointerId !== event.pointerId) return;
+    const point = getUvCanvasPoint(event);
+    const mapping = mappingSettings[uvDrag.surfaceName];
+    const start = uvDrag.startMapping;
+
+    if (uvDrag.action === "move") {
+      mapping.uOffset = THREE.MathUtils.clamp(
+        start.uOffset + (point.x - uvDrag.startPoint.x) / 360,
+        -1,
+        1,
+      );
+      mapping.vOffset = THREE.MathUtils.clamp(
+        start.vOffset - (point.y - uvDrag.startPoint.y) / 200,
+        -1,
+        1,
+      );
+    } else if (uvDrag.action === "scale") {
+      const centerX = 20 + 360 * (0.5 + start.uOffset);
+      const centerY = 25 + 200 * (0.5 - start.vOffset);
+      const angle = THREE.MathUtils.degToRad(start.rotation);
+      const deltaX = point.x - centerX;
+      const deltaY = point.y - centerY;
+      const localX = deltaX * Math.cos(angle) - deltaY * Math.sin(angle);
+      const localY = deltaX * Math.sin(angle) + deltaY * Math.cos(angle);
+      mapping.uScale = THREE.MathUtils.clamp(Math.abs(localX) / 180, 0.1, 2);
+      mapping.vScale = THREE.MathUtils.clamp(Math.abs(localY) / 100, 0.1, 2);
+    } else if (uvDrag.action === "rotate") {
+      const centerX = 20 + 360 * (0.5 + start.uOffset);
+      const centerY = 25 + 200 * (0.5 - start.vOffset);
+      const angle = THREE.MathUtils.radToDeg(Math.atan2(point.y - centerY, point.x - centerX));
+      mapping.rotation = (((Math.round((-angle - 90) / 90) * 90) % 360) + 360) % 360;
+    }
+
+    commitGraphicalMapping(uvDrag.surfaceName);
+  });
+
+  const endUvDrag = (event) => {
+    if (!uvDrag || uvDrag.pointerId !== event.pointerId) return;
+    ui.uvCanvas.releasePointerCapture(event.pointerId);
+    uvDrag = null;
+  };
+  ui.uvCanvas.addEventListener("pointerup", endUvDrag);
+  ui.uvCanvas.addEventListener("pointercancel", endUvDrag);
+
   window.addEventListener("pagehide", () => cancelAnimationFrame(raf), { once: true });
 
   resetStage();
+  setScreenBrightness(ui.brightness.value);
+  updateAllMappings();
+  syncMappingEditor();
   ui.toggleCeiling.textContent = "Hide Ceiling";
   setStatus(`Ready in room ${roomId}. Use Pick Window / Screen on the source computer.`);
 });
