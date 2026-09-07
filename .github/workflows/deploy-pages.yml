@@ -25,7 +25,7 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm run verify
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
