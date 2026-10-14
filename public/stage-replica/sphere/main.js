@@ -28,7 +28,9 @@ const adaptationModes = sceneJson.adaptationModes;
 
 // Cue behaviour lives here; venue geometry lives in scene.json (see AGENTS.md).
 const STATE_PARAMS = {
-  HORIZON: { elevMax: 0.3, azMax: 0.55, bright: 0.34, density: 0.16, aperture: 0 },
+  // V2 composition area: HORIZON covered only 0.8% of the dome surface, below the threshold where
+  // a viewer can tell there is any content at all. Widened and brightened; timing is untouched.
+  HORIZON: { elevMax: 0.42, azMax: 0.85, bright: 0.46, density: 0.2, aperture: 0 },
   ENCLOSE: { elevMax: 0.86, azMax: 1.55, bright: 0.62, density: 0.44, aperture: 0 },
   // FULL_FIELD deliberately overshoots PI so the fixed feather finishes outside the dome.
   FULL_FIELD: {
@@ -221,6 +223,30 @@ const performerHeightRule = new THREE.Line(
 );
 scene.add(performerHeightRule);
 
+// Second scale anchor (V2 viewing relationship). Three 1.7 m reference posts at different
+// distances on the audience side — scale marks, not an audience simulation: the brief rules out
+// crowd simulation, but one ~30 px performer cannot carry scale on its own.
+const scalePostMaterial = new THREE.LineBasicMaterial({
+  color: 0x7cc4ff,
+  transparent: true,
+  opacity: 0.7,
+});
+for (const spot of [
+  [-3.5, 6.5],
+  [3.5, 6.5],
+  [0, 10.5],
+]) {
+  scene.add(
+    new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(spot[0], 0, spot[1]),
+        new THREE.Vector3(spot[0], performerHeight, spot[1]),
+      ]),
+      scalePostMaterial,
+    ),
+  );
+}
+
 // ---------------------------------------------------------------- dome
 const source = createSource();
 
@@ -234,6 +260,7 @@ const uniforms = {
   uAperture: { value: 0 },
   uFeed: { value: 0 },
   uMode: { value: 0 },
+  uAzCenter: { value: 0 },
   uFitLo: { value: new THREE.Vector2(0, 0) },
   uFitHi: { value: new THREE.Vector2(1, 1) },
 };
@@ -260,6 +287,7 @@ const dome = new THREE.Mesh(
       uniform float uAperture;
       uniform float uFeed;
       uniform float uMode;
+      uniform float uAzCenter;
       uniform vec2 uFitLo;
       uniform vec2 uFitHi;
       varying vec3 vPos;
@@ -280,7 +308,12 @@ const dome = new THREE.Mesh(
         // azimuth 0 = the direction the audience faces; elevation 0 = horizon.
         float elev = asin(clamp(vPos.y / radius, 0.0, 1.0));
         float az = atan(vPos.x, -vPos.z);
-        float azAbs = abs(az);
+        // V2 viewing relationship: the azimuth is measured RELATIVE to where the current viewer
+        // looks. A dome has no single front, so a world-locked window leaves whoever is not in
+        // the middle of the room staring at an empty shell (V1's STAGE_LOOKBACK was black).
+        float azRel = az - uAzCenter;
+        azRel = atan(sin(azRel), cos(azRel));
+        float azAbs = abs(azRel);
 
         // Occupied area is the primary difference between the four states.
         // Feather widths are fixed in radians (not a fraction of the state), otherwise a
@@ -292,8 +325,12 @@ const dome = new THREE.Mesh(
         float cover = bandE * bandA;
 
         // APERTURE is a different shape, not a smaller band: one centred opening.
-        vec2 window = vec2((elev - 0.55) / 0.42, az / 0.34);
-        float apertureMask = 1.0 - smoothstep(0.55, 1.0, length(window));
+        // V2: a crisper edge plus a rim, so it reads as an aperture instead of a soft patch.
+        vec2 window = vec2((elev - 0.55) / 0.42, azRel / 0.34);
+        float windowRadius = length(window);
+        float apertureMask = 1.0 - smoothstep(0.82, 1.0, windowRadius);
+        float apertureRim =
+          smoothstep(0.62, 0.86, windowRadius) * (1.0 - smoothstep(0.94, 1.06, windowRadius));
         cover = mix(cover, apertureMask, uAperture);
 
         if (cover < 0.002) {
@@ -301,12 +338,15 @@ const dome = new THREE.Mesh(
           return;
         }
 
-        vec2 master = vec2((az + PI) / (2.0 * PI), elev / (PI * 0.5));
+        vec2 master = vec2((azRel + PI) / (2.0 * PI), elev / (PI * 0.5));
         vec2 srcUv;
         float procedural = 0.2;
 
         if (uMode < 0.5) {
-          vec2 windowUv = vec2(az / (2.0 * max(uAzMax, 0.0001)) + 0.5, elev / max(uElevMax, 0.0001));
+          vec2 windowUv = vec2(
+            azRel / (2.0 * max(uAzMax, 0.0001)) + 0.5,
+            elev / max(uElevMax, 0.0001)
+          );
           float inside = step(uFitLo.x, windowUv.x) * step(windowUv.x, uFitHi.x);
           inside *= step(uFitLo.y, windowUv.y) * step(windowUv.y, uFitHi.y);
           srcUv = (windowUv - uFitLo) / max(uFitHi - uFitLo, vec2(0.0001));
@@ -334,6 +374,7 @@ const dome = new THREE.Mesh(
 
         vec3 tint = mix(vec3(0.42, 0.49, 0.6), vec3(0.8, 0.86, 0.95), uFeed);
         vec3 colour = tint * (0.18 + 0.82 * src.g) + tint * field * (0.25 + luma) * (0.6 + procedural);
+        colour += tint * apertureRim * uAperture * 0.55;
         colour *= uBright * cover * mix(0.5, 1.0, uFeed);
 
         gl_FragColor = vec4(colour, 1.0);
@@ -357,6 +398,8 @@ const cameraList = presetCameras.map((preset) => {
   return camera;
 });
 const cameraById = new Map(cameraList.map((camera) => [camera.name, camera]));
+
+const viewDirection = new THREE.Vector3();
 
 const debugCamera = cameraById.get("DEBUG_ORBIT");
 const controls = new OrbitControls(debugCamera, renderer.domElement);
@@ -625,6 +668,11 @@ renderer.setAnimationLoop(() => {
   uniforms.uAperture.value = sample.aperture;
   uniforms.uFeed.value = feed;
   uniforms.uMode.value = modeIndex;
+
+  // Point the media window at whoever is watching: the azimuth origin follows the program
+  // camera around the dome, so no viewpoint is left facing an empty shell.
+  programFor().getWorldDirection(viewDirection);
+  uniforms.uAzCenter.value = Math.atan2(viewDirection.x, -viewDirection.z);
 
   // front-window uses the shared fit math: the window's real aspect comes from the
   // angular extent it covers at the dome radius.

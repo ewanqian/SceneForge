@@ -36,17 +36,17 @@
     {
       "id": "AUDIENCE_CENTER",
       "label": "观众正中",
-      "position": [0, 1.6, 12],
-      "target": [0, 3.0, 0],
-      "fovDeg": 62,
+      "position": [0, 1.6, 10],
+      "target": [0, 5.5, -2],
+      "fovDeg": 66,
       "eyeHeightM": 1.6
     },
     {
       "id": "AUDIENCE_LEFT",
       "label": "观众偏左",
       "position": [-6.5, 1.6, 10.5],
-      "target": [0, 3.0, 0],
-      "fovDeg": 62,
+      "target": [0, 5.5, -2],
+      "fovDeg": 66,
       "eyeHeightM": 1.6
     },
     {

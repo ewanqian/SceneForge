@@ -69,7 +69,14 @@ Sphere is the only demo started.
 - `V1.1` — review fixes applied without overwriting V1: true dome-coverage metric, the 5 m scale bar
   actually renders, accurate raster badge, reference link, and a scripted director pass
   (`?cuts=1`) recorded as `sphere/delivery/v1.1-director-32s.mp4`.
-- `V2`, `DELIVERY` — not started. V2 scope is fixed in `review-v1.md` §6.
+- `V2` — done. Exactly two axes changed, timing left untouched so the improvement stays
+  attributable: the media window now follows the viewer's azimuth (`uAzCenter`) instead of a fixed
+  world front, the program framing was raised so the image actually fills the frame, three 1.7 m
+  scale posts were added, `HORIZON` was widened and brightened, and `APERTURE` got a defined edge
+  plus a rim. Measured lit area: FULL_FIELD 69.7% → 84.8%; STAGE_LOOKBACK at FULL_FIELD 21.0% →
+  87.9%. See `review-diff-v1-v2.md`.
+- `DELIVERY` — in progress. The V2 recording and stills exist; the 20–30 s edit, the
+  `reference → graybox → V1 → V2` comparison sheet and the final README are outstanding.
 - Festival / Installation / Stadium — not started.
 
 ## Controls
