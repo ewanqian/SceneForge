@@ -1,0 +1,83 @@
+{
+  "sceneId": "festival-two-wall-a",
+  "units": "meters",
+  "note": "教学预演 proxy。参考（Vita Motus / Coachella Quasar 2024）确认了「两块对置 monolithic LED 墙 + 艺人在中央 + 实时内容播放 + 与场地景观共存」的关系，但未公布任何尺寸；本文件所有数字均为自定 proxy。",
+  "structure": {
+    "stage": { "widthM": 44, "depthM": 20, "centerZ": -6 },
+    "djPlatform": { "shape": "triangle", "widthM": 6, "depthM": 4, "heightM": 0.9 },
+    "performerHeightM": 1.7,
+    "eyeHeightM": 1.6,
+    "gridSpacingM": 4,
+    "scaleBarM": 5,
+    "note": "DJ 平台为三角形有参考依据（The Desert Sun：triangular DJ stage in the center）；尺寸无依据。"
+  },
+  "screens": [
+    {
+      "id": "SCREEN_L",
+      "shape": "plane",
+      "physicalSize": { "widthM": 18, "heightM": 9 },
+      "raster": { "master": "2048x1024" },
+      "transform": { "positionM": [-13, 4.5, -10], "rotationDeg": [0, 18, 0] },
+      "source": { "type": "procedural", "id": "shared-generative", "state": "live" },
+      "fallback": { "type": "local-loop", "id": "screen-fallback-loop" }
+    },
+    {
+      "id": "SCREEN_R",
+      "shape": "plane",
+      "physicalSize": { "widthM": 18, "heightM": 9 },
+      "raster": { "master": "2048x1024" },
+      "transform": { "positionM": [13, 4.5, -10], "rotationDeg": [0, -18, 0] },
+      "source": { "type": "procedural", "id": "shared-generative", "state": "live" },
+      "fallback": { "type": "local-loop", "id": "screen-fallback-loop" }
+    }
+  ],
+  "screenRelationship": {
+    "note": "本 Demo 的核心变量：join=0 时两屏各自显示不同内容，join=1 时两屏合成同一张连续画面。",
+    "sharedSource": true
+  },
+  "cameras": [
+    {
+      "id": "FOH_WIDE",
+      "label": "FOH 大广角",
+      "position": [0, 6.5, 30],
+      "target": [0, 5, -9],
+      "fovDeg": 58,
+      "eyeHeightM": null
+    },
+    {
+      "id": "DJ_FRONT",
+      "label": "中轴近景",
+      "position": [0, 2.2, 13],
+      "target": [0, 3.0, -2],
+      "fovDeg": 52,
+      "eyeHeightM": 2.2
+    },
+    {
+      "id": "STAGE_LEFT",
+      "label": "左前 35°",
+      "position": [-17, 4.5, 7],
+      "target": [0, 4.5, -6],
+      "fovDeg": 62,
+      "eyeHeightM": 4.5
+    },
+    {
+      "id": "HIGH_WIDE",
+      "label": "高位全景",
+      "position": [0, 26, 38],
+      "target": [0, 3, -8],
+      "fovDeg": 48,
+      "eyeHeightM": null
+    }
+  ],
+  "cue": {
+    "durationSec": 32,
+    "rampSec": 1.6,
+    "states": [
+      { "id": "LOW", "label": "铺垫", "start": 0, "end": 8 },
+      { "id": "BUILD", "label": "建立", "start": 8, "end": 16 },
+      { "id": "PEAK", "label": "爆发", "start": 16, "end": 24 },
+      { "id": "RELEASE", "label": "收束", "start": 24, "end": 32 }
+    ]
+  },
+  "programCamera": "FOH_WIDE"
+}

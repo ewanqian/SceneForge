@@ -26,6 +26,9 @@ coverage/
 **/_review_frames/
 **/_review_shots/
 
+# Local-only third-party reference captures (this repository is public; we link, not republish).
+**/_local/
+
 # OS
 .DS_Store
 Thumbs.db

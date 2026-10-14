@@ -164,27 +164,64 @@
       "role": "最容易一眼看懂课程怎么玩的音乐节案例",
       "question": "两块巨型屏幕什么时候应该独立，什么时候应该连成一个整体？中央 performer 怎样保持视觉中心？",
       "done": "不是把两个屏幕都塞满，而是在预演里真正看出「什么时候分开、什么时候连接」会改变演出。",
-      "run": null,
+      "run": { "label": "打开预演", "url": "festival/" },
       "stages": {
-        "REFERENCE": "todo",
-        "GRAYBOX": "todo",
-        "V1": "todo",
-        "REVIEW": "todo",
+        "REFERENCE": "done",
+        "GRAYBOX": "done",
+        "V1": "done",
+        "REVIEW": "active",
         "V2": "todo",
         "DELIVERY": "todo"
       },
-      "states": [],
-      "views": [],
+      "states": [
+        { "id": "LOW", "label": "铺垫 · 两块独立 5%", "url": "festival/?t=4&quad=0" },
+        { "id": "BUILD", "label": "建立 · 过渡 45%", "url": "festival/?t=12&quad=0" },
+        { "id": "PEAK", "label": "爆发 · 合成整体 100%", "url": "festival/?t=20&quad=0" },
+        { "id": "RELEASE", "label": "收束 · 回到 15%", "url": "festival/?t=28&quad=0" }
+      ],
+      "views": [
+        { "id": "FOH_WIDE", "url": "festival/?t=20&view=FOH_WIDE&quad=0" },
+        { "id": "DJ_FRONT", "url": "festival/?t=20&view=DJ_FRONT&quad=0" },
+        { "id": "STAGE_LEFT", "url": "festival/?t=20&view=STAGE_LEFT&quad=0" },
+        { "id": "HIGH_WIDE", "url": "festival/?t=20&view=HIGH_WIDE&quad=1" }
+      ],
       "modes": [],
+      "artifacts": [
+        {
+          "label": "▶ V1 导演版录屏 32s（含四次切机位 + 丢源）",
+          "url": "festival/delivery/v1-director-32s.mp4",
+          "primary": true
+        },
+        { "label": "V1 PEAK（两屏合成一个环）", "url": "festival/stills/v1-peak.png" },
+        { "label": "V1 LOW（两块各自完整）", "url": "festival/stills/v1-low.png" },
+        { "label": "V1 PEAK 中轴近景", "url": "festival/stills/v1-dj-peak.png" },
+        {
+          "label": "REFERENCE（三条链接全部核验）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/festival/reference/reference.md"
+        }
+      ],
       "proxy": [
         ["舞台", "44 × 20 m", "教学 proxy"],
-        ["Screen L / R", "18 × 9 m，各内旋 18°", "教学 proxy"],
-        ["DJ 平台", "6 × 4 m", "教学 proxy"],
-        ["单屏 raster", "2048 × 1024", "proxy"]
+        ["Screen L / R", "18 × 9 m，各内旋 18°", "教学 proxy（内旋角为自定）"],
+        ["DJ 平台", "6 × 4 m 三角形", "形状有参考依据，尺寸无"],
+        ["单屏 raster", "2048 × 1024", "proxy"],
+        ["中央间距", "8.9 m", "由几何推导，非参考数据"]
       ],
-      "confirmed": ["Quasar 2024：两块 monolithic LED walls、艺人在中间、支持实时 playback"],
-      "v1Observations": [],
-      "next": "等 Sphere 闭环后启动：REFERENCE LOCK（核对 Vita Motus 链接）→ 双屏灰盒。",
+      "confirmed": [
+        "两块 monolithic LED walls，艺人在中间（Vita Motus 原文 / IQ Magazine）",
+        "中央是 triangular DJ stage，Shaw 称之为 digital scenic（The Desert Sun）",
+        "X-Live + Unreal Engine 实时内容播放（Vita Motus 官方）",
+        "用 AR 与 Coachella 背景结合（Coachella Valley Weekly）；设计提到 mirror",
+        "制作设计 Vita Motus，音乐节制作 Goldenvoice，取代 Sahara 帐篷位置"
+      ],
+      "v1Observations": [
+        "「合成一个整体」必须有一个跨缝的地标才看得出来。第一版源内容没有跨缝形状，LOW 与 PEAK 两块屏看起来几乎一样——已改为在 u=0.5 放一个环：PEAK 时两屏各持一半、在缝处合成完整环，LOW 时每屏各有一个完整但大小位置不同的环。构建期发现并已在冻结前修掉。",
+        "FOH_WIDE 原本在 z=44，舞台只占画面中间一条窄带；已收到 z=30 并收紧 fov。",
+        "两屏之间 8.9 m 的真实缺口意味着「合成一个整体」永远不可能无缝——这正是值得预演的地方，但也意味着 PEAK 的判据应是「构图连成一体」而不是「像素连续」。",
+        "performer 在 FOH 大广角里仍然很小；只有中轴近景才读得出尺度。",
+        "舞台地面偏暗，作为空间证据的地面网格在远景里几乎不可读。"
+      ],
+      "next": "独立 REVIEW：让不参与构建的 agent 看 V1，重点核对「两屏拆分/合成是否真的可读」，以及四状态是否只是换了亮度。之后 V2 至少改两项。",
       "notesKey": "stagereplica.review.festival"
     },
     {
