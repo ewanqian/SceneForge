@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#05070a" />
+    <title>Stage Replica · 内部审核看板</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #05070a;
+        --panel: rgba(12, 15, 20, 0.86);
+        --line: rgba(255, 255, 255, 0.14);
+        --dim: #8d97a3;
+        --text: #eef1f4;
+        --done: #7fd69b;
+        --active: #f0c98a;
+        --todo: #5d6775;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: radial-gradient(1200px 600px at 20% -10%, #0d1622 0%, var(--bg) 60%);
+        color: var(--text);
+        padding: 20px max(14px, env(safe-area-inset-left)) 60px max(14px, env(safe-area-inset-right));
+        line-height: 1.5;
+      }
+      .wrap { max-width: 1100px; margin: 0 auto; }
+      header h1 { font-size: 19px; margin: 0 0 4px; letter-spacing: 0.01em; }
+      header .sub { font-size: 12.5px; color: var(--dim); }
+      .links { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+      .links a {
+        font-size: 11.5px; color: #cfe0f5; text-decoration: none;
+        border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .links a:hover { background: rgba(255, 255, 255, 0.11); }
+      .cards { display: grid; gap: 14px; margin-top: 18px; }
+      .card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 14px; }
+      .card-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+      .card-head h2 { font-size: 15.5px; margin: 0; }
+      .pill { font-size: 10.5px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--dim); }
+      .pill.p0 { color: #ff9f9f; border-color: rgba(255, 120, 120, 0.4); }
+      .pill.p1 { color: #ffd29f; border-color: rgba(255, 200, 120, 0.4); }
+      .pill.p2 { color: #b9d5ff; border-color: rgba(140, 180, 255, 0.4); }
+      .pill.p3 { color: #c9c9d6; }
+      .q { font-size: 12.5px; color: #c6cfd9; margin: 8px 0 0; padding-left: 10px; border-left: 2px solid rgba(124, 196, 255, 0.4); }
+      .done-note { font-size: 12px; color: var(--dim); margin: 6px 0 0; }
+      .stages { display: flex; flex-wrap: wrap; gap: 5px; margin: 11px 0 0; }
+      .stage { font-size: 10.5px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--line); color: var(--todo); }
+      .stage[data-s="done"] { color: #06110a; background: var(--done); border-color: transparent; font-weight: 650; }
+      .stage[data-s="active"] { color: #1a1206; background: var(--active); border-color: transparent; font-weight: 650; }
+      .section { margin-top: 12px; }
+      .section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--dim); margin: 0 0 6px; }
+      .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .chips a {
+        font-size: 11.5px; text-decoration: none; color: var(--text);
+        border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; min-height: 34px;
+        display: inline-flex; align-items: center; background: rgba(255, 255, 255, 0.05);
+      }
+      .chips a:hover { background: rgba(255, 255, 255, 0.13); }
+      .chips a.run { background: #f3f5f7; color: #07090d; border-color: transparent; font-weight: 650; }
+      table { width: 100%; border-collapse: collapse; font-size: 12px; }
+      th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); vertical-align: top; }
+      th { color: var(--dim); font-weight: 500; white-space: nowrap; }
+      ul { margin: 0; padding-left: 18px; font-size: 12px; color: #c6cfd9; }
+      li { margin-bottom: 4px; }
+      li.gap { color: #f0c98a; }
+      textarea {
+        width: 100%; min-height: 74px; resize: vertical; font: inherit; font-size: 12px;
+        color: var(--text); background: rgba(255, 255, 255, 0.045);
+        border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px;
+      }
+      .note-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 7px; }
+      button {
+        min-height: 36px; border-radius: 9px; border: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.07); color: var(--text);
+        padding: 8px 11px; font: inherit; font-size: 12px; cursor: pointer;
+      }
+      button:hover { background: rgba(255, 255, 255, 0.14); }
+      button.primary { background: #f3f5f7; color: #07090d; border-color: transparent; font-weight: 650; }
+      .saved { font-size: 11px; color: var(--done); }
+      .global { border: 1px solid rgba(240, 201, 138, 0.35); border-radius: 14px; background: rgba(240, 201, 138, 0.06); padding: 14px; margin-top: 18px; }
+      .global h2 { font-size: 14px; margin: 0 0 8px; color: #f0c98a; }
+      details { border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; margin-top: 10px; }
+      summary { cursor: pointer; font-size: 12px; color: #c6cfd9; }
+      footer { margin-top: 24px; font-size: 11.5px; color: var(--dim); }
+      .loading { color: var(--dim); font-size: 13px; }
+      @media (max-width: 560px) {
+        header h1 { font-size: 17px; }
+        .card { padding: 12px; }
+        th { white-space: normal; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1 id="title">Stage Replica · Demo Sprint</h1>
+        <div class="sub" id="subtitle">载入中…</div>
+        <div class="links" id="links"></div>
+      </header>
+
+      <div class="global" id="global" hidden>
+        <h2>当前全局缺口</h2>
+        <ul id="global-list"></ul>
+      </div>
+
+      <div class="cards" id="cards"><div class="loading">载入 status.json…</div></div>
+
+      <details id="questions">
+        <summary>统一验收问题（brief §1.4，7 条）</summary>
+        <ul id="question-list"></ul>
+      </details>
+
+      <div class="note-row" style="margin-top: 18px">
+        <button type="button" class="primary" id="export">导出全部批注 (JSON)</button>
+        <button type="button" id="clear">清空本机批注</button>
+        <span class="saved" id="save-state"></span>
+      </div>
+
+      <footer id="footer"></footer>
+    </div>
+
+    <script type="module">
+      const STATUS_URL = "./status.json";
+      const CHECK = { done: "✅", active: "▶", todo: "○" };
+
+      const noteKey = (id) => `stagereplica.review.${id}`;
+      const readNote = (id) => {
+        try {
+          return localStorage.getItem(noteKey(id)) ?? "";
+        } catch {
+          return "";
+        }
+      };
+      const writeNote = (id, value) => {
+        try {
+          localStorage.setItem(noteKey(id), value);
+        } catch {
+          /* private mode: notes stay in-memory only */
+        }
+      };
+
+      const element = (tag, className, text) => {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined) node.textContent = text;
+        return node;
+      };
+
+      const link = (label, url, className) => {
+        const anchor = element("a", className, label);
+        anchor.href = url;
+        anchor.target = "_blank";
+        anchor.rel = "noreferrer";
+        return anchor;
+      };
+
+      function renderChips(container, items, className) {
+        if (!items || items.length === 0) {
+          container.append(element("span", "sub", "尚未生成"));
+          return;
+        }
+        for (const item of items) {
+          container.append(link(item.label ? `${item.id}｜${item.label}` : item.id, item.url, className));
+        }
+      }
+
+      function renderDemo(demo) {
+        const card = element("div", "card");
+
+        const head = element("div", "card-head");
+        head.append(element("h2", null, demo.name));
+        head.append(element("span", `pill ${demo.priority.toLowerCase()}`, demo.priority));
+        head.append(element("span", "pill", `Issue #${demo.issue}`));
+        head.append(element("span", "pill", demo.role));
+        card.append(head);
+
+        card.append(element("p", "q", demo.question));
+        card.append(element("p", "done-note", `完成定义：${demo.done}`));
+
+        const stages = element("div", "stages");
+        for (const stage of Object.keys(demo.stages)) {
+          const chip = element("span", "stage", `${CHECK[demo.stages[stage]] ?? "○"} ${stage}`);
+          chip.dataset.s = demo.stages[stage];
+          chip.title = demo.stages[stage];
+          stages.append(chip);
+        }
+        card.append(stages);
+
+        if (demo.run) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "入口"));
+          const chips = element("div", "chips");
+          chips.append(link(`▶ ${demo.run.label}`, demo.run.url, "run"));
+          chips.append(link("回到看板", "./", ""));
+          chips.append(link("GitHub Issue", demo.issueUrl, ""));
+          section.append(chips);
+          card.append(section);
+        }
+
+        if (demo.states.length > 0) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "四状态直达（reviewer 逐状态核对）"));
+          const chips = element("div", "chips");
+          renderChips(chips, demo.states, "");
+          section.append(chips);
+          card.append(section);
+        }
+
+        if (demo.views.length > 0) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "机位 / 视点"));
+          const chips = element("div", "chips");
+          renderChips(chips, demo.views, "");
+          section.append(chips);
+          card.append(section);
+        }
+
+        if (demo.modes.length > 0) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "16:9 输入适配模式"));
+          const chips = element("div", "chips");
+          renderChips(chips, demo.modes, "");
+          section.append(chips);
+          card.append(section);
+        }
+
+        if (demo.proxy.length > 0) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "尺寸（proxy 与 confirmed 分离）"));
+          const table = element("table");
+          const headRow = element("tr");
+          headRow.append(element("th", null, "项目"), element("th", null, "值"), element("th", null, "性质"));
+          table.append(headRow);
+          for (const row of demo.proxy) {
+            const tr = element("tr");
+            for (const cell of row) tr.append(element("td", null, cell));
+            table.append(tr);
+          }
+          section.append(table);
+          card.append(section);
+        }
+
+        if (demo.confirmed.length > 0) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "可公开引用的参考事实"));
+          const list = element("ul");
+          for (const item of demo.confirmed) list.append(element("li", null, item));
+          section.append(list);
+          card.append(section);
+        }
+
+        if (demo.v1Observations.length > 0) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "V1 观察（待 review 阶段确认）"));
+          const list = element("ul");
+          for (const item of demo.v1Observations) list.append(element("li", "gap", item));
+          section.append(list);
+          card.append(section);
+        }
+
+        const nextSection = element("div", "section");
+        nextSection.append(element("h3", null, "下一步"));
+        nextSection.append(element("p", "done-note", demo.next));
+        card.append(nextSection);
+
+        const noteSection = element("div", "section");
+        noteSection.append(element("h3", null, "我的批注（存在本机浏览器，可导出）"));
+        const area = element("textarea");
+        area.placeholder = "例：FULL_FIELD 的内容和 dome 线框分不开，建议 V2 降低线框对比度；APERTURE 需要更像开口。";
+        area.value = readNote(demo.id);
+        const row = element("div", "note-row");
+        const save = element("button", null, "保存本机批注");
+        const state = element("span", "saved", "");
+        save.addEventListener("click", () => {
+          writeNote(demo.id, area.value);
+          state.textContent = "已保存";
+          setTimeout(() => {
+            state.textContent = "";
+          }, 1800);
+        });
+        row.append(save, state);
+        noteSection.append(area, row);
+        card.append(noteSection);
+
+        return card;
+      }
+
+      async function main() {
+        let status;
+        try {
+          const response = await fetch(STATUS_URL, { cache: "no-cache" });
+          status = await response.json();
+        } catch (error) {
+          document.getElementById("cards").innerHTML =
+            `<div class="loading">无法读取 ${STATUS_URL}：${String(error)}。请通过 http(s) 打开本页，不要用 file:// 。</div>`;
+          return;
+        }
+
+        document.title = `${status.title} · 内部审核`;
+        document.getElementById("title").textContent = status.title;
+        document.getElementById("subtitle").textContent = `${status.subtitle} · 更新于 ${status.updated}`;
+        document.getElementById("footer").textContent =
+          "尺寸均为教学 proxy。公开产物不得把 proxy 写成真实场馆尺寸。";
+
+        const links = document.getElementById("links");
+        links.append(link(status.brief.label, status.brief.url));
+        for (const source of status.sources) links.append(link(source.label, source.url));
+
+        const globalBox = document.getElementById("global");
+        const globalList = document.getElementById("global-list");
+        if (status.globalGaps.length > 0) {
+          globalBox.hidden = false;
+          for (const item of status.globalGaps) globalList.append(element("li", "gap", item));
+        }
+
+        const questionList = document.getElementById("question-list");
+        status.acceptanceQuestions.forEach((question, index) => {
+          questionList.append(element("li", null, `${index + 1}. ${question}`));
+        });
+
+        const cards = document.getElementById("cards");
+        cards.innerHTML = "";
+        for (const demo of status.demos) cards.append(renderDemo(demo));
+
+        document.getElementById("export").addEventListener("click", () => {
+          const notes = {};
+          for (const demo of status.demos) notes[demo.id] = readNote(demo.id);
+          const payload = { exportedAt: new Date().toISOString(), board: status.title, notes };
+          const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const anchor = document.createElement("a");
+          anchor.href = url;
+          anchor.download = "stage-replica-review-notes.json";
+          anchor.click();
+          URL.revokeObjectURL(url);
+          document.getElementById("save-state").textContent = "已导出 JSON";
+        });
+
+        document.getElementById("clear").addEventListener("click", () => {
+          for (const demo of status.demos) writeNote(demo.id, "");
+          for (const area of document.querySelectorAll("textarea")) area.value = "";
+          document.getElementById("save-state").textContent = "已清空";
+        });
+      }
+
+      main();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,202 @@
+{
+  "updated": "2026-10-15T07:20+08:00",
+  "title": "Stage Replica · Demo Sprint",
+  "subtitle": "内部审核看板 / Internal review board",
+  "brief": {
+    "label": "生产任务书 dsh-production-brief.md",
+    "url": "https://github.com/ewanqian/portfolio/blob/main/workshops/audiovisual-engineer-simulator/stage-replica/dsh-production-brief.md"
+  },
+  "sources": [
+    {
+      "label": "demo-packs.md（scene manifest / source / director 契约）",
+      "url": "https://github.com/ewanqian/portfolio/blob/main/workshops/audiovisual-engineer-simulator/stage-replica/demo-packs.md"
+    },
+    {
+      "label": "demo-prompts.md（Layout / Motion Cue / Agent Build 提示词）",
+      "url": "https://github.com/ewanqian/portfolio/blob/main/workshops/audiovisual-engineer-simulator/stage-replica/demo-prompts.md"
+    },
+    {
+      "label": "Sphere 参考冻结 reference.md（confirmed vs proxy）",
+      "url": "https://github.com/ewanqian/portfolio/blob/codex/stage-replica-sphere-20261015/lab/stage-replica/sphere/reference/reference.md"
+    },
+    {
+      "label": "Sphere 灰盒说明 NOTES.md（S2）",
+      "url": "https://github.com/ewanqian/portfolio/blob/codex/stage-replica-sphere-20261015/lab/stage-replica/sphere/build/NOTES.md"
+    }
+  ],
+  "pipeline": ["REFERENCE", "GRAYBOX", "V1", "REVIEW", "V2", "DELIVERY"],
+  "acceptanceQuestions": [
+    "10 秒内能不能看懂这个空间的核心关系？",
+    "人物、屏幕和观看位置是否有明确尺度？",
+    "四个状态真的有不同，还是只换了素材？",
+    "V1 完整播放后发现了什么问题？",
+    "V2 具体删掉、改变或保留了什么？",
+    "自己的内容放进去以后，是否真的比静态效果图多获得了信息？",
+    "这个 Demo 是否可以作为工作坊案例，让参与者理解「为什么要预演」？"
+  ],
+  "globalGaps": [
+    "Festival / Installation / Stadium 的参考链接尚未逐条核验（各自 REFERENCE LOCK 阶段必须核验）。",
+    "dome / 双屏 / 圆柱屏 目前都不符合 SceneForge 的 venueManifestSchema（layout: box|arena，单一 screen）。Stage Replica 页面暂以独立静态页存在，schema 是否扩展待定。",
+    "S3 的录制通道（页面内 MediaRecorder 或 CDP 抓帧）尚未验证，V1/V2 录屏依赖它。"
+  ],
+  "demos": [
+    {
+      "id": "sphere",
+      "name": "Sphere / Immersive Dome",
+      "issue": 81,
+      "issueUrl": "https://github.com/ewanqian/portfolio/issues/81",
+      "priority": "P0",
+      "role": "大型演唱会 / 沉浸式空间主视觉",
+      "question": "同一个视觉从「前方一块屏」扩展到「包住整个观众」以后，构图、观看位置、音乐段落和视觉密度怎样改变？",
+      "done": "预演的意义不是提前看一个 Dome 模型，而是提前发现「画面占据整个视野以后，原来的视觉为什么必须重新编排」。",
+      "run": { "label": "打开预演", "url": "sphere/" },
+      "stages": {
+        "REFERENCE": "done",
+        "GRAYBOX": "done",
+        "V1": "active",
+        "REVIEW": "todo",
+        "V2": "todo",
+        "DELIVERY": "todo"
+      },
+      "states": [
+        { "id": "HORIZON", "label": "铺垫 · 占用 3.3%", "url": "sphere/?t=4&quad=0" },
+        { "id": "ENCLOSE", "label": "建立 · 占用 27%", "url": "sphere/?t=12&quad=0" },
+        { "id": "FULL_FIELD", "label": "爆发 · 占用 100%", "url": "sphere/?t=20&quad=0" },
+        { "id": "APERTURE", "label": "收束 · 占用 18%", "url": "sphere/?t=28&quad=0" }
+      ],
+      "views": [
+        { "id": "AUDIENCE_CENTER", "url": "sphere/?t=20&view=AUDIENCE_CENTER&quad=0" },
+        { "id": "AUDIENCE_LEFT", "url": "sphere/?t=20&view=AUDIENCE_LEFT&quad=0" },
+        { "id": "STAGE_LOOKBACK", "url": "sphere/?t=20&view=STAGE_LOOKBACK&quad=0" },
+        { "id": "DEBUG_ORBIT", "url": "sphere/?t=20&view=DEBUG_ORBIT&quad=1" }
+      ],
+      "modes": [
+        { "id": "front-window", "url": "sphere/?t=12&mode=front-window&quad=0" },
+        { "id": "mirror-extend", "url": "sphere/?t=20&mode=mirror-extend&quad=0" },
+        { "id": "shader-fill", "url": "sphere/?t=20&mode=shader-fill&quad=0" },
+        { "id": "square-master", "url": "sphere/?t=20&mode=square-master&quad=0" }
+      ],
+      "proxy": [
+        ["dome 半径", "25 m", "教学 proxy"],
+        ["观众地面", "⌀34 m", "教学 proxy"],
+        ["舞台平台", "14 × 8 m", "教学 proxy"],
+        ["舞台高", "0.9 m", "本项目补充 proxy"],
+        ["人物 / 眼高", "1.7 m / 1.6 m", "尺度参考"],
+        ["母版 proxy", "4096² / 2048²", "浏览器 proxy"]
+      ],
+      "confirmed": [
+        "Media Plane：16k × 16k，display surface 超过 3 acres",
+        "官方原文：wraps up, over and around the audience",
+        "Exosphere：580,000 平方英尺可编程外立面"
+      ],
+      "v1Observations": [
+        "（已在构建中发现并修复）方位羽化原本按状态比例缩放，导致 FULL_FIELD 在 ±180° 背后整片衰减为黑：名为满场、实为半场。已换成固定弧度羽化，并让 FULL_FIELD 的方位/仰角溢出面外，覆盖读数现为 100%。",
+        "（同上，读数已修）默认 front-window 模式下，源的适配窗口只覆盖约 46% 方位，所以 STAGE_LOOKBACK 在 FULL_FIELD 时仍全黑——这是模式语义而不是状态缺陷。HUD 原本只报「占用 100%」，与画面不符，现改为同时报「状态占用」与「窗口覆盖 方位/高度」。",
+        "FULL_FIELD 的程序化网格与 dome 线框结构视觉上混淆，容易被读成「模型线框」而不是「投影内容」。",
+        "APERTURE 目前是一个柔边亮块，还不像「开口 / 天空」，收束的语义偏弱。",
+        "STAGE_LOOKBACK 缺少尺度锚点：人物位于机位原点因此不可见，该视角目前只能读空间不能读尺度。",
+        "HORIZON 的状态亮度 0.34 在小窗口内接近看不清，需要判断是「刻意压暗」还是「压过头」。"
+      ],
+      "next": "S4：把 32s 完整跑一轮并录屏，将以上观察固化成 review-v1.md；S3 剩余项为录制通道验证。",
+      "notesKey": "stagereplica.review.sphere"
+    },
+    {
+      "id": "festival",
+      "name": "Festival / Two-Wall Stage",
+      "issue": 78,
+      "issueUrl": "https://github.com/ewanqian/portfolio/issues/78",
+      "priority": "P1",
+      "role": "最容易一眼看懂课程怎么玩的音乐节案例",
+      "question": "两块巨型屏幕什么时候应该独立，什么时候应该连成一个整体？中央 performer 怎样保持视觉中心？",
+      "done": "不是把两个屏幕都塞满，而是在预演里真正看出「什么时候分开、什么时候连接」会改变演出。",
+      "run": null,
+      "stages": {
+        "REFERENCE": "todo",
+        "GRAYBOX": "todo",
+        "V1": "todo",
+        "REVIEW": "todo",
+        "V2": "todo",
+        "DELIVERY": "todo"
+      },
+      "states": [],
+      "views": [],
+      "modes": [],
+      "proxy": [
+        ["舞台", "44 × 20 m", "教学 proxy"],
+        ["Screen L / R", "18 × 9 m，各内旋 18°", "教学 proxy"],
+        ["DJ 平台", "6 × 4 m", "教学 proxy"],
+        ["单屏 raster", "2048 × 1024", "proxy"]
+      ],
+      "confirmed": ["Quasar 2024：两块 monolithic LED walls、艺人在中间、支持实时 playback"],
+      "v1Observations": [],
+      "next": "等 Sphere 闭环后启动：REFERENCE LOCK（核对 Vita Motus 链接）→ 双屏灰盒。",
+      "notesKey": "stagereplica.review.festival"
+    },
+    {
+      "id": "installation",
+      "name": "Installation / Black Box",
+      "issue": 80,
+      "issueUrl": "https://github.com/ewanqian/portfolio/issues/80",
+      "priority": "P2",
+      "role": "证明 Stage Replica 不只适用于演唱会",
+      "question": "当素材很少、变化很慢时，尺寸、观看距离、声音与持续时间能否共同形成完整现场？",
+      "done": "少量素材也可以通过预演被组织成一个成立的现场；课程不是「做大屏模板」。",
+      "run": null,
+      "stages": {
+        "REFERENCE": "todo",
+        "GRAYBOX": "todo",
+        "V1": "todo",
+        "REVIEW": "todo",
+        "V2": "todo",
+        "DELIVERY": "todo"
+      },
+      "states": [],
+      "views": [],
+      "modes": [],
+      "proxy": [
+        ["主投影", "10.24 × 5.4 m", "可确认的最低展示尺寸"],
+        ["Raster", "4096 × 2160", "DCI 4K"],
+        ["黑盒", "14 × 18 × 7 m", "教学 proxy"],
+        ["观看距离", "6 – 12 m", "教学 proxy"],
+        ["可选地面", "10.24 × 5.4 m", "课程比较实验，非原作配置"]
+      ],
+      "confirmed": ["Ryoji Ikeda data-verse：DCI-4K DLP projector / computer / speakers"],
+      "v1Observations": [],
+      "next": "排期在 Festival 之后；重点是 duration / density / viewer distance。",
+      "notesKey": "stagereplica.review.installation"
+    },
+    {
+      "id": "stadium",
+      "name": "Stadium / 360° Concert",
+      "issue": 79,
+      "issueUrl": "https://github.com/ewanqian/portfolio/issues/79",
+      "priority": "P3",
+      "role": "Camera / Director / Program Out 技术强化",
+      "question": "同一条视觉进入 360° 圆柱媒体面以后，人物、观看位置和导播切换怎样改变最终观看结果？",
+      "done": "舞台预演不只是在看模型；摄像机本身也在重新编排演出。",
+      "run": null,
+      "stages": {
+        "REFERENCE": "todo",
+        "GRAYBOX": "todo",
+        "V1": "todo",
+        "REVIEW": "todo",
+        "V2": "todo",
+        "DELIVERY": "todo"
+      },
+      "states": [],
+      "views": [],
+      "modes": [],
+      "proxy": [
+        ["Arena proxy", "⌀120 m", "教学 proxy"],
+        ["主舞台", "⌀30 m", "可确认"],
+        ["LED 圆柱", "⌀20 m × 8 m 高", "8m 高为教学 proxy"],
+        ["Panorama 母版", "4096 × 512 / 2048 × 256", "proxy"],
+        ["观众规模", "约 95,000", "可确认"]
+      ],
+      "confirmed": ["STUFISH / Anna Vissi OAKA：360° in-the-round，⌀30 m 圆形舞台，⌀20 m 圆柱 LED"],
+      "v1Observations": [],
+      "next": "最后执行；补完 Quad Preview / Program Out / 多机位导播。",
+      "notesKey": "stagereplica.review.stadium"
+    }
+  ]
+}
