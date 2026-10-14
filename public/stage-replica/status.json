@@ -169,8 +169,8 @@
         "REFERENCE": "done",
         "GRAYBOX": "done",
         "V1": "done",
-        "REVIEW": "active",
-        "V2": "todo",
+        "REVIEW": "done",
+        "V2": "active",
         "DELIVERY": "todo"
       },
       "states": [
@@ -187,6 +187,10 @@
       ],
       "modes": [],
       "artifacts": [
+        {
+          "label": "独立 REVIEW（含构建者逐条裁定与 V2 范围）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-festival-v1.md"
+        },
         {
           "label": "▶ V1 导演版录屏 32s（含四次切机位 + 丢源）",
           "url": "festival/delivery/v1-director-32s.mp4",
@@ -215,13 +219,18 @@
         "制作设计 Vita Motus，音乐节制作 Goldenvoice，取代 Sahara 帐篷位置"
       ],
       "v1Observations": [
-        "「合成一个整体」必须有一个跨缝的地标才看得出来。第一版源内容没有跨缝形状，LOW 与 PEAK 两块屏看起来几乎一样——已改为在 u=0.5 放一个环：PEAK 时两屏各持一半、在缝处合成完整环，LOW 时每屏各有一个完整但大小位置不同的环。构建期发现并已在冻结前修掉。",
-        "FOH_WIDE 原本在 z=44，舞台只占画面中间一条窄带；已收到 z=30 并收紧 fov。",
-        "两屏之间 8.9 m 的真实缺口意味着「合成一个整体」永远不可能无缝——这正是值得预演的地方，但也意味着 PEAK 的判据应是「构图连成一体」而不是「像素连续」。",
-        "performer 在 FOH 大广角里仍然很小；只有中轴近景才读得出尺度。",
-        "舞台地面偏暗，作为空间证据的地面网格在远景里几乎不可读。"
+        "【独立 review 首位】PEAK 的「合成」被 168 px（≈5.6 m）黑场劈开，而每侧可见的半地标只有 90 px——缺口比地标本身还宽。join 是这个 Demo 的全部意义，但它在画面上不成立。",
+        "【独立 review】join 只在 FOH_WIDE / HIGH_WIDE 两个非人类机位上可读；DJ_FRONT 把两屏都裁出画外。两个「人站的位置」里反而读不到核心关系。",
+        "【独立 review】performer 站在墙面前方 10 m（平台在原点、屏在 z=−10），不在两屏「之间」。参考原文是 artists performing in the middle——这是我对参考的误读。",
+        "【独立 review】四状态不是四种构图：只有 join/density/bright 在 ramp，LOW 与 RELEASE 近似重复（5%/15%、0.16/0.24、0.46/0.52）；而 brief 对 RELEASE 的定义是「一侧先退、中心保留」，我只做了整体变暗——漏实现了一条明确要求。",
+        "【独立 review】18×9 m 屏幕是 2:1，源却是 16:9，着色器直接采样 → 画面被横向拉伸约 12.5%。角标宣称的 2048×1024 也不存在（实际 1280×720）。",
+        "【独立 review】`fallback` 声明 `local-loop`，实现却是「冻结 + 变暗」（跳过 source.draw）。声明与实现不符。",
+        "【独立 review】尺度只有 HUD 文字；三个机位 eyeHeightM=null，浮在 6.5 m / 26 m。预演的意义是从观看位置判断，浮空机位削弱了这个主张。",
+        "【构建者细化】评审说 PEAK 两屏是「互为镜像」，机制上更准确是「互补的两半」；但因为我选的地标是**对称椭圆**，互补的两半看起来就像镜像——根因是地标形状，这直接决定了 V2 要换非对称地标。",
+        "【已修・构建期】第一版源没有跨缝地标，LOW 与 PEAK 几乎一样；已改为 u=0.5 处的环。FOH_WIDE 也从 z=44 收到 z=30。",
+        "【已修・流程】评审 agent 的 scratch 文件（其中一个 .html）此前被误提交并导致 CI lint 失败；已从树中移除，并让 biome 排除所有 `**/_review_*` 与 `**/_local`，使评审草稿不可能再卡住 CI。"
       ],
-      "next": "独立 REVIEW：让不参与构建的 agent 看 V1，重点核对「两屏拆分/合成是否真的可读」，以及四状态是否只是换了亮度。之后 V2 至少改两项。",
+      "next": "V2 已确定三项（见 review-festival-v1.md 末尾裁定表）：①观看关系——把 performer 移到两屏之间、收窄缺口、重排机位（DJ_FRONT 必须看到两屏内缘，取消浮空高位）；②构图面积——源改 2:1 修掉拉伸、换非对称地标使合成可被证明、LOW 让两屏真的像两块不同内容；③状态节奏——按 brief 实现 RELEASE 的「一侧先退、中心保留」。另需把 fallback 做成真正的本地 loop，并用 ?hud=0&quad=0 单独出干净交付录屏。",
       "notesKey": "stagereplica.review.festival"
     },
     {
