@@ -55,7 +55,9 @@ height `1.6 m`, media proxy `4096² / 2048²`.
 
 ## Current state
 
-Sphere is the only demo started.
+Three demos are in flight; Sphere is complete.
+
+### Sphere (P0) — complete
 
 - `REFERENCE` — done. Confirmed/proxy separated; one dead reference URL found and replaced; two
   wordings in the brief were not supported by the official source and were corrected.
@@ -75,8 +77,73 @@ Sphere is the only demo started.
   scale posts were added, `HORIZON` was widened and brightened, and `APERTURE` got a defined edge
   plus a rim. Measured lit area: FULL_FIELD 69.7% → 84.8%; STAGE_LOOKBACK at FULL_FIELD 21.0% →
   87.9%. See `review-diff-v1-v2.md`.
-- `DELIVERY` — in progress. The V2 recording and stills exist; the 20–30 s edit, the
-  `reference → graybox → V1 → V2` comparison sheet and the final README are outstanding.
+- `DELIVERY` — done. 28.2 s delivery cut (`sphere/delivery/v2-promo-28s.mp4`), the
+  `reference → graybox → V1 → V2` comparison sheet
+  (`sphere/delivery/reference-graybox-v1-v2.png`), and the answers to the brief's seven
+  questions in `review-v1.md` §5 and `review-diff-v1-v2.md` §6.
+
+### Festival / Two-Wall Stage (P1) — V2 done, delivery in progress
+
+- `REFERENCE` — done. All three Vita Motus / Quasar links verified live. The brief's
+  description checks out, and two details are corrected or added: the centre element is
+  confirmed as a **triangular** DJ stage, and playback runs on **X-Live + Unreal Engine**.
+  The reference publishes **no dimensions**, so every number is a teaching proxy,
+  including the 18° inward angle.
+- `GRAYBOX` + `V1` — done and frozen. Two 18x9m walls, a triangular platform and a
+  performer between them; `join` (0 = two independent pictures, 1 = one continuous
+  picture) is the demo's single variable.
+- `REVIEW` — done, and it was the most productive step in the project. The independent
+  agent found that the join **did not hold on screen**: the two half-landmarks were
+  separated by 168 px of black while each half was only ~90 px. It also found the
+  performer standing 10 m *in front of* the wall plane rather than between the walls
+  (a misreading of the reference), that `join` was legible only from two non-human
+  cameras, that RELEASE did not implement the brief's "one side retreats first", that the
+  2:1 screens were fed a 16:9 source with no aspect correction, and that the declared
+  `local-loop` fallback was really a frozen frame. Full report and the builder's
+  adjudication: `review-festival-v1.md`.
+- `V2` — done. The performer moved into the throat of the V, the inner edges closed from
+  8.9 m to 3.28 m, the landmark became an **asymmetric diagonal** so the join is provable
+  rather than inferred, the source became 2048x1024 (2:1) matching both the screens and
+  the advertised raster, the independent state flips the right wall so the two walls read
+  as different pictures, RELEASE retreats one side first, and the fallback is a real
+  moving loop. See `review-diff-festival-v1-v2.md`.
+- `DELIVERY` — in progress. Clean 32 s director output
+  (`festival/delivery/v2-director-clean-32s.mp4`), a 28 s delivery cut, and the
+  `reference → V1 → V2` comparison sheet exist.
+
+### Installation / Black Box (P2) — V1 done, review next
+
+- `REFERENCE` — done. Both official links verified; the brief's two technical claims are
+  verbatim primary source (`DCI-4K DLP projector, computer, speakers` and
+  `dimensions variable (minimum: W10.24 x H5.4m)`). 4096x2160 is recorded as a derivation
+  from the confirmed DCI-4K projector, not a quotation.
+- `GRAYBOX` + `V1` — done. A 48 s cue (duration is the variable this demo tests), a
+  rule-based source sampled at four densities, and AFTERIMAGE implemented as a real
+  residual rather than a lower density. Audio is **not** implemented and is recorded as a
+  known gap.
+- `REVIEW`, `V2`, `DELIVERY` — not started.
+
+### Stadium / 360° Concert (P3)
+
+Not started. It is the last demo and the only one that carries Quad Preview / Program Out
+and multi-camera directing as its main subject.
+
+## Shared engineering conventions
+
+Established by Sphere and reused by the later demos:
+
+- the runtime lives in this repository under `public/stage-replica/<demo>/`;
+- `scene.json` follows one manifest shape (`screens[] / cameras[] / states[] / programCamera`),
+  with geometry in data and cue behaviour in code, per `AGENTS.md`;
+- `../shared/fit-math.js` is the single place media fits a surface;
+- every demo accepts the same deterministic review parameters (`?t=`, `?view=`, `?quad=`,
+  `?hud=`, `?drop`, `?dropAt=`, `?record=`, and `?cuts=` where directing applies), so a
+  reviewer can address an exact frame without operating the UI;
+- recordings are produced by `tools/record-cdp.mjs` (CDP screencast + ffmpeg), gated on
+  `__REPLICA_READY__` / `__REPLICA_DONE__` so load time is excluded and the clip matches the cue;
+- V1 is never overwritten: each revision keeps its own recording and stills;
+- review scratch is gitignored **and** excluded from biome, because biome lints HTML and a
+  reviewer's throwaway `.html` can otherwise fail CI.
 - Festival / Installation / Stadium — not started.
 
 ## Controls

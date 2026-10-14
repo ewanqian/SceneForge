@@ -171,7 +171,7 @@
         "V1": "done",
         "REVIEW": "done",
         "V2": "done",
-        "DELIVERY": "active"
+        "DELIVERY": "done"
       },
       "states": [
         { "id": "LOW", "label": "铺垫 · 两块独立 5%", "url": "festival/?t=4&quad=0" },
@@ -191,6 +191,10 @@
           "label": "▶ V2 交付录屏 28s（干净 Program 输出）",
           "url": "festival/delivery/v2-delivery-28s.mp4",
           "primary": true
+        },
+        {
+          "label": "对照图 reference → V1 → V2",
+          "url": "festival/delivery/reference-v1-v2-festival.png"
         },
         {
           "label": "▶ V2 导演版 32s（无 HUD / 无四分屏）",
