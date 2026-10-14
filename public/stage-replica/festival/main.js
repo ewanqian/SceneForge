@@ -1,7 +1,17 @@
-// Stage Replica — Festival / Two-Wall Stage.
+// Stage Replica — Festival / Two-Wall Stage (V2).
 //
 // The demo's whole point is one variable: do the two LED walls show different things, or do they
-// resolve into a single continuous image? Everything else is structure.
+// resolve into a single continuous image?
+//
+// V2 geometry changes come from the V1 review:
+//   - the performer now stands between the walls, not 10 m in front of them;
+//   - the inner edges are 3.28 m apart instead of 8.9 m, so the joined halves actually meet;
+//   - the source is 2048x1024 (2:1) to match the 18x9 m screens, removing V1's 12.5% stretch;
+//   - the cross-seam landmark is an ASYMMETRIC diagonal, so "joined" is provable rather than
+//     inferred from a symmetric shape;
+//   - the two walls really are different pictures in the independent state (the right wall is
+//     flipped), instead of the same picture at two scales;
+//   - RELEASE retreats one side first, as the brief specifies, instead of dimming uniformly.
 //
 // Deterministic review entry points:
 //   ?t=<seconds>   ?view=<id>   ?quad=0|1   ?hud=0|1   ?drop=1   ?dropAt=<sec>
@@ -12,8 +22,10 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { aspectOf } from "../shared/fit-math.js";
 
-const SOURCE_WIDTH = 1280;
-const SOURCE_HEIGHT = 720;
+// 2:1 to match the 18 x 9 m screens. This is also the raster the board advertises, so the
+// advertisement and the implementation now agree.
+const SOURCE_WIDTH = 2048;
+const SOURCE_HEIGHT = 1024;
 
 const params = new URLSearchParams(location.search);
 const sceneJson = await (await fetch("./scene.json")).json();
@@ -23,13 +35,12 @@ const presetCameras = sceneJson.cameras;
 const screenSpecs = sceneJson.screens;
 
 // Cue behaviour lives here; venue geometry lives in scene.json (see AGENTS.md).
-// `join` is the composition relationship: 0 = two independent images, 1 = one continuous image
-// spanning the pair. It is the axis this demo exists to test.
+// `join` is the composition relationship: 0 = two independent pictures, 1 = one continuous image.
 const STATE_PARAMS = {
-  LOW: { join: 0.05, density: 0.16, bright: 0.46, aperture: 0 },
-  BUILD: { join: 0.45, density: 0.5, bright: 0.72, aperture: 0 },
-  PEAK: { join: 1, density: 0.9, bright: 1, aperture: 0 },
-  RELEASE: { join: 0.15, density: 0.24, bright: 0.52, aperture: 0 },
+  LOW: { join: 0.05, density: 0.16, bright: 0.5 },
+  BUILD: { join: 0.45, density: 0.5, bright: 0.72 },
+  PEAK: { join: 1, density: 0.9, bright: 1 },
+  RELEASE: { join: 0.1, density: 0.26, bright: 0.55 },
 };
 
 const clamp = (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum);
@@ -53,6 +64,16 @@ function evaluateCue(time) {
   const ramp = easeInOut(clamp((clamped - state.start) / cueConfig.rampSec, 0, 1));
   const blend = (a, b) => a + (b - a) * ramp;
 
+  // RELEASE is defined by the brief as "one side withdraws first, the centre is retained".
+  // That is a different shape of state from a uniform dim, so it is driven by progress through
+  // the state rather than by the entry ramp.
+  const stateProgress = clamp(
+    (clamped - state.start) / Math.max(state.end - state.start, 0.001),
+    0,
+    1,
+  );
+  const retreat = state.id === "RELEASE" ? stateProgress : 0;
+
   return {
     id: state.id,
     label: state.label,
@@ -61,11 +82,14 @@ function evaluateCue(time) {
     join: blend(from.join, to.join),
     density: blend(from.density, to.density),
     bright: blend(from.bright, to.bright),
+    retreat,
     time: clamped,
   };
 }
 
 // ---------------------------------------------------------------- own source
+// One generating rule plus an ASYMMETRIC cross-seam landmark. The landmark matters: the diagonal
+// is broken at u=0.5, so it only becomes one continuous line when the two walls are joined.
 function createSource() {
   const canvas = document.createElement("canvas");
   canvas.width = SOURCE_WIDTH;
@@ -76,44 +100,38 @@ function createSource() {
   texture.wrapS = THREE.ClampToEdgeWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
 
-  const draw = (time, density, brightness) => {
+  const draw = (time, density, brightness, fallback) => {
     ctx.fillStyle = "#04050a";
     ctx.fillRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
 
-    // A wide sweep plus a left/right landmark pair. The landmarks matter for this demo: without
-    // them a reviewer cannot tell whether the two screens are showing different regions.
-    const sweep = (time * 0.06) % 1;
+    if (fallback) {
+      // A real local loop, not a frozen frame: a slow dim bar that keeps moving, clearly not the
+      // live content. V1 declared a fallback source that did not exist in code.
+      const x = ((time * 0.18) % 1) * SOURCE_WIDTH;
+      const bar = ctx.createLinearGradient(x - 400, 0, x + 400, 0);
+      bar.addColorStop(0, "rgba(70,80,100,0)");
+      bar.addColorStop(0.5, "rgba(120,135,160,0.5)");
+      bar.addColorStop(1, "rgba(70,80,100,0)");
+      ctx.fillStyle = bar;
+      ctx.fillRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
+      ctx.fillStyle = "rgba(180,190,205,0.5)";
+      ctx.fillRect(0, SOURCE_HEIGHT - 8, SOURCE_WIDTH, 3);
+      texture.needsUpdate = true;
+      return;
+    }
+
+    // base field
+    const sweep = (time * 0.05) % 1;
     const wash = ctx.createLinearGradient(0, 0, SOURCE_WIDTH, 0);
-    wash.addColorStop(0, "rgba(255,120,90,0.22)");
-    wash.addColorStop(clamp(sweep, 0.02, 0.98), "rgba(180,215,255,0.55)");
-    wash.addColorStop(1, "rgba(90,150,255,0.22)");
+    wash.addColorStop(0, "rgba(255,120,90,0.16)");
+    wash.addColorStop(clamp(sweep, 0.02, 0.98), "rgba(170,205,255,0.4)");
+    wash.addColorStop(1, "rgba(90,150,255,0.16)");
     ctx.fillStyle = wash;
     ctx.fillRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
 
-    // A landmark centred on the seam (u = 0.5). When the pair is joined each wall carries half of
-    // it, so the shape only completes across the gap; when they are independent the whole shape
-    // sits inside one wall. Without this, "joined" is an assertion rather than something a
-    // reviewer can actually see.
-    ctx.strokeStyle = "rgba(255,255,255,0.6)";
-    ctx.lineWidth = 7;
-    ctx.beginPath();
-    ctx.ellipse(
-      SOURCE_WIDTH * 0.5,
-      SOURCE_HEIGHT * 0.5,
-      SOURCE_WIDTH * 0.13,
-      SOURCE_HEIGHT * 0.3,
-      0,
-      0,
-      Math.PI * 2,
-    );
-    ctx.stroke();
-
-    ctx.fillStyle = "rgba(255,210,120,0.85)";
-    ctx.fillRect(0, SOURCE_HEIGHT - 26, SOURCE_WIDTH, 4);
-
-    const spacing = 52;
-    const drift = (time * 10) % spacing;
-    ctx.strokeStyle = "rgba(150,175,210,0.18)";
+    const spacing = 64;
+    const drift = (time * 12) % spacing;
+    ctx.strokeStyle = "rgba(150,175,210,0.13)";
     ctx.lineWidth = 1;
     for (let y = -spacing + drift; y < SOURCE_HEIGHT; y += spacing) {
       ctx.beginPath();
@@ -122,15 +140,38 @@ function createSource() {
       ctx.stroke();
     }
 
-    const count = Math.round(60 + density * 820);
+    const count = Math.round(60 + density * 900);
     for (let i = 0; i < count; i += 1) {
       const seedX = pseudo(i * 1.7 + 3.1);
       const seedY = pseudo(i * 2.3 + 7.7);
-      const x = (((seedX + time * (0.008 + seedX * 0.02)) % 1) + 1) % 1;
-      const y = (((seedY + Math.sin(time * 0.28 + i) * 0.01) % 1) + 1) % 1;
-      ctx.fillStyle = `rgba(220,232,248,${(0.16 + brightness * 0.5).toFixed(3)})`;
-      ctx.fillRect(x * SOURCE_WIDTH, y * SOURCE_HEIGHT, 1 + seedX * 2.2, 1 + seedX * 2.2);
+      const x = (((seedX + time * (0.006 + seedX * 0.016)) % 1) + 1) % 1;
+      const y = (((seedY + Math.sin(time * 0.26 + i) * 0.008) % 1) + 1) % 1;
+      ctx.fillStyle = `rgba(220,232,248,${(0.14 + brightness * 0.42).toFixed(3)})`;
+      const size = 1 + seedX * 2.6;
+      ctx.fillRect(x * SOURCE_WIDTH, y * SOURCE_HEIGHT, size, size);
     }
+
+    // THE landmark: one thick diagonal crossing u = 0.5, plus a thinner parallel offset so the
+    // shape is unmistakably asymmetric judged on either wall alone.
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "rgba(255,255,255,0.72)";
+    ctx.lineWidth = 26;
+    ctx.beginPath();
+    ctx.moveTo(SOURCE_WIDTH * 0.08, SOURCE_HEIGHT * 0.82);
+    ctx.lineTo(SOURCE_WIDTH * 0.92, SOURCE_HEIGHT * 0.18);
+    ctx.stroke();
+
+    ctx.strokeStyle = "rgba(255,205,120,0.5)";
+    ctx.lineWidth = 10;
+    ctx.beginPath();
+    ctx.moveTo(SOURCE_WIDTH * 0.18, SOURCE_HEIGHT * 0.72);
+    ctx.lineTo(SOURCE_WIDTH * 0.74, SOURCE_HEIGHT * 0.28);
+    ctx.stroke();
+
+    // an off-centre mark so the two halves cannot be mistaken for a mirrored pair
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.fillRect(SOURCE_WIDTH * 0.62 - 12, SOURCE_HEIGHT * 0.5 - 12, 24, 24);
+
     texture.needsUpdate = true;
   };
 
@@ -166,34 +207,54 @@ floor.rotation.x = -Math.PI / 2;
 floor.position.z = stageCenterZ;
 scene.add(floor);
 
-const grid = new THREE.GridHelper(
-  stageWidth,
-  Math.round(stageWidth / structure.gridSpacingM),
-  0x2b3646,
-  0x171d26,
-);
-grid.position.set(0, 0.01, stageCenterZ);
-grid.scale.set(1, 1, stageDepth / stageWidth);
-scene.add(grid);
+// square grid matching the 4 m spacing on BOTH axes (V1 used GridHelper's square divisions then
+// scaled z, so the z cells were 1.82 m while x cells were 4 m)
+const gridGroup = new THREE.Group();
+gridGroup.position.set(0, 0.01, stageCenterZ);
+const gridMaterial = new THREE.LineBasicMaterial({ color: 0x232c3a, transparent: true });
+for (let x = -stageWidth / 2; x <= stageWidth / 2 + 1e-6; x += structure.gridSpacingM) {
+  gridGroup.add(
+    new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(x, 0, -stageDepth / 2),
+        new THREE.Vector3(x, 0, stageDepth / 2),
+      ]),
+      gridMaterial,
+    ),
+  );
+}
+for (let z = -stageDepth / 2; z <= stageDepth / 2 + 1e-6; z += structure.gridSpacingM) {
+  gridGroup.add(
+    new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(-stageWidth / 2, 0, z),
+        new THREE.Vector3(stageWidth / 2, 0, z),
+      ]),
+      gridMaterial,
+    ),
+  );
+}
+scene.add(gridGroup);
 
-// 5 m scale bar on the deck
 const barHalf = structure.scaleBarM / 2;
 scene.add(
   new THREE.Line(
     new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(-barHalf, 0.03, 8),
-      new THREE.Vector3(barHalf, 0.03, 8),
+      new THREE.Vector3(-barHalf, 0.03, 6),
+      new THREE.Vector3(barHalf, 0.03, 6),
     ]),
     new THREE.LineBasicMaterial({ color: 0xffffff }),
   ),
 );
 
-// ---------------------------------------------------------------- DJ platform (triangular)
-const platformHeight = structure.djPlatform.heightM;
+// ---------------------------------------------------------------- DJ platform + performer
+const platformSpec = structure.djPlatform;
+const platformHeight = platformSpec.heightM;
 const platform = new THREE.Mesh(
   new THREE.CylinderGeometry(3.46, 3.46, platformHeight, 3),
   new THREE.MeshStandardMaterial({ color: 0x232a35, roughness: 0.95, metalness: 0 }),
 );
+platform.position.fromArray(platformSpec.positionM);
 platform.position.y = platformHeight / 2;
 platform.rotation.y = Math.PI / 6;
 platform.scale.set(1, 1, 0.85);
@@ -204,13 +265,14 @@ const performer = new THREE.Mesh(
   new THREE.CapsuleGeometry(0.28, performerHeight - 0.56, 8, 16),
   new THREE.MeshStandardMaterial({ color: 0xffb86b, roughness: 0.8, metalness: 0 }),
 );
-performer.position.set(0, platformHeight + performerHeight / 2, 0);
+const performerZ = platformSpec.positionM[2];
+performer.position.set(0, platformHeight + performerHeight / 2, performerZ);
 scene.add(performer);
 
 const heightRule = new THREE.Line(
   new THREE.BufferGeometry().setFromPoints([
-    new THREE.Vector3(1.1, platformHeight, 0),
-    new THREE.Vector3(1.1, platformHeight + performerHeight, 0),
+    new THREE.Vector3(1.1, platformHeight, performerZ),
+    new THREE.Vector3(1.1, platformHeight + performerHeight, performerZ),
   ]),
   new THREE.LineBasicMaterial({ color: 0xffb86b, transparent: true }),
 );
@@ -224,55 +286,60 @@ function createScreenMaterial() {
     uSource: { value: source.texture },
     uScale: { value: new THREE.Vector2(1, 1) },
     uOffset: { value: new THREE.Vector2(0, 0) },
+    uFlipV: { value: 0 },
     uBright: { value: 0.4 },
     uDensity: { value: 0.2 },
     uTime: { value: 0 },
     uPhase: { value: 0 },
     uFeed: { value: 0 },
   };
-  const material = new THREE.ShaderMaterial({
+  return {
     uniforms,
-    vertexShader: `
-      varying vec2 vUv;
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      uniform sampler2D uSource;
-      uniform vec2 uScale;
-      uniform vec2 uOffset;
-      uniform float uBright;
-      uniform float uDensity;
-      uniform float uTime;
-      uniform float uPhase;
-      uniform float uFeed;
-      varying vec2 vUv;
+    material: new THREE.ShaderMaterial({
+      uniforms,
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D uSource;
+        uniform vec2 uScale;
+        uniform vec2 uOffset;
+        uniform float uFlipV;
+        uniform float uBright;
+        uniform float uDensity;
+        uniform float uTime;
+        uniform float uPhase;
+        uniform float uFeed;
+        varying vec2 vUv;
 
-      float hash(vec2 p) {
-        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-      }
+        float hash(vec2 p) {
+          return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+        }
 
-      void main() {
-        vec2 uv = vUv * uScale + uOffset;
-        vec3 src = texture2D(uSource, clamp(uv, 0.0, 1.0)).rgb;
-        float luma = dot(src, vec3(0.299, 0.587, 0.114));
+        void main() {
+          vec2 uv = vUv * uScale + uOffset;
+          if (uFlipV > 0.5) uv.y = 1.0 - uv.y;
+          vec3 src = texture2D(uSource, clamp(uv, 0.0, 1.0)).rgb;
+          float luma = dot(src, vec3(0.299, 0.587, 0.114));
 
-        vec2 g = vUv * vec2(26.0, 13.0) + vec2(uPhase, uTime * 0.05);
-        vec2 cell = fract(g) - 0.5;
-        float line = 1.0 - smoothstep(0.02, 0.12, min(abs(cell.x), abs(cell.y)));
-        float dots = step(0.988 - uDensity * 0.07, hash(floor(g * 2.0)));
-        float field = mix(line, dots, 0.4);
+          vec2 g = vUv * vec2(26.0, 13.0) + vec2(uPhase, uTime * 0.05);
+          vec2 cell = fract(g) - 0.5;
+          float line = 1.0 - smoothstep(0.02, 0.12, min(abs(cell.x), abs(cell.y)));
+          float dots = step(0.988 - uDensity * 0.07, hash(floor(g * 2.0)));
+          float field = mix(line, dots, 0.4);
 
-        vec3 tint = mix(vec3(0.45, 0.55, 0.7), vec3(0.86, 0.9, 0.98), uFeed);
-        vec3 colour = tint * (0.16 + 0.84 * src.g) + tint * field * (0.3 + luma);
-        colour *= uBright * mix(0.45, 1.0, uFeed);
-        gl_FragColor = vec4(colour, 1.0);
-      }
-    `,
-  });
-  return { material, uniforms };
+          vec3 tint = mix(vec3(0.45, 0.55, 0.7), vec3(0.86, 0.9, 0.98), uFeed);
+          vec3 colour = tint * (0.16 + 0.84 * src.g) + tint * field * (0.3 + luma);
+          colour *= uBright * mix(0.45, 1.0, uFeed);
+          gl_FragColor = vec4(colour, 1.0);
+        }
+      `,
+    }),
+  };
 }
 
 const screens = screenSpecs.map((spec) => {
@@ -281,7 +348,6 @@ const screens = screenSpecs.map((spec) => {
   group.position.fromArray(spec.transform.positionM);
   group.rotation.y = (spec.transform.rotationDeg[1] * Math.PI) / 180;
 
-  // bezel behind the emissive face, so the pair reads as physical walls
   const bezel = new THREE.Mesh(
     new THREE.BoxGeometry(spec.physicalSize.widthM + 0.5, spec.physicalSize.heightM + 0.5, 0.3),
     new THREE.MeshStandardMaterial({ color: 0x11151c, roughness: 1, metalness: 0 }),
@@ -295,28 +361,34 @@ const screens = screenSpecs.map((spec) => {
   );
   group.add(face);
   scene.add(group);
-  return { id: spec.id, uniforms, group };
+  return { id: spec.id, isLeft: spec.id === "SCREEN_L", uniforms };
 });
 
-const screenById = new Map(screens.map((screen) => [screen.id, screen]));
-
-// Per-screen UV transform. Independent: left shows the whole source, right shows an offset crop at
-// a different scale, so the two walls are visibly not the same picture. Joined: each takes half of
-// one source, so together they form a single continuous image.
+// Per-screen UV transform.
+// Independent: each wall gets a DIFFERENT treatment - the right wall is vertically flipped and
+// sampled from a different crop, so they read as two different pictures rather than one picture
+// at two scales (the V1 review's criticism).
+// Joined: each wall takes one half of one master, so together they are one continuous image.
 const INDEPENDENT = {
-  SCREEN_L: { scale: [1, 1], offset: [0, 0] },
-  SCREEN_R: { scale: [0.58, 0.58], offset: [0.21, 0.3] },
+  SCREEN_L: { scale: [1, 1], offset: [0, 0], flip: 0, phase: 0 },
+  SCREEN_R: { scale: [0.62, 0.62], offset: [0.19, 0.19], flip: 1, phase: 9 },
 };
 const JOINED = {
-  SCREEN_L: { scale: [0.5, 1], offset: [0, 0] },
-  SCREEN_R: { scale: [0.5, 1], offset: [0.5, 0] },
+  SCREEN_L: { scale: [0.5, 1], offset: [0, 0], flip: 0, phase: 0 },
+  SCREEN_R: { scale: [0.5, 1], offset: [0.5, 0], flip: 0, phase: 0 },
 };
 
-function applyRelationship(join) {
+function applyRelationship(sample) {
+  const join = sample.join;
+  const mix = (a, b) => a + (b - a) * join;
+
+  // RELEASE: the left wall withdraws first, then the right. The performer stays central.
+  const leftRetreat = clamp(sample.retreat * 2, 0, 1);
+  const rightRetreat = clamp((sample.retreat - 0.45) * 2, 0, 1);
+
   for (const screen of screens) {
     const independent = INDEPENDENT[screen.id];
     const joined = JOINED[screen.id];
-    const mix = (a, b) => a + (b - a) * join;
     screen.uniforms.uScale.value.set(
       mix(independent.scale[0], joined.scale[0]),
       mix(independent.scale[1], joined.scale[1]),
@@ -325,20 +397,17 @@ function applyRelationship(join) {
       mix(independent.offset[0], joined.offset[0]),
       mix(independent.offset[1], joined.offset[1]),
     );
-    // the phase offset disappears as the pair joins, otherwise the seam reads as a mistake
-    screen.uniforms.uPhase.value = (screen.id === "SCREEN_R" ? 7.5 : 0) * (1 - join);
+    screen.uniforms.uFlipV.value = mix(independent.flip, joined.flip) > 0.5 ? 1 : 0;
+    screen.uniforms.uPhase.value = mix(independent.phase, joined.phase);
+
+    const sideRetreat = screen.isLeft ? leftRetreat : rightRetreat;
+    screen.uniforms.uBright.value = sample.bright * (1 - 0.88 * sideRetreat);
+    screen.uniforms.uDensity.value = sample.density * (1 - 0.8 * sideRetreat);
+    screen.uniforms.uTime.value = sample.time;
   }
 }
 
 // ---------------------------------------------------------------- cameras
-// Inner gap between the two walls, derived from the geometry rather than hard-coded, so the HUD
-// readout cannot drift away from the scene if the placement changes.
-const screenRotationDeg = Math.abs(screenSpecs[0].transform.rotationDeg[1]);
-const screenCenterX = Math.abs(screenSpecs[0].transform.positionM[0]);
-const screenHalfWidth = screenSpecs[0].physicalSize.widthM / 2;
-const innerGapM =
-  2 * (screenCenterX - screenHalfWidth * Math.cos((screenRotationDeg * Math.PI) / 180));
-
 const cameraList = presetCameras.map((preset) => {
   const camera = new THREE.PerspectiveCamera(
     preset.fovDeg,
@@ -357,7 +426,7 @@ const debugCamera = cameraById.get("HIGH_WIDE");
 const controls = new OrbitControls(debugCamera, renderer.domElement);
 controls.enableDamping = true;
 controls.target.fromArray(
-  presetCameras.find((preset) => preset.id === "HIGH_WIDE")?.target ?? [0, 3, -8],
+  presetCameras.find((preset) => preset.id === "HIGH_WIDE")?.target ?? [0, 3, -5],
 );
 
 let programId = cameraById.has(params.get("view")) ? params.get("view") : sceneJson.programCamera;
@@ -501,7 +570,7 @@ function updateStream(time) {
     const elapsed = dropTime === null ? time : time - dropTime;
     streamState = elapsed > 2.5 ? "offline" : "fallback";
   }
-  feed = streamState === "live" ? 1 : streamState === "fallback" ? 0.45 : 0.16;
+  feed = streamState === "live" ? 1 : streamState === "fallback" ? 0.5 : 0.25;
 }
 
 // ---------------------------------------------------------------- clock
@@ -576,17 +645,13 @@ renderer.setAnimationLoop(() => {
     if (desired !== programId) setProgram(desired);
   }
 
-  applyRelationship(sample.join);
+  applyRelationship(sample);
   for (const screen of screens) {
-    screen.uniforms.uTime.value = cueTime;
-    screen.uniforms.uDensity.value = sample.density;
-    screen.uniforms.uBright.value = sample.bright;
     screen.uniforms.uFeed.value = feed;
   }
 
-  if (streamState !== "offline") {
-    source.draw(cueTime, sample.density, sample.bright);
-  }
+  // the fallback is a real local loop that keeps animating, not a frozen frame
+  source.draw(cueTime, sample.density, sample.bright, streamState !== "live");
 
   if (controls.enabled) controls.update();
 
@@ -605,12 +670,18 @@ renderer.setAnimationLoop(() => {
       playing ? "" : "  ⏸"
     }`;
     const phrase = sample.join < 0.25 ? "两块独立" : sample.join < 0.72 ? "过渡中" : "合成一个整体";
-    hud.rel.textContent = `${phrase}（join ${(sample.join * 100).toFixed(0)}%）`;
+    const leftRetreatPct = clamp(sample.retreat * 2, 0, 1) * 100;
+    const rightRetreatPct = clamp((sample.retreat - 0.45) * 2, 0, 1) * 100;
+    const retreatNote =
+      sample.retreat > 0.02
+        ? ` · 收束：左退 ${leftRetreatPct.toFixed(0)}% / 右退 ${rightRetreatPct.toFixed(0)}%`
+        : "";
+    hud.rel.textContent = `${phrase}（join ${(sample.join * 100).toFixed(0)}%）${retreatNote}`;
     hud.stream.textContent = streamState.toUpperCase();
     hud.stream.dataset.state = streamState;
     const preset = presetCameras.find((item) => item.id === programId);
     hud.cam.textContent = preset ? `${programId}｜${preset.label}` : programId;
-    hud.scale.textContent = `屏 ${screenSpecs[0].physicalSize.widthM}×${screenSpecs[0].physicalSize.heightM}m · 内旋 ${screenRotationDeg}° · 中央间距 ${innerGapM.toFixed(1)}m · 人物 ${structure.performerHeightM}m`;
+    hud.scale.textContent = `屏 ${screenSpecs[0].physicalSize.widthM}×${screenSpecs[0].physicalSize.heightM}m · 内旋 ${Math.abs(screenSpecs[0].transform.rotationDeg[1])}° · 中央间距 ${sceneJson.derivedGeometry.centreGapM}m · 人物 ${structure.performerHeightM}m`;
   }
 
   frames += 1;
@@ -626,13 +697,16 @@ window.__STAGE_REPLICA__ = {
   play: () => {
     playing = true;
   },
-  state: () => ({
-    state: evaluateCue(cueTime).id,
-    cueTime,
-    join: evaluateCue(cueTime).join,
-    stream: streamState,
-    program: programId,
-    screens: screenById.size,
-    frames,
-  }),
+  state: () => {
+    const sample = evaluateCue(cueTime);
+    return {
+      state: sample.id,
+      cueTime,
+      join: sample.join,
+      retreat: sample.retreat,
+      stream: streamState,
+      program: programId,
+      frames,
+    };
+  },
 };

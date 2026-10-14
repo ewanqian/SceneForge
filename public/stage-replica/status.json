@@ -170,8 +170,8 @@
         "GRAYBOX": "done",
         "V1": "done",
         "REVIEW": "done",
-        "V2": "active",
-        "DELIVERY": "todo"
+        "V2": "done",
+        "DELIVERY": "active"
       },
       "states": [
         { "id": "LOW", "label": "铺垫 · 两块独立 5%", "url": "festival/?t=4&quad=0" },
@@ -188,13 +188,33 @@
       "modes": [],
       "artifacts": [
         {
+          "label": "▶ V2 交付录屏 28s（干净 Program 输出）",
+          "url": "festival/delivery/v2-delivery-28s.mp4",
+          "primary": true
+        },
+        {
+          "label": "▶ V2 导演版 32s（无 HUD / 无四分屏）",
+          "url": "festival/delivery/v2-director-clean-32s.mp4"
+        },
+        { "label": "V2 PEAK（斜线跨缝连成一条）", "url": "festival/stills/v2-peak.png" },
+        {
+          "label": "V2 DJ_FRONT（人眼机位终于看得到两屏）",
+          "url": "festival/stills/v2-dj-peak.png"
+        },
+        { "label": "V2 LOW（右屏翻转，两块确实不同）", "url": "festival/stills/v2-low.png" },
+        { "label": "V2 RELEASE 后期（左先退）", "url": "festival/stills/v2-release-late.png" },
+        { "label": "V2 fallback 本地 loop", "url": "festival/stills/v2-fallback.png" },
+        {
+          "label": "V1→V2 改动与实测（review-diff-festival-v1-v2.md）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-diff-festival-v1-v2.md"
+        },
+        {
           "label": "独立 REVIEW（含构建者逐条裁定与 V2 范围）",
           "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-festival-v1.md"
         },
         {
-          "label": "▶ V1 导演版录屏 32s（含四次切机位 + 丢源）",
-          "url": "festival/delivery/v1-director-32s.mp4",
-          "primary": true
+          "label": "▶ V1 导演版录屏 32s（保留不覆盖）",
+          "url": "festival/delivery/v1-director-32s.mp4"
         },
         { "label": "V1 PEAK（两屏合成一个环）", "url": "festival/stills/v1-peak.png" },
         { "label": "V1 LOW（两块各自完整）", "url": "festival/stills/v1-low.png" },
@@ -219,18 +239,21 @@
         "制作设计 Vita Motus，音乐节制作 Goldenvoice，取代 Sahara 帐篷位置"
       ],
       "v1Observations": [
-        "【独立 review 首位】PEAK 的「合成」被 168 px（≈5.6 m）黑场劈开，而每侧可见的半地标只有 90 px——缺口比地标本身还宽。join 是这个 Demo 的全部意义，但它在画面上不成立。",
-        "【独立 review】join 只在 FOH_WIDE / HIGH_WIDE 两个非人类机位上可读；DJ_FRONT 把两屏都裁出画外。两个「人站的位置」里反而读不到核心关系。",
-        "【独立 review】performer 站在墙面前方 10 m（平台在原点、屏在 z=−10），不在两屏「之间」。参考原文是 artists performing in the middle——这是我对参考的误读。",
-        "【独立 review】四状态不是四种构图：只有 join/density/bright 在 ramp，LOW 与 RELEASE 近似重复（5%/15%、0.16/0.24、0.46/0.52）；而 brief 对 RELEASE 的定义是「一侧先退、中心保留」，我只做了整体变暗——漏实现了一条明确要求。",
-        "【独立 review】18×9 m 屏幕是 2:1，源却是 16:9，着色器直接采样 → 画面被横向拉伸约 12.5%。角标宣称的 2048×1024 也不存在（实际 1280×720）。",
-        "【独立 review】`fallback` 声明 `local-loop`，实现却是「冻结 + 变暗」（跳过 source.draw）。声明与实现不符。",
-        "【独立 review】尺度只有 HUD 文字；三个机位 eyeHeightM=null，浮在 6.5 m / 26 m。预演的意义是从观看位置判断，浮空机位削弱了这个主张。",
-        "【构建者细化】评审说 PEAK 两屏是「互为镜像」，机制上更准确是「互补的两半」；但因为我选的地标是**对称椭圆**，互补的两半看起来就像镜像——根因是地标形状，这直接决定了 V2 要换非对称地标。",
-        "【已修・构建期】第一版源没有跨缝地标，LOW 与 PEAK 几乎一样；已改为 u=0.5 处的环。FOH_WIDE 也从 z=44 收到 z=30。",
-        "【已修・流程】评审 agent 的 scratch 文件（其中一个 .html）此前被误提交并导致 CI lint 失败；已从树中移除，并让 biome 排除所有 `**/_review_*` 与 `**/_local`，使评审草稿不可能再卡住 CI。"
+        "【V2 已修】PEAK 的合成被 168 px 黑场劈开——V2 把两屏内缘从 8.9m 收到 3.28m（−63%），画面中央暗带同口径测量 77px → 44px，斜线现在跨缝连成一条。",
+        "【V2 已修】join 只在非人类机位可读——`DJ_FRONT` 重排后同时看到 performer 与两屏内缘（v2-dj-peak.png）。",
+        "【V2 已修】performer 原本站在墙面前方 10m——已移进两屏之间的 V 形喉部。这是对参考「artists performing in the middle」的修正。",
+        "【V2 已修】RELEASE 原本只是整体变暗——现在按 brief 实现「一侧先退」：左屏先退，45% 进度后右屏再退，中心保留。",
+        "【V2 已修】源 16:9 被拉伸到 2:1 屏——源改为 2048×1024（2:1），同时让角标宣称的 proxy raster 变成真的。",
+        "【V2 已修】跨缝地标是对称椭圆，两半看起来像镜像，「合成」只能靠文字断言——换成非对称斜线，共线的两段只有合成时才成立。",
+        "【V2 已修】独立态其实是同一张画两种比例——右屏现在垂直翻转并使用不同裁切，两块读起来确实是不同画面。",
+        "【V2 已修】fallback 声明 local-loop 实现却是冻结+变暗——现在是真的本地 loop（持续移动的暗扫描条，v2-fallback.png）。",
+        "【V2 已修】V1 的 director 录屏含 HUD 与四分屏——V2 用 ?hud=0&quad=0 单独出干净 Program 输出。",
+        "【V2 未消除・性质如此】两屏之间 3.28m 的缺口永远不可能无缝；从 DJ_FRONT 看是一片纵长黑带。因此 PEAK 的判据应是「构图跨缝连成一体」而不是「像素连续」。",
+        "【V2 新代价】源从 1280×720 变 2048×1024 后绘制成本约 4 倍，CDP 抓帧率 59.98 → 46.04 fps（录屏采样率，非页面 rAF），仍在可用范围。",
+        "【V2 遗留】右屏垂直翻转是「独立」的廉价表达：确实让两屏不同，但仍是同一素材的变体而非第二条源。brief 允许同一 source 通过 crop/UV/offset 形成两种构图，故不违规；真双源属下一轮范围。",
+        "【流程】评审 agent 的 scratch 文件曾导致 CI lint 失败并被误提交；已从树中移除，并让 biome 排除 `**/_review_*` 与 `**/_local`，评审草稿不会再卡 CI。"
       ],
-      "next": "V2 已确定三项（见 review-festival-v1.md 末尾裁定表）：①观看关系——把 performer 移到两屏之间、收窄缺口、重排机位（DJ_FRONT 必须看到两屏内缘，取消浮空高位）；②构图面积——源改 2:1 修掉拉伸、换非对称地标使合成可被证明、LOW 让两屏真的像两块不同内容；③状态节奏——按 brief 实现 RELEASE 的「一侧先退、中心保留」。另需把 fallback 做成真正的本地 loop，并用 ?hud=0&quad=0 单独出干净交付录屏。",
+      "next": "交付：把 v2-delivery-28s.mp4、对照图（reference → graybox → V1 → V2）与 README 补齐，回答 brief §1.4 全部 7 问。之后启动 Stadium P3（四个 Demo 里唯一还负责 Quad Preview / Program Out / 多机位导播的技术包）。",
       "notesKey": "stagereplica.review.festival"
     },
     {

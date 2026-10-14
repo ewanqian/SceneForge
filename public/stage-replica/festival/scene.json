@@ -1,15 +1,26 @@
 {
-  "sceneId": "festival-two-wall-a",
+  "sceneId": "festival-two-wall-b",
   "units": "meters",
   "note": "教学预演 proxy。参考（Vita Motus / Coachella Quasar 2024）确认了「两块对置 monolithic LED 墙 + 艺人在中央 + 实时内容播放 + 与场地景观共存」的关系，但未公布任何尺寸；本文件所有数字均为自定 proxy。",
+  "v2Changes": {
+    "why": "V1 的独立 review 指出三个空间问题，V2 直接改几何而不是改参数。",
+    "geometry": "① 两屏从「人身后 10m」移到「人两侧」，内缘收到 x=±1.64m，让合成后的两半接近相接（V1 的缺口 8.9m 比地标本身还宽）；② performer 与三角形平台移到两屏之间的 V 形喉部。",
+    "aspect": "③ 源改为 2048×1024（2:1），与 18×9m 屏幕一致，修掉 V1 横向拉伸约 12.5% 的问题——这同时让角标宣称的 2048×1024 proxy 变成真的。"
+  },
   "structure": {
-    "stage": { "widthM": 44, "depthM": 20, "centerZ": -6 },
-    "djPlatform": { "shape": "triangle", "widthM": 6, "depthM": 4, "heightM": 0.9 },
+    "stage": { "widthM": 44, "depthM": 20, "centerZ": -4 },
+    "djPlatform": {
+      "shape": "triangle",
+      "widthM": 6,
+      "depthM": 4,
+      "heightM": 0.9,
+      "positionM": [0, 0, -5.5],
+      "note": "三角形有参考依据（The Desert Sun：triangular DJ stage in the center）；尺寸无依据。位置改为两屏之间的 V 形喉部。"
+    },
     "performerHeightM": 1.7,
     "eyeHeightM": 1.6,
     "gridSpacingM": 4,
-    "scaleBarM": 5,
-    "note": "DJ 平台为三角形有参考依据（The Desert Sun：triangular DJ stage in the center）；尺寸无依据。"
+    "scaleBarM": 5
   },
   "screens": [
     {
@@ -17,56 +28,67 @@
       "shape": "plane",
       "physicalSize": { "widthM": 18, "heightM": 9 },
       "raster": { "master": "2048x1024" },
-      "transform": { "positionM": [-13, 4.5, -10], "rotationDeg": [0, 18, 0] },
+      "transform": { "positionM": [-10.2, 4.5, -4.0], "rotationDeg": [0, 18, 0] },
       "source": { "type": "procedural", "id": "shared-generative", "state": "live" },
-      "fallback": { "type": "local-loop", "id": "screen-fallback-loop" }
+      "fallback": { "type": "local-loop", "id": "fallback-loop", "implemented": true }
     },
     {
       "id": "SCREEN_R",
       "shape": "plane",
       "physicalSize": { "widthM": 18, "heightM": 9 },
       "raster": { "master": "2048x1024" },
-      "transform": { "positionM": [13, 4.5, -10], "rotationDeg": [0, -18, 0] },
+      "transform": { "positionM": [10.2, 4.5, -4.0], "rotationDeg": [0, -18, 0] },
       "source": { "type": "procedural", "id": "shared-generative", "state": "live" },
-      "fallback": { "type": "local-loop", "id": "screen-fallback-loop" }
+      "fallback": { "type": "local-loop", "id": "fallback-loop", "implemented": true }
     }
   ],
+  "derivedGeometry": {
+    "innerEdgeXM": 1.64,
+    "innerEdgeZM": -6.78,
+    "centreGapM": 3.28,
+    "note": "内缘 x = 10.2 − 9·cos18° = 1.64；中央缺口 3.28m。V1 是 8.9m。"
+  },
   "screenRelationship": {
-    "note": "本 Demo 的核心变量：join=0 时两屏各自显示不同内容，join=1 时两屏合成同一张连续画面。",
-    "sharedSource": true
+    "note": "核心变量：join=0 两块各显示不同内容（右屏在独立态做垂直翻转，读起来确实是两块不同画面）；join=1 两块各取同一张母版的一半，合成一张连续画面。地标为跨缝的**非对称斜线**，只有合成时才连成一条。",
+    "sharedSource": true,
+    "asymmetricLandmark": true
   },
   "cameras": [
     {
       "id": "FOH_WIDE",
       "label": "FOH 大广角",
-      "position": [0, 6.5, 30],
-      "target": [0, 5, -9],
-      "fovDeg": 58,
-      "eyeHeightM": null
+      "position": [0, 5.5, 26],
+      "target": [0, 3.5, -5],
+      "fovDeg": 46,
+      "eyeHeightM": null,
+      "note": "技术广角：能看到两块屏的完整关系，不是人眼高度。"
     },
     {
       "id": "DJ_FRONT",
       "label": "中轴近景",
-      "position": [0, 2.2, 13],
-      "target": [0, 3.0, -2],
-      "fovDeg": 52,
-      "eyeHeightM": 2.2
+      "position": [0, 2.2, 2],
+      "target": [0, 3.0, -5.5],
+      "fovDeg": 56,
+      "eyeHeightM": 2.2,
+      "note": "V1 的 DJ_FRONT 把两屏都裁出画外；V2 必须同时看到 performer 与两屏内缘。"
     },
     {
       "id": "STAGE_LEFT",
       "label": "左前 35°",
-      "position": [-17, 4.5, 7],
-      "target": [0, 4.5, -6],
-      "fovDeg": 62,
-      "eyeHeightM": 4.5
+      "position": [-9, 2.6, 3],
+      "target": [0, 3.0, -5.5],
+      "fovDeg": 60,
+      "eyeHeightM": 2.6,
+      "note": "舞台侧人眼高度，检查两屏夹角与人物关系。"
     },
     {
       "id": "HIGH_WIDE",
-      "label": "高位全景",
-      "position": [0, 26, 38],
-      "target": [0, 3, -8],
-      "fovDeg": 48,
-      "eyeHeightM": null
+      "label": "高位全景（技术机位）",
+      "position": [0, 12, 20],
+      "target": [0, 3, -5],
+      "fovDeg": 50,
+      "eyeHeightM": null,
+      "note": "明确标注为技术机位而非人眼视角——V1 有 3/4 机位浮空却没有说明。"
     }
   ],
   "cue": {
