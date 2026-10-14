@@ -147,6 +147,27 @@ This is visible inside the recorded V1.1 pass at 30 s.
 Quad preview shows all four presets; the program camera is outlined; `AUDIENCE_CENTER` is the
 default program source, and `DEBUG_ORBIT` is the only orbit-controlled view.
 
+## Deliverables
+
+Sphere (P0) is complete end to end. Everything below is served from
+`/stage-replica/sphere/` and listed on the review board at `/stage-replica/`.
+
+| Artifact | What it is |
+|---|---|
+| `sphere/delivery/v2-promo-28s.mp4` | 28 s delivery cut (all four states, four camera cuts) |
+| `sphere/delivery/v2-director-32s.mp4` | full V2 pass: four camera cuts plus a source drop at 28 s |
+| `sphere/delivery/reference-graybox-v1-v2.png` | comparison sheet: reference → graybox → V1 → V2 |
+| `sphere/delivery/v1.1-director-32s.mp4`, `v1-sphere-32s.mp4` | retained V1 revisions, never overwritten |
+| `sphere/stills/v2-*.png`, `v1-*.png` | state frames for both revisions |
+| `review-v1.md` | V1 review: builder findings, the independent review, and the adjudication |
+| `review-diff-v1-v2.md` | what V2 changed, what it measured, what it cost, what it deliberately left alone |
+| `v1-freeze.json` | V1 file hashes and the recorded run's metadata |
+| `review-tools/` | probe scripts used to measure coverage, elevation and lit area |
+
+The brief's seven acceptance questions are answered in `review-v1.md` §5 and
+`review-diff-v1-v2.md` §6 (questions 5–7 are answered after V2, since they ask what
+V2 changed).
+
 ## Known gaps
 
 Open after V1.1, all listed as V2 scope in `review-v1.md` §6:

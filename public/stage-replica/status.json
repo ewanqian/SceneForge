@@ -56,7 +56,7 @@
         "V1": "done",
         "REVIEW": "done",
         "V2": "done",
-        "DELIVERY": "active"
+        "DELIVERY": "done"
       },
       "states": [
         { "id": "HORIZON", "label": "铺垫 · 穹顶覆盖 2.4%", "url": "sphere/?t=4&quad=0" },
@@ -78,9 +78,17 @@
       ],
       "artifacts": [
         {
-          "label": "▶ V2 导演版录屏 32s（含切机位 + 丢源）",
-          "url": "sphere/delivery/v2-director-32s.mp4",
+          "label": "▶ 交付录屏 28s 宣传版",
+          "url": "sphere/delivery/v2-promo-28s.mp4",
           "primary": true
+        },
+        {
+          "label": "对照图 reference → graybox → V1 → V2",
+          "url": "sphere/delivery/reference-graybox-v1-v2.png"
+        },
+        {
+          "label": "▶ V2 导演版完整 32s（含切机位 + 丢源）",
+          "url": "sphere/delivery/v2-director-32s.mp4"
         },
         { "label": "V2 状态帧 HORIZON", "url": "sphere/stills/v2-horizon.png" },
         { "label": "V2 状态帧 FULL_FIELD", "url": "sphere/stills/v2-full-field.png" },
@@ -144,7 +152,7 @@
         "【已修・V1.1】原 V1 录屏全程单机位，无法暴露与视角相关的问题；已新增 ?cuts=1 导演脚本并重录（含四次切机位与丢源 fallback）。",
         "【否证】独立 review 提出的「状态边界跳变 / 静帧不对应时刻」不成立：那是把 0.86 rad / 1.55 rad 当成度数。逐点复算显示 7.99→8.00（17.2°）、15.99→16.00（49.3°）、23.99→24.00（104.3°）均连续，无回落。"
       ],
-      "next": "S6（交付）：把 V2 录屏剪成 20–30 秒宣传版，出 `reference → graybox → V1 → V2` 对照图，补齐 README 的结构/尺寸/状态/机位/修改原因，并回答 brief §1.4 全部 7 问。随后启动 Festival P1。",
+      "next": "Sphere P0 已完成（reference → graybox → V1 → review → V2 → delivery 全走完）。下一个启动 Festival P1：REFERENCE LOCK（核验 Vita Motus 参考链接）→ 双屏灰盒。",
       "notesKey": "stagereplica.review.sphere"
     },
     {
