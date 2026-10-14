@@ -235,7 +235,7 @@
       "done": "少量素材也可以通过预演被组织成一个成立的现场；课程不是「做大屏模板」。",
       "run": null,
       "stages": {
-        "REFERENCE": "todo",
+        "REFERENCE": "done",
         "GRAYBOX": "todo",
         "V1": "todo",
         "REVIEW": "todo",
@@ -245,16 +245,27 @@
       "states": [],
       "views": [],
       "modes": [],
+      "artifacts": [
+        {
+          "label": "REFERENCE（两条官方链接核验，尺寸逐字确认）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/installation/reference/reference.md"
+        }
+      ],
       "proxy": [
-        ["主投影", "10.24 × 5.4 m", "可确认的最低展示尺寸"],
-        ["Raster", "4096 × 2160", "DCI 4K"],
-        ["黑盒", "14 × 18 × 7 m", "教学 proxy"],
+        ["主投影", "10.24 × 5.4 m", "官方公布的最低展示尺寸（原作尺寸可变）"],
+        ["Raster", "4096 × 2160", "由已确认的 DCI-4K 器材换算"],
+        ["黑盒", "14 × 18 × 7 m", "教学 proxy（参考无房间尺寸）"],
         ["观看距离", "6 – 12 m", "教学 proxy"],
         ["可选地面", "10.24 × 5.4 m", "课程比较实验，非原作配置"]
       ],
-      "confirmed": ["Ryoji Ikeda data-verse：DCI-4K DLP projector / computer / speakers"],
+      "confirmed": [
+        "data-verse 1/2/3 官方器材：DCI-4K DLP projector, computer, speakers（逐字）",
+        "data-verse 官方尺寸：dimensions variable（最低 W10.24 × H5.4m）（逐字）",
+        "命名澄清：官方项目页为 X-verse，data-verse 1/2/3 属于该系列",
+        "相邻作品确有镜面/地面做法（The Universe within the Universe、micro | macro、the critical paths），但本项目的地面投影仍是课程实验"
+      ],
       "v1Observations": [],
-      "next": "排期在 Festival 之后；重点是 duration / density / viewer distance。",
+      "next": "REFERENCE 已完成。排期在 Festival 交付之后：GRAYBOX（黑盒 14×18×7m + 10.24×5.4m 主投影）→ V1，重点是 duration / density / viewer distance，以及「墙面 only vs 墙+地面」两个版本的对照。",
       "notesKey": "stagereplica.review.installation"
     },
     {
