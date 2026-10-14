@@ -1,0 +1,83 @@
+{
+  "component": "stage-replica/sphere",
+  "version": "V1",
+  "frozenAt": "2026-10-15T07:00+08:00",
+  "status": "frozen — V2 must not overwrite these files; V2 lives alongside them and diffs against this record",
+  "source": {
+    "repo": "https://github.com/ewanqian/SceneForge",
+    "commit": "186b3b9",
+    "branch": "main",
+    "live": "https://ewanqian.github.io/SceneForge/stage-replica/sphere/"
+  },
+  "reproduce": {
+    "serve": "python -m http.server 8123 --bind 127.0.0.1 -d dist   (after: npm run build)",
+    "still": "chrome --headless=new --disable-gpu --hide-scrollbars --window-size=1600,900 --virtual-time-budget=9000 --screenshot=out.png \"http://127.0.0.1:8123/stage-replica/sphere/?t=20&quad=0\"",
+    "record": "node tools/record-cdp.mjs \"http://127.0.0.1:8123/stage-replica/sphere/?record=1&quad=1\" <outDir> 45",
+    "note": "The recorder gates the screencast on window.__REPLICA_READY__ and stops on window.__REPLICA_DONE__, so load time is excluded and the clip length matches the cue."
+  },
+  "hashes": {
+    "public/stage-replica/sphere/main.js": "F4C5312A1BF1BB3F242477E53FBB28682409561D7181CB055828F769A7B1F4F9",
+    "public/stage-replica/sphere/index.html": "10EC02744F66200484A0E810D05B141EFBFF96DD7BA8A09AAE54DB0DFC53B1CD",
+    "public/stage-replica/sphere/scene.json": "516E3379647A440F98C230F302C10814D05867FBFE8863A463B4424BE49C38AE",
+    "public/stage-replica/shared/fit-math.js": "3B6187EF953A1B6848B2F36F49505B36C8A26E6752442A12544CF5F14D05EB26",
+    "public/stage-replica/sphere/delivery/v1-sphere-32s.mp4": "0C4B0BCA42FCF29F524A32D5E7134DA95B985374A0FB8245C5E9114D22C322B7",
+    "public/stage-replica/sphere/stills/v1-horizon.png": "91CEA49515E8E55236EDB27FCC3B2893CE15E1BFA81FE0F53A849BD22D7DF5AD",
+    "public/stage-replica/sphere/stills/v1-enclose.png": "4FB0F67DA0F7380607EDBD43B8B649E97AEA1F838ADF18DA0F3E53BEBFD0CEA8",
+    "public/stage-replica/sphere/stills/v1-full-field.png": "E31AB6333046F082735EA158F64A444EDD2E0DA178D0A006FD0763DF9E4E4BAD",
+    "public/stage-replica/sphere/stills/v1-aperture.png": "79F0AD58C16E3F3475912A4237767E3D61290150561043A4C064DF89DEB62F64"
+  },
+  "recordedRun": {
+    "file": "public/stage-replica/sphere/delivery/v1-sphere-32s.mp4",
+    "durationSec": 32.159,
+    "frames": 1591,
+    "captureFps": 49.47,
+    "width": 1578,
+    "height": 802,
+    "bytes": 2160455,
+    "mode": "?record=1&quad=1 — deterministic single pass, quad preview and HUD visible",
+    "completionSignal": "window.__REPLICA_DONE__ observed true"
+  },
+  "measuredStates": [
+    {
+      "id": "HORIZON",
+      "t": 4,
+      "elevMaxDeg": 17.2,
+      "azMaxDeg": 31.5,
+      "stateOccupancyPct": 3.3,
+      "windowCoverage": "azimuth 48% / elevation 100%"
+    },
+    {
+      "id": "ENCLOSE",
+      "t": 12,
+      "elevMaxDeg": 49.3,
+      "azMaxDeg": 88.8,
+      "stateOccupancyPct": 27.0,
+      "windowCoverage": "azimuth 51% / elevation 100%"
+    },
+    {
+      "id": "FULL_FIELD",
+      "t": 20,
+      "elevMaxDeg": 104.3,
+      "azMaxDeg": 202.9,
+      "stateOccupancyPct": 100,
+      "windowCoverage": "azimuth 56% / elevation 100%"
+    },
+    {
+      "id": "APERTURE",
+      "t": 28,
+      "elevMaxDeg": 35.5,
+      "azMaxDeg": 13.8,
+      "stateOccupancyPct": 18.0,
+      "windowCoverage": "n/a (elliptical opening mask)"
+    }
+  ],
+  "fixesAlreadyAppliedDuringConstruction": [
+    "Azimuth feathering was a fraction of the state, so FULL_FIELD faded to black across its own last 30% and was not full. Replaced with fixed radian feathers and out-of-range FULL_FIELD extents.",
+    "The HUD reported only state occupancy, so in front-window mode it read 100% while the fitted source window covered ~46% of the azimuth. It now reports state occupancy and window coverage separately.",
+    "?record=1 advanced the cue at a fixed 1/30 per frame, completing the 32s cue in ~16s of wall time. It now uses real elapsed time so the clip matches the cue."
+  ],
+  "todoBeforeV2": [
+    "Independent review findings must be folded in before any V2 change is chosen.",
+    "V2 must change at least two of: composition area, state timing, viewing relationship."
+  ]
+}

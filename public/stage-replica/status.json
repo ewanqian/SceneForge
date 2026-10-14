@@ -53,16 +53,16 @@
       "stages": {
         "REFERENCE": "done",
         "GRAYBOX": "done",
-        "V1": "active",
-        "REVIEW": "todo",
+        "V1": "done",
+        "REVIEW": "done",
         "V2": "todo",
         "DELIVERY": "todo"
       },
       "states": [
-        { "id": "HORIZON", "label": "铺垫 · 占用 3.3%", "url": "sphere/?t=4&quad=0" },
-        { "id": "ENCLOSE", "label": "建立 · 占用 27%", "url": "sphere/?t=12&quad=0" },
-        { "id": "FULL_FIELD", "label": "爆发 · 占用 100%", "url": "sphere/?t=20&quad=0" },
-        { "id": "APERTURE", "label": "收束 · 占用 18%", "url": "sphere/?t=28&quad=0" }
+        { "id": "HORIZON", "label": "铺垫 · 穹顶覆盖 0.8%", "url": "sphere/?t=4&quad=0" },
+        { "id": "ENCLOSE", "label": "建立 · 穹顶覆盖 17%", "url": "sphere/?t=12&quad=0" },
+        { "id": "FULL_FIELD", "label": "爆发 · 穹顶覆盖 100%", "url": "sphere/?t=20&quad=0" },
+        { "id": "APERTURE", "label": "收束 · 穹顶覆盖 4.6%", "url": "sphere/?t=28&quad=0" }
       ],
       "views": [
         { "id": "AUDIENCE_CENTER", "url": "sphere/?t=20&view=AUDIENCE_CENTER&quad=0" },
@@ -75,6 +75,33 @@
         { "id": "mirror-extend", "url": "sphere/?t=20&mode=mirror-extend&quad=0" },
         { "id": "shader-fill", "url": "sphere/?t=20&mode=shader-fill&quad=0" },
         { "id": "square-master", "url": "sphere/?t=20&mode=square-master&quad=0" }
+      ],
+      "artifacts": [
+        {
+          "label": "▶ V1.1 导演版录屏 32s（含四次切机位 + 丢源 fallback）",
+          "url": "sphere/delivery/v1.1-director-32s.mp4",
+          "primary": true
+        },
+        {
+          "label": "▶ V1 原版录屏 32s（单机位，保留不覆盖）",
+          "url": "sphere/delivery/v1-sphere-32s.mp4"
+        },
+        { "label": "V1 状态帧 HORIZON", "url": "sphere/stills/v1-horizon.png" },
+        { "label": "V1 状态帧 ENCLOSE", "url": "sphere/stills/v1-enclose.png" },
+        { "label": "V1 状态帧 FULL_FIELD", "url": "sphere/stills/v1-full-field.png" },
+        { "label": "V1 状态帧 APERTURE", "url": "sphere/stills/v1-aperture.png" },
+        {
+          "label": "V1 冻结记录 v1-freeze.json",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/v1-freeze.json"
+        },
+        {
+          "label": "V1 REVIEW（含独立 review 与逐条裁定）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-v1.md"
+        },
+        {
+          "label": "S2 灰盒说明 NOTES.md",
+          "url": "https://github.com/ewanqian/portfolio/blob/codex/stage-replica-sphere-20261015/lab/stage-replica/sphere/build/NOTES.md"
+        }
       ],
       "proxy": [
         ["dome 半径", "25 m", "教学 proxy"],
@@ -90,14 +117,19 @@
         "Exosphere：580,000 平方英尺可编程外立面"
       ],
       "v1Observations": [
-        "（已在构建中发现并修复）方位羽化原本按状态比例缩放，导致 FULL_FIELD 在 ±180° 背后整片衰减为黑：名为满场、实为半场。已换成固定弧度羽化，并让 FULL_FIELD 的方位/仰角溢出面外，覆盖读数现为 100%。",
-        "（同上，读数已修）默认 front-window 模式下，源的适配窗口只覆盖约 46% 方位，所以 STAGE_LOOKBACK 在 FULL_FIELD 时仍全黑——这是模式语义而不是状态缺陷。HUD 原本只报「占用 100%」，与画面不符，现改为同时报「状态占用」与「窗口覆盖 方位/高度」。",
-        "FULL_FIELD 的程序化网格与 dome 线框结构视觉上混淆，容易被读成「模型线框」而不是「投影内容」。",
-        "APERTURE 目前是一个柔边亮块，还不像「开口 / 天空」，收束的语义偏弱。",
-        "STAGE_LOOKBACK 缺少尺度锚点：人物位于机位原点因此不可见，该视角目前只能读空间不能读尺度。",
-        "HORIZON 的状态亮度 0.34 在小窗口内接近看不清，需要判断是「刻意压暗」还是「压过头」。"
+        "【V2 首要】观众 Program 视角从未让画面占满视野：FULL_FIELD 时地板与舞台仍占下方约 40%，本 Demo 的论点（画面占据整个视野后视觉必须重排）恰恰没有被演示。独立 review 的首要发现。",
+        "【V2】STAGE_LOOKBACK 没有尺度锚点：performer 位于该机位原点因此不可见。现在可在 V1.1 录屏 21 秒处直接看到。",
+        "【V2】performer 在 Program 视角只有约 30×97 px——有高度标尺可追溯，但读不出大小。",
+        "【V2】FULL_FIELD 的程序化 lattice 在角度空间生成，读起来像 dome 自身线框，无法迁移到真实球面投影。",
+        "【V2】APERTURE 仍是柔边亮块，不像「开口 / 天空」，收束语义偏弱。",
+        "【V2】HORIZON 只覆盖穹顶表面 0.8%，可能低于「看得出有内容」的下限。",
+        "【已修・V1.1】「占用 %」原是角度乘积（且 aperture>0.5 时换公式），FULL_FIELD 打印 100% 而画面露出地板；已改为球面实心角占比并改名 dome 覆盖：0.8 / 17 / 100 / 4.6%。",
+        "【已修・V1.1】scene.json 声明了 5 m 比例尺、README 也写进验收条目，但移植时漏了几何体，画面里从未出现；现已补上，并加了 performer 1.7 m 高度标尺。",
+        "【已修・V1.1】角标宣称 4096²/2048² 运行时光栅，实际源是 1280×720 canvas；已改为「母版规格 4096²/2048²（V1 运行时源 1280×720）」并补上参考来源链接。",
+        "【已修・V1.1】原 V1 录屏全程单机位，无法暴露与视角相关的问题；已新增 ?cuts=1 导演脚本并重录（含四次切机位与丢源 fallback）。",
+        "【否证】独立 review 提出的「状态边界跳变 / 静帧不对应时刻」不成立：那是把 0.86 rad / 1.55 rad 当成度数。逐点复算显示 7.99→8.00（17.2°）、15.99→16.00（49.3°）、23.99→24.00（104.3°）均连续，无回落。"
       ],
-      "next": "S4：把 32s 完整跑一轮并录屏，将以上观察固化成 review-v1.md；S3 剩余项为录制通道验证。",
+      "next": "V2：按 review-v1.md §6 改两项——①构图面积（重塑 APERTURE 开口、抬高 HORIZON 可读面积）②观看关系（补尺度锚点、让媒体窗口相对观看位置而非固定「正面」，并让 Program 视角真正让画面占满视野）。节奏（4×8s 均分）本轮明确不改，以保证改善可归因。",
       "notesKey": "stagereplica.review.sphere"
     },
     {

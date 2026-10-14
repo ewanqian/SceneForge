@@ -199,6 +199,28 @@ const performer = new THREE.Mesh(
 performer.position.set(0, stageHeight + performerHeight / 2, 0);
 scene.add(performer);
 
+// 5 m scale bar, declared in scene.json as structure.scaleBarM. It must actually render:
+// an independent review found the README and the acceptance harness both cite it while no
+// geometry existed, so "scale is traceable" had no in-frame evidence.
+const scaleBarHalf = structure.scaleBarM / 2;
+const scaleBar = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(-scaleBarHalf, 0.03, 7.5),
+    new THREE.Vector3(scaleBarHalf, 0.03, 7.5),
+  ]),
+  new THREE.LineBasicMaterial({ color: 0xffffff }),
+);
+scene.add(scaleBar);
+
+const performerHeightRule = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(1.1, stageHeight, 0),
+    new THREE.Vector3(1.1, stageHeight + performerHeight, 0),
+  ]),
+  new THREE.LineBasicMaterial({ color: 0xffb86b, transparent: true }),
+);
+scene.add(performerHeightRule);
+
 // ---------------------------------------------------------------- dome
 const source = createSource();
 
@@ -502,6 +524,21 @@ function updateStream(time) {
   feed = streamState === "live" ? 1 : streamState === "fallback" ? 0.45 : 0.16;
 }
 
+// ---------------------------------------------------------------- director pass
+// ?cuts=1 scripts the program camera across the cue so one recording exercises the director
+// layer instead of holding a single view for 32s (an independent review noted that a
+// single-camera pass cannot expose view-dependent problems such as STAGE_LOOKBACK).
+const cutSchedule =
+  params.get("cuts") === "1"
+    ? [
+        { at: 0, view: "AUDIENCE_CENTER" },
+        { at: 12, view: "AUDIENCE_LEFT" },
+        { at: 20, view: "STAGE_LOOKBACK" },
+        { at: 24, view: "DEBUG_ORBIT" },
+        { at: 28, view: "AUDIENCE_CENTER" },
+      ]
+    : null;
+
 // ---------------------------------------------------------------- clock
 const recordMode = params.get("record") === "1";
 const clock = new THREE.Clock();
@@ -552,13 +589,17 @@ layoutQuadChrome(innerWidth, innerHeight);
 let frames = 0;
 
 renderer.setAnimationLoop(() => {
-  const delta = recordMode ? 1 / 30 : clock.getDelta();
+  // Real elapsed time, not a fixed step: a fixed 1/30 step played the 32s cue in ~16s of
+  // wall time at 60fps, which is shorter than the 20-30s recording the brief asks for.
+  const delta = clock.getDelta();
   if (playing) {
     cueTime += delta;
     if (cueTime >= cueConfig.durationSec) {
       if (recordMode) {
         cueTime = cueConfig.durationSec - 0.001;
         playing = false;
+        // Signals a recorder that the single deterministic pass has finished.
+        window.__REPLICA_DONE__ = true;
       } else {
         cueTime -= cueConfig.durationSec;
       }
@@ -567,6 +608,14 @@ renderer.setAnimationLoop(() => {
 
   const sample = evaluateCue(cueTime);
   updateStream(cueTime);
+
+  if (cutSchedule) {
+    let desired = cutSchedule[0].view;
+    for (const cut of cutSchedule) {
+      if (cueTime >= cut.at) desired = cut.view;
+    }
+    if (desired !== programId) setProgram(desired);
+  }
 
   uniforms.uTime.value = cueTime;
   uniforms.uElevMax.value = sample.elevMax;
@@ -626,16 +675,21 @@ renderer.setAnimationLoop(() => {
     hud.mode.textContent = fitNote;
     const preset = presetCameras.find((item) => item.id === programId);
     hud.cam.textContent = preset ? `${programId}｜${preset.label}` : programId;
-    const occupied = clamp(
-      sample.aperture > 0.5
-        ? sample.aperture * 0.18 * 100
-        : (sample.elevMax / (Math.PI / 2)) * (sample.azMax / Math.PI) * 100,
-      0,
-      100,
-    );
+    // True fraction of the hemisphere SURFACE inside the current mask, as a solid-angle ratio:
+    // a band between the horizon and elevation E over an azimuth half-span A covers
+    // (A/pi) * (1 - cos E) of the hemisphere. The previous number was an angular product that
+    // also switched formula above aperture 0.5, so it printed 100% while the frame still showed
+    // uncovered floor. Reported as "dome coverage", not "occupancy".
+    const elevForCoverage = Math.min(sample.elevMax, Math.PI / 2);
+    const bandCoverage = clamp(sample.azMax / Math.PI, 0, 1) * (1 - Math.cos(elevForCoverage));
+    // APERTURE is an ellipse rather than a band; integrate the same cosine form over its extent.
+    const apertureCoverage =
+      (0.68 / (2 * Math.PI)) *
+      (Math.cos(0.55 - 0.42) - Math.cos(Math.min(0.55 + 0.42, Math.PI / 2)));
+    const domeCoverage = clamp(sample.aperture > 0.5 ? apertureCoverage : bandCoverage, 0, 1) * 100;
     hud.fit.textContent = `elevMax ${(sample.elevMax * 57.2958).toFixed(1)}° · azMax ${(
       sample.azMax * 57.2958
-    ).toFixed(1)}° · 占用 ${occupied.toFixed(1)}%`;
+    ).toFixed(1)}° · dome 覆盖 ${domeCoverage.toFixed(1)}%`;
   }
 
   frames += 1;

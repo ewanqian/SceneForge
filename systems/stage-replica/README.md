@@ -61,9 +61,15 @@ Sphere is the only demo started.
   wordings in the brief were not supported by the official source and were corrected.
 - `GRAYBOX` — done. Hemisphere, floor, stage, performer scale, radial scale grid, four camera
   definitions.
-- `V1` — in progress. Dome mapping, four cue states, one own procedural source with fallback, four
-  viewpoints, quad preview and program out are running. The recording path is not yet verified.
-- `REVIEW`, `V2`, `DELIVERY` — not started.
+- `V1` — done and frozen (`v1-freeze.json`). Dome mapping, four cue states, one own procedural source
+  with fallback, four viewpoints, quad preview and program out all run; a 32 s pass is recorded
+  (`sphere/delivery/v1-sphere-32s.mp4`) via the CDP recorder in `tools/record-cdp.mjs`.
+- `REVIEW` — done. An independent review agent watched V1; its findings and the builder's
+  adjudication (including two findings refuted with arithmetic) are in `review-v1.md`.
+- `V1.1` — review fixes applied without overwriting V1: true dome-coverage metric, the 5 m scale bar
+  actually renders, accurate raster badge, reference link, and a scripted director pass
+  (`?cuts=1`) recorded as `sphere/delivery/v1.1-director-32s.mp4`.
+- `V2`, `DELIVERY` — not started. V2 scope is fixed in `review-v1.md` §6.
 - Festival / Installation / Stadium — not started.
 
 ## Controls
@@ -92,7 +98,9 @@ anything:
 ?quad=0|1      quad preview
 ?hud=0|1       chrome (for clean capture)
 ?drop=1        hold the source in fallback
-?record=1      deterministic 32 s single pass at a fixed step
+?dropAt=<sec>  drop the source at a cue time (used by the recorded pass)
+?cuts=1        run the scripted director pass across the cue
+?record=1      play the cue once in real time and stop (for recording)
 ```
 
 ## Acceptance harness
@@ -103,25 +111,29 @@ At `?t=4` a first-time viewer should read "people inside a curved surface" witho
 
 ### H1 — scale traceable
 
-Every dimension is traceable to the proxy table. The performer is `1.7 m`; audience eye height is
-`1.6 m`; a `5 m` scale bar sits on the floor.
+Every dimension is traceable to the proxy table. The performer is `1.7 m` with an in-frame height
+rule; audience eye height is `1.6 m`; a `5 m` scale bar is drawn on the floor. Note that the
+performer is still only ~30 px wide in the program view — traceable, but not yet readable, which is
+a V2 item.
 
-### H2 — four states differ by occupied area
+### H2 — four states differ by dome coverage
 
-`HORIZON` ≈ 3% (a low front band), `ENCLOSE` ≈ 27%, `FULL_FIELD` = 100% wrap, `APERTURE` = a single
-centred opening. The difference must come from composition and density, **not** from swapping in
-unrelated media.
+Measured as a fraction of the hemisphere surface (solid angle), not as an angular product:
+`HORIZON` ≈ 0.8%, `ENCLOSE` ≈ 17%, `FULL_FIELD` = 100%, `APERTURE` ≈ 4.6%. The difference must come
+from composition and density, **not** from swapping in unrelated media.
 
 ### H3 — own content really enters the stage
 
-The screen content is generated in-page (`canvas` source) and mapped through the dome UV path. V1
-uses only the local source; `file` / `capture` / `webrtc` are specified in the brief but are not in
-the V1 scope.
+The screen content is generated in-page (`canvas` source, 1280×720 in V1) and mapped through the dome
+UV path. The `4096² / 2048²` figures are the proxy **master specification**, not a raster that V1
+renders. V1 uses only the local source; `file` / `capture` / `webrtc` are specified in the brief but
+are not in the V1 scope.
 
 ### H4 — source loss is not a blackout
 
-`d` or `?drop=1` moves the stream `live → fallback → offline`. `fallback` dims and keeps the last
-frame; `offline` stops drawing and holds the last frame rather than clearing to black.
+`d`, `?drop=1` or `?dropAt=<sec>` moves the stream `live → fallback → offline`. `fallback` dims and
+keeps the last frame; `offline` stops drawing and holds the last frame rather than clearing to black.
+This is visible inside the recorded V1.1 pass at 30 s.
 
 ### H5 — director layer
 
@@ -130,19 +142,28 @@ default program source, and `DEBUG_ORBIT` is the only orbit-controlled view.
 
 ## Known gaps
 
-1. `STAGE_LOOKBACK` has no scale anchor: the performer sits at that camera's origin and is therefore
-   invisible. The view reads space but not scale.
-2. In `front-window` mode the fitted source window covers only part of the azimuth span, so the dome
-   behind the audience stays empty. This is mode semantics, not a state defect — and the HUD now
-   reports *state occupancy* and *window coverage* separately because reporting only the first made
-   the numbers disagree with the picture.
-3. `FULL_FIELD`'s procedural lattice reads similarly to the dome's own wireframe geometry, so
-   "projected content" can be mistaken for "model wireframe".
-4. `APERTURE` is a soft-edged bright patch rather than something that reads as an opening.
-5. The recording path (in-page `MediaRecorder` or CDP frame capture) is unverified, so no V1
-   recording exists yet.
-6. `center-1to1` / `pixel-1to1` LED pixel-grid fit modes are not implemented here; a dome has no
+Open after V1.1, all listed as V2 scope in `review-v1.md` §6:
+
+1. **The program view never gives the media the field of view.** At FULL_FIELD the floor and stage
+   still own the bottom ~40%, so the demo's own thesis ("the image occupies the whole view") is not
+   exercised from the audience camera. This is the largest gap.
+2. `STAGE_LOOKBACK` has no scale anchor: the performer sits at that camera's origin and is therefore
+   invisible. The view reads space but not scale. Visible inside the V1.1 recording at 21 s.
+3. The performer is ~30 × 97 px in the program view — traceable via the height rule, but not readable.
+4. `FULL_FIELD`'s procedural lattice is generated in angle space, so it reads like the dome's own
+   wireframe and would not transfer to a real spherical projection.
+5. `APERTURE` is a soft-edged bright patch rather than something that reads as an opening.
+6. `HORIZON` covers 0.8% of the dome surface, which is arguably below the threshold where a viewer
+   can tell there is any content at all.
+7. In `front-window` mode the fitted source window covers only part of the azimuth span, so the dome
+   behind the audience stays empty. This is mode semantics, not a state defect — the HUD reports
+   *dome coverage* and *window coverage* separately for that reason.
+8. `center-1to1` / `pixel-1to1` LED pixel-grid fit modes are not implemented here; a dome has no
    rectangular pixel grid. They remain relevant to the plane and cylinder demos.
+
+Fixed during V1.1 (kept for the record): the 5 m scale bar was declared in `scene.json` and cited here
+but had no geometry; the `占用` readout was an angular product that misdescribed coverage; the badge
+claimed a 4096² runtime raster that does not exist.
 
 ## Failure behaviour
 

@@ -21,6 +21,11 @@ coverage/
 *.glb
 !/examples/*.glb
 
+# Review scratch: frame dumps and screenshots captured by review agents.
+# Probe scripts worth keeping live in systems/stage-replica/review-tools/.
+**/_review_frames/
+**/_review_shots/
+
 # OS
 .DS_Store
 Thumbs.db

@@ -228,6 +228,17 @@
           card.append(section);
         }
 
+        if (demo.artifacts && demo.artifacts.length > 0) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "产物 / 证据"));
+          const chips = element("div", "chips");
+          for (const item of demo.artifacts) {
+            chips.append(link(item.label, item.url, item.primary ? "run" : ""));
+          }
+          section.append(chips);
+          card.append(section);
+        }
+
         if (demo.proxy.length > 0) {
           const section = element("div", "section");
           section.append(element("h3", null, "尺寸（proxy 与 confirmed 分离）"));
