@@ -1,0 +1,104 @@
+{
+  "sceneId": "stadium-360-a",
+  "units": "meters",
+  "note": "⌀20m 圆柱 LED 与 ⌀30m 圆形舞台来自 STUFISH 官方项目页（Anna Vissi / OAKA）。圆柱 8m 高、⌀120m 碗体、⌀12m performer zone 与 halo ring 为教学 proxy；95,000 人规模仅作参照，不做人群模拟。",
+  "structure": {
+    "arenaBowlDiameterM": 120,
+    "mainStageDiameterM": 30,
+    "performerZoneDiameterM": 12,
+    "ledCylinderDiameterM": 20,
+    "ledCylinderHeightM": 8,
+    "haloRingDiameterM": 12,
+    "performerHeightM": 1.7,
+    "eyeHeightM": 1.6,
+    "scaleBarM": 5
+  },
+  "screens": [
+    {
+      "id": "LED_CYLINDER",
+      "shape": "cylinder",
+      "physicalSize": {
+        "diameterM": 20,
+        "heightM": 8,
+        "circumferenceM": 62.8,
+        "unwrappedAspect": 7.85
+      },
+      "raster": { "master": "4096x512", "fast": "2048x256", "program": "1920x1080" },
+      "transform": { "positionM": [0, 4, 0], "rotationDeg": [0, 0, 0] },
+      "source": { "type": "procedural", "id": "panorama-generative", "state": "live" },
+      "fallback": { "type": "local-loop", "id": "cylinder-fallback-loop" }
+    }
+  ],
+  "panoramaModes": [
+    {
+      "id": "panorama",
+      "label": "8:1 全景母版",
+      "note": "2048×256 proxy 环绕 360°，比例正确（周长 62.8m / 高 8m ≈ 7.85:1）"
+    },
+    {
+      "id": "front-window",
+      "label": "16:9 前区窗口",
+      "note": "16:9 源只占正面 ±45°，其余保持暗——模拟「只有一块屏」"
+    },
+    {
+      "id": "repeat",
+      "label": "16:9 ×4 重复",
+      "note": "把 16:9 源在环上重复 4 次，用于看清比例差（测试用）"
+    },
+    { "id": "fill", "label": "16:9 拉伸填满", "note": "把 16:9 拉满 360°，会明显变形——用于对照" }
+  ],
+  "lightThroughScreen": {
+    "note": "STUFISH 原文：屏幕透明（blow-through）使灯光可以放在屏后，为灯光与内容同时增加层次。本 Demo 用屏后 8 根灯柱 + 屏幕半透明来低保真还原这一点。透明度下限由「PERFORMER_FRONT 必须看得见屏后的人」决定——V1 用 0.86 时人物完全被挡掉，等于否定了 blow-through 这个已确认属性。",
+    "backLightBars": 8,
+    "screenOpacity": 0.55
+  },
+  "cameras": [
+    {
+      "id": "BOWL_WIDE",
+      "label": "观众席高位·完整看圆形舞台",
+      "position": [0, 18, 52],
+      "target": [0, 5, 0],
+      "fovDeg": 42,
+      "eyeHeightM": null,
+      "note": "碗体高位机位（技术/看台视角），Program 默认。"
+    },
+    {
+      "id": "PERFORMER_FRONT",
+      "label": "人物近景·屏幕作背景",
+      "position": [0, 2.4, 22],
+      "target": [0, 3.0, 0],
+      "fovDeg": 40,
+      "eyeHeightM": 2.4,
+      "note": "人眼高度附近，检查人物与环绕屏的关系。"
+    },
+    {
+      "id": "ORBIT_45",
+      "label": "绕舞台 45° 轨道",
+      "position": [19, 9, 19],
+      "target": [0, 4, 0],
+      "fovDeg": 45,
+      "eyeHeightM": null,
+      "note": "45° 轨道机位，检查 360° 下没有单一正面。"
+    },
+    {
+      "id": "TOP",
+      "label": "垂直俯视·看 360° 几何",
+      "position": [0, 62, 0.5],
+      "target": [0, 0, 0],
+      "fovDeg": 50,
+      "eyeHeightM": null,
+      "note": "几何机位：用于讲清圆形舞台与环形屏的关系。"
+    }
+  ],
+  "cue": {
+    "durationSec": 32,
+    "rampSec": 1.6,
+    "states": [
+      { "id": "LOW", "label": "铺垫", "start": 0, "end": 8 },
+      { "id": "BUILD", "label": "建立", "start": 8, "end": 16 },
+      { "id": "PEAK", "label": "爆发", "start": 16, "end": 24 },
+      { "id": "RELEASE", "label": "收束", "start": 24, "end": 32 }
+    ]
+  },
+  "programCamera": "BOWL_WIDE"
+}

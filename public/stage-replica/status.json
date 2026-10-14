@@ -343,28 +343,76 @@
       "role": "Camera / Director / Program Out 技术强化",
       "question": "同一条视觉进入 360° 圆柱媒体面以后，人物、观看位置和导播切换怎样改变最终观看结果？",
       "done": "舞台预演不只是在看模型；摄像机本身也在重新编排演出。",
-      "run": null,
+      "run": { "label": "打开预演", "url": "stadium/" },
       "stages": {
-        "REFERENCE": "todo",
-        "GRAYBOX": "todo",
-        "V1": "todo",
-        "REVIEW": "todo",
+        "REFERENCE": "done",
+        "GRAYBOX": "done",
+        "V1": "done",
+        "REVIEW": "active",
         "V2": "todo",
         "DELIVERY": "todo"
       },
-      "states": [],
-      "views": [],
-      "modes": [],
-      "proxy": [
-        ["Arena proxy", "⌀120 m", "教学 proxy"],
-        ["主舞台", "⌀30 m", "可确认"],
-        ["LED 圆柱", "⌀20 m × 8 m 高", "8m 高为教学 proxy"],
-        ["Panorama 母版", "4096 × 512 / 2048 × 256", "proxy"],
-        ["观众规模", "约 95,000", "可确认"]
+      "states": [
+        { "id": "LOW", "label": "铺垫 · 覆盖 90°", "url": "stadium/?t=4&quad=0" },
+        { "id": "BUILD", "label": "建立 · 覆盖 180°", "url": "stadium/?t=12&quad=0" },
+        { "id": "PEAK", "label": "爆发 · 覆盖 360°", "url": "stadium/?t=20&quad=0" },
+        { "id": "RELEASE", "label": "收束 · 退回 80°", "url": "stadium/?t=28&quad=0" }
       ],
-      "confirmed": ["STUFISH / Anna Vissi OAKA：360° in-the-round，⌀30 m 圆形舞台，⌀20 m 圆柱 LED"],
-      "v1Observations": [],
-      "next": "最后执行；补完 Quad Preview / Program Out / 多机位导播。",
+      "views": [
+        { "id": "BOWL_WIDE", "url": "stadium/?t=20&view=BOWL_WIDE&quad=0" },
+        { "id": "PERFORMER_FRONT", "url": "stadium/?t=20&view=PERFORMER_FRONT&quad=0" },
+        { "id": "ORBIT_45", "url": "stadium/?t=20&view=ORBIT_45&quad=0" },
+        { "id": "TOP", "url": "stadium/?t=20&view=TOP&quad=0" }
+      ],
+      "modes": [
+        { "id": "8:1 全景母版", "url": "stadium/?t=20&pano=panorama&quad=0" },
+        { "id": "16:9 前区窗口", "url": "stadium/?t=20&pano=front-window&quad=0" },
+        { "id": "16:9 ×4 重复", "url": "stadium/?t=20&pano=repeat&quad=0" },
+        { "id": "16:9 拉伸填满", "url": "stadium/?t=20&pano=fill&quad=0" }
+      ],
+      "artifacts": [
+        {
+          "label": "▶ V1 导演版 32s（Wide→Performer→Orbit→Top→Wide，含四分屏）",
+          "url": "stadium/delivery/v1-director-32s.mp4",
+          "primary": true
+        },
+        { "label": "V1 PEAK（覆盖 360°）", "url": "stadium/stills/v1-peak.png" },
+        {
+          "label": "V1 PERFORMER_FRONT（透过 blow-through 屏看见人）",
+          "url": "stadium/stills/v1-performer-front.png"
+        },
+        { "label": "V1 TOP（360° 几何）", "url": "stadium/stills/v1-top.png" },
+        { "label": "V1 Quad Preview", "url": "stadium/stills/v1-quad.png" },
+        { "label": "V1 16:9 前区窗口", "url": "stadium/stills/v1-pano-front-window.png" },
+        {
+          "label": "REFERENCE（STUFISH 逐字核验）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/stadium/reference/reference.md"
+        }
+      ],
+      "proxy": [
+        ["LED 圆柱", "⌀20 m", "**可确认**（STUFISH 原文）"],
+        ["主舞台", "⌀30 m", "**可确认**（STUFISH 原文）"],
+        ["圆柱高度", "8 m", "教学 proxy —— 参考未给高度"],
+        ["Arena 碗体", "⌀120 m", "教学 proxy"],
+        ["Performer zone / halo", "⌀12 m", "教学 proxy"],
+        ["Panorama", "4096×512 / 2048×256", "展开比 7.85:1 由已确认尺寸推导"],
+        ["观众规模", "约 95,000", "可确认，仅作参照（不做人群模拟）"]
+      ],
+      "confirmed": [
+        "360° in-the-round，95,000 人环绕（STUFISH 原文逐字）",
+        "20m cylindrical blow-through LED screen rises like a beacon above a 30m circular stage（STUFISH 原文逐字）",
+        "屏幕透明使灯光可以放在屏后，为灯光与内容同时增加层次（STUFISH 原文逐字）——本 Demo 据此做了屏后 8 根灯柱 + 半透明屏",
+        "同一巡演在 Sheffield Arena 有 10m 直径 LED 旋转可变形版本，说明圆形方案在两种尺度上都成立"
+      ],
+      "v1Observations": [
+        "【构建期发现并已修】PERFORMER_FRONT 看不到人物：performer 在圆柱内部，而屏幕本来是不透明的。根因是 ShaderMaterial **不会自动应用 material.opacity**——V1 设了 opacity 0.86 却在着色器里写死 alpha=1.0，屏幕其实一直是不透明的。已改为用 uOpacity uniform 输出 alpha（0.55），这才真正复现了参考确认的 blow-through 透明性。",
+        "【构建期发现并已修】屏后一根灯柱正好落在 0° 视线上，挡住了 PERFORMER_FRONT 唯一要展示的人。灯柱改为半格偏移（22.5°、67.5°…），中心视线让开。",
+        "360° 场地下没有单一「正面」——HUD 的「覆盖角度 + 旋转角度」是理解状态的必要读数，而不是装饰。",
+        "95,000 人规模只用一圈围栏刻度表示（brief 明确不做人群模拟），因此「被环绕」是靠**几何**读出来的，不是靠人。",
+        "16:9 输入的三种处理（前区窗口 / ×4 重复 / 拉伸填满）与 8:1 全景母版并列，直接暴露「同一条素材换到圆柱上比例会怎样崩」。",
+        "PERFORMER_FRONT 里人物仍然偏小：相机在 22m 外、人只有 1.7m，符合真实看台关系，但读尺度仍需靠近。"
+      ],
+      "next": "独立 REVIEW：让不参与构建的 agent 看 V1，重点核对「同一视觉进入 360° 圆柱后人物/观看位置/导播是否真的改变结果」，以及四状态是否只是覆盖角度的数值变化。之后 V2 至少改两项（brief 对 Stadium 的要求是改 camera sequence 与至少一个视觉状态）。",
       "notesKey": "stagereplica.review.stadium"
     }
   ]

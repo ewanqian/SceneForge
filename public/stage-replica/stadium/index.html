@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#05070a" />
+    <title>Stage Replica · Stadium / 360° Concert</title>
+    <style>
+      :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #05070a; color: #f4f6f8; }
+      canvas { display: block; }
+      .hud { position: fixed; z-index: 10; bottom: max(16px, env(safe-area-inset-bottom)); left: max(16px, env(safe-area-inset-left)); width: min(370px, calc(100vw - 32px)); padding: 12px; border: 1px solid rgba(255,255,255,.16); border-radius: 14px; background: rgba(6,8,12,.78); backdrop-filter: blur(18px); box-shadow: 0 18px 50px rgba(0,0,0,.28); }
+      .hud h1 { font-size: 13px; margin: 0 0 2px; letter-spacing: .04em; }
+      .hud .sub { font-size: 11px; color: #8d97a3; margin-bottom: 10px; }
+      .meta { display: grid; grid-template-columns: 80px 1fr; gap: 4px 10px; font-size: 11.5px; color: #a9b0ba; }
+      .meta strong { color: #eef1f4; font-weight: 600; overflow-wrap: anywhere; }
+      .wrap { color: #9fe0b4; }
+      .row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+      button { flex: 1 1 auto; min-height: 32px; border-radius: 8px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.07); color: #f4f6f8; padding: 6px 9px; font: inherit; font-size: 11px; cursor: pointer; }
+      button:hover { background: rgba(255,255,255,.13); }
+      button[aria-pressed="true"] { background: #f3f5f7; color: #07090d; border-color: transparent; font-weight: 650; }
+      .badge { position: fixed; z-index: 10; top: max(16px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); max-width: 380px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; background: rgba(6,8,12,.78); backdrop-filter: blur(14px); font-size: 11px; line-height: 1.5; color: #f0c98a; text-align: right; }
+      .badge span { color: #8d97a3; }
+      .badge a { color: #cfe0f5; }
+      .quad { position: fixed; z-index: 9; pointer-events: none; }
+      .quad-label { position: absolute; font: 650 10px/1 ui-monospace, monospace; color: #e8edf3; text-shadow: 0 1px 3px #000; letter-spacing: .04em; }
+      .quad-frame { position: absolute; border: 1px solid rgba(255,255,255,.28); }
+      .quad-frame[data-program="true"] { border-color: #7cc4ff; }
+      .stream[data-state="fallback"], .stream[data-state="offline"] { color: #f0c98a; }
+      .stream[data-state="live"] { color: #9ee6a8; }
+      .cut { position: fixed; z-index: 10; bottom: max(16px, env(safe-area-inset-bottom)); right: max(16px, env(safe-area-inset-right)); font: 650 11px/1.4 ui-monospace, monospace; color: #8d97a3; text-align: right; pointer-events: none; }
+      .cut b { color: #7cc4ff; }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="hud">
+      <h1>STAGE REPLICA · STADIUM / 360° CONCERT</h1>
+      <div class="sub">Issue #79 · P3 · Camera / Director / Program Out</div>
+      <div class="meta">
+        <span>STATE</span><strong id="hud-state">—</strong>
+        <span>CUE</span><strong id="hud-cue">—</strong>
+        <span>RING</span><strong class="wrap" id="hud-wrap">—</strong>
+        <span>PANORAMA</span><strong id="hud-pano">—</strong>
+        <span>STREAM</span><strong class="stream" id="hud-stream">—</strong>
+        <span>PROGRAM</span><strong id="hud-cam">—</strong>
+      </div>
+      <div class="row" id="row-cam"></div>
+      <div class="row" id="row-pano"></div>
+      <div class="row">
+        <button type="button" id="btn-cue">暂停 CUE</button>
+        <button type="button" id="btn-drop">模拟源中断</button>
+      </div>
+    </div>
+    <div class="badge">
+      <b>教学预演 PROXY</b><br />
+      ⌀20m 圆柱 LED · ⌀30m 圆形舞台 <span>（STUFISH 官方）</span><br />
+      圆柱 8m 高 · ⌀120m 碗体 · ⌀12m 人物区 为教学 proxy<br />
+      展开比 62.8 : 8 ≈ 7.85 : 1 → 母版 4096×512，运行时 2048×256<br />
+      <a href="https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/stadium/reference/reference.md" target="_blank" rel="noreferrer">参考来源与 confirmed / proxy 对照 ↗</a>
+    </div>
+    <div class="quad" id="quad"></div>
+    <div class="cut">数字键 <b>1–4</b> Cut · <b>Space</b> 回 Program</div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
