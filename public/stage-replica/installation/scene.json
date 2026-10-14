@@ -1,0 +1,81 @@
+{
+  "sceneId": "installation-black-box-a",
+  "units": "meters",
+  "note": "主投影 10.24 × 5.4 m 是 Ryoji Ikeda 官方公布的 data-verse 最低展示尺寸；4096×2160 由已确认的 DCI-4K 器材换算。房间、观看距离与地面投影为教学 proxy。",
+  "structure": {
+    "room": { "widthM": 14, "depthM": 18, "heightM": 7 },
+    "projectionMain": { "widthM": 10.24, "heightM": 5.4, "centerYM": 3.2 },
+    "projectionFloor": { "widthM": 10.24, "heightM": 5.4, "enabledByDefault": false },
+    "viewerNearM": 6,
+    "viewerFarM": 12,
+    "performerHeightM": 1.7,
+    "eyeHeightM": 1.6
+  },
+  "screens": [
+    {
+      "id": "WALL_MAIN",
+      "shape": "plane",
+      "physicalSize": { "widthM": 10.24, "heightM": 5.4 },
+      "raster": { "master": "4096x2160" },
+      "transform": { "positionM": [0, 3.2, -9], "rotationDeg": [0, 0, 0] },
+      "source": { "type": "procedural", "id": "rule-based-generative", "state": "live" },
+      "fallback": { "type": "local-loop", "id": "projection-fallback-loop" }
+    },
+    {
+      "id": "FLOOR_OPTIONAL",
+      "shape": "plane",
+      "physicalSize": { "widthM": 10.24, "heightM": 5.4 },
+      "raster": { "master": "2048x1080" },
+      "transform": { "positionM": [0, 0.02, -4], "rotationDeg": [-90, 0, 0] },
+      "source": { "type": "procedural", "id": "rule-based-generative", "state": "live" },
+      "fallback": { "type": "local-loop", "id": "projection-fallback-loop" },
+      "note": "课程比较实验，不声称为 data-verse 原作配置"
+    }
+  ],
+  "cameras": [
+    {
+      "id": "CENTER",
+      "label": "6m 正中",
+      "position": [0, 1.6, -3],
+      "target": [0, 3.2, -9],
+      "fovDeg": 58,
+      "eyeHeightM": 1.6
+    },
+    {
+      "id": "FAR",
+      "label": "12m 正中",
+      "position": [0, 1.6, 3],
+      "target": [0, 3.2, -9],
+      "fovDeg": 58,
+      "eyeHeightM": 1.6
+    },
+    {
+      "id": "LEFT",
+      "label": "左侧 30°",
+      "position": [-5.2, 1.6, -1],
+      "target": [0, 3.2, -9],
+      "fovDeg": 58,
+      "eyeHeightM": 1.6
+    },
+    {
+      "id": "FLOOR",
+      "label": "低机位·看墙与地",
+      "position": [0, 0.7, -2.4],
+      "target": [0, 2.6, -9],
+      "fovDeg": 66,
+      "eyeHeightM": 0.7
+    }
+  ],
+  "cue": {
+    "durationSec": 48,
+    "rampSec": 4.0,
+    "note": "48 秒而非 32 秒：这个 Demo 验证的是 duration，状态切换要慢。",
+    "states": [
+      { "id": "SPARSE", "label": "铺垫", "start": 0, "end": 12 },
+      { "id": "ACCUMULATE", "label": "累积", "start": 12, "end": 24 },
+      { "id": "DENSE", "label": "密集", "start": 24, "end": 36 },
+      { "id": "AFTERIMAGE", "label": "余像", "start": 36, "end": 48 }
+    ]
+  },
+  "programCamera": "CENTER"
+}
