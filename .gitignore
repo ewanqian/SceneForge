@@ -23,8 +23,11 @@ coverage/
 
 # Review scratch: frame dumps and screenshots captured by review agents.
 # Probe scripts worth keeping live in systems/stage-replica/review-tools/.
+# NOTE: biome lints HTML as well, so a review agent's scratch .html can fail CI lint.
+# Every "scratch" prefix a reviewer might use must be listed here.
 **/_review_frames/
 **/_review_shots/
+**/_review_scratch/
 
 # Local-only third-party reference captures (this repository is public; we link, not republish).
 **/_local/

@@ -392,7 +392,6 @@ function quadLayout(width) {
   const tileWidth = Math.round(Math.min(288, width * 0.21));
   const tileHeight = Math.round((tileWidth * 9) / 16);
   const totalWidth = tileWidth * 2 + TILE_GAP;
-  const totalHeight = tileHeight * 2 + TILE_GAP;
   const originX = width - TILE_MARGIN - totalWidth;
   const originY = TILE_MARGIN;
   const tiles = cameraList.map((camera, index) => {
