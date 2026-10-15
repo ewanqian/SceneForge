@@ -274,15 +274,19 @@
         "REFERENCE": "done",
         "GRAYBOX": "done",
         "V1": "done",
-        "REVIEW": "active",
-        "V2": "todo",
+        "REVIEW": "done",
+        "V2": "active",
         "DELIVERY": "todo"
       },
       "states": [
-        { "id": "SPARSE", "label": "铺垫 · 密度 2%", "url": "installation/?t=6" },
-        { "id": "ACCUMULATE", "label": "累积 · 密度 16%", "url": "installation/?t=18" },
-        { "id": "DENSE", "label": "密集 · 密度 58%", "url": "installation/?t=30" },
-        { "id": "AFTERIMAGE", "label": "余像 · 残影保持", "url": "installation/?t=42" }
+        { "id": "SPARSE", "label": "铺垫 · 实际占用 2.0%", "url": "installation/?t=6" },
+        { "id": "ACCUMULATE", "label": "累积 · 实际占用 14.6%", "url": "installation/?t=18" },
+        { "id": "DENSE", "label": "密集 · 实际占用 44.6%", "url": "installation/?t=30" },
+        {
+          "id": "AFTERIMAGE",
+          "label": "余像 · 待 V2 重做（见 REVIEW）",
+          "url": "installation/?t=42"
+        }
       ],
       "views": [
         { "id": "CENTER", "url": "installation/?t=30&view=CENTER" },
@@ -324,14 +328,20 @@
         "相邻作品确有镜面/地面做法（The Universe within the Universe、micro | macro、the critical paths），但本项目的地面投影仍是课程实验"
       ],
       "v1Observations": [
-        "DENSE 原本名不副实：36% 格占用 + 1px 短线读起来仍是稀疏场，状态没兑现自己的名字。已在冻结前提到 58% 并把短线加粗到 2px。",
-        "投影边界在黑盒里不可读——而 10.24×5.4m 的尺寸恰恰是这个 Demo 要验证的东西。已加淡边框标出投射面。",
-        "音频未实现。brief 只要求「音频可以播放，但不要求 audio-reactive」，V1 没有音轨：无头录屏 + 音频通道会引入额外变数。这是已知缺口，不声称已完成。",
-        "「墙 + 地面」的空间化增益偏弱：低机位能看到两侧同时发亮，但它是否真的比单面墙更成立，需要独立 review 判断而不是由构建者断言。",
-        "48 秒里状态是「缓慢生长」而不是「事件」，判据因此与另外三个 Demo 不同：四状态是否真的不同，要靠密度与停留时间回答，而不是构图面积。",
-        "CENTER(6m) 与 FAR(12m) 的差别在静帧里不明显，只有在连续播放时才读得出「观看距离改变的是画面占比与压力」。"
+        "【独立 review 判定】does not hold up — as the test it claims to be。问题不是画面好不好看，而是这个 Demo 声称要检验的四件事（尺寸 / 观看距离 / 声音 / 持续时间）里有三件没有被真正检验。构建者接受该判定，且本轮**没有需要否证的条目**。",
+        "【B1 已确认】AFTERIMAGE 把每帧重画的静态线条在淡出合成下**累积成一条横贯全屏的硬直线**：实测源图 y=450 行亮度均值 20.807、frac>10 = 1.000（整行完全均匀），而同一行在 t=18 只有 2.86。这是渲染瑕疵，只在一个状态出现。",
+        "【B2 已确认】AFTERIMAGE 实为「被压暗的 SPARSE」：residual 只在 >0.5 切换、淡出半衰期约 0.2 秒，而布局每 6 秒才重排 → 没有东西可以拖尾。点亮面积 0.688 / 1.331 / 3.129 / 1.000%，峰值 46 / 148 / 203 / 51。",
+        "【B3 已确认】观看距离只改变缩放：材质是 1280×720 画布（125 px/m），而 scene.json 声明的 4096×2160（400 px/m）**从未被 main.js 读取**。CENTER 与 FAR 的投影包围盒比值 0.496 / 0.520 —— 正好一半，内容与可读性无变化。",
+        "【B4 已确认】「墙 + 地面」是同一张 texture 的拷贝，且两面不在同一坐标系统（中间 2.3m 未打光）；在 Program 机位做差分，UI 之外的 3D 渲染**逐位相同**。",
+        "【B5 已确认】黑盒在 Program 机位读作空洞；场景唯一的尺度物（5m 比例尺）在 CENTER/LEFT/FLOOR 都位于相机身后，在 FAR 也低于视轴 65°。五个机位实测 **0 个近白像素**。performerHeightM / eyeHeightM / viewerNearM / viewerFarM 从未被读取。",
+        "【F1 已确认】HUD 的 DENSITY 是生成器参数、且有放回抽样：标称 58% 时实际只点亮 44.6% 的不同格子（准确值 2.00 / 14.63 / 44.57 / 4.95%）。状态标签已改为报告实际占用。",
+        "【F4 已确认】`&hud=0` 写在注释里但没有实现——这是构建者的文档谎言，V2 必须实现或删掉该说法。",
+        "【F7 已确认】`?t=30&drop=1` 得到近乎全黑的墙 + OFFLINE，而 `dropAt=20` 才是预期的 FALLBACK 亮度：`drop=1` 单独使用不能复现 fallback 画面。",
+        "【D 已确认・最严重的一条】48 秒并没有「建立」：4 次 ramp 之间有 8 秒静止，而**全片最大的两次变化是每 6 秒的整场重排**（|Δ| 3.528 / 3.426），比状态切换本身（0.954）还大。在一个明确禁止快速导播的 Demo 里，最大的视觉事件是一次剪切。",
+        "【评审同时确认做对的】confirmed / proxy 分离是三处一致的（reference.md、proxy 表、画面角标）；「暗房里不画边就看不出投影边界」这一点确实解决了（边框线约 26/255，可见）。",
+        "【方法论结论】Sphere 与 Festival 的变量是空间与构图，看画面就够；Installation 的变量是时间与距离，**必须靠测量**。V2 的每个状态都要给出可测的变化量，而不只是「看起来不一样」。"
       ],
-      "next": "独立 REVIEW：让不参与构建的 agent 看 V1，重点核对「少量素材能否成立」以及四状态是否只是密度数值不同、还是真的形成不同的观看体验。之后 V2 至少改两项。",
+      "next": "V2 范围（详见 review-installation-v1.md 第二部分）：①观看关系——重排四个机位让地面与房间边线入画、把已知尺寸的参照物放进所有机位、让 6m↔12m 作用在细节与视场压力上；②构图面积——源改为与 10.24×5.4m 等比例（修掉 6.7% 拉伸）、墙与地共享同一坐标系统（否则只是第二块屏）、DENSITY 报告去重后的实际占用；③状态节奏——重写 AFTERIMAGE 为真正的累积缓冲（静态装饰线在残留模式不得重画）、取消每 6 秒整场重排、让 ACCUMULATE 真的累积。另需实现 `?hud=0`、让 `drop=1` 单独可复现可读的 fallback、并对齐 raster 声明。声音：brief 只要求「可以播放」，V2 可以加可选音轨，但不会声称它已被检验。",
       "notesKey": "stagereplica.review.installation"
     },
     {
