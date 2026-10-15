@@ -51,50 +51,104 @@ const instanceCap = Number.parseInt(params.get("cap") ?? "", 10) || spec.crowd.m
 
 // ---------------------------------------------------------------- stands + sightlines
 const human = () => spec.sightline[posture];
-const focusH = spec.sightline.focusHeightM;
 const targetC = spec.sightline.cValueTargetM;
+const focusOptions = spec.sightline.focus.options;
+let focusId = focusOptions.some((o) => o.id === params.get("focus"))
+  ? params.get("focus")
+  : spec.sightline.focus.defaultId;
+const focus = () => focusOptions.find((o) => o.id === focusId) ?? focusOptions[0];
+const focusH = () => focus().heightM;
+const focusR = () => focus().radiusM;
+
+// Horizontal distance from a row to the focus. The whole recurrence scales with this, which is
+// exactly why the focus point has to be declared rather than assumed: moving it from the bowl axis
+// to the stage edge changes the headline "first failing row" from 13 to 2.
+const distToFocus = (radius) => radius - focusR();
 
 /** Build the rake. `sightline` mode solves for the riser that holds C at the target. */
 function buildRows() {
   const s = spec.stands;
   const { eyeHeightM: E, headHeightM: P } = human();
-  const rows = [];
-  let height = s.startHeightM;
+  const f = focusH();
+  const list = [];
   for (let i = 0; i < s.rows; i += 1) {
     const radius = s.innerRadiusM + (i + 0.5) * s.rowDepthM;
+    let height;
     if (i === 0 || rakeMode === "constant") {
       height = s.startHeightM + i * s.riserM;
     } else {
       // Solve for the riser h that yields exactly targetC:
       //   C = f + k*(y_prev + h + E - f) - (y_prev + P),  k = D_prev / D_i
       // => h = [C - f + y_prev + P - k*(y_prev + E - f)] / k
-      const dPrev = s.innerRadiusM + (i - 0.5) * s.rowDepthM;
-      const k = dPrev / radius;
-      const yPrev = rows[i - 1].height;
-      const h = (targetC - focusH + yPrev + P - k * (yPrev + E - focusH)) / k;
+      const dPrev = distToFocus(s.innerRadiusM + (i - 0.5) * s.rowDepthM);
+      const k = dPrev / distToFocus(radius);
+      const yPrev = list[i - 1].height;
+      const h = (targetC - f + yPrev + P - k * (yPrev + E - f)) / k;
       height = yPrev + Math.max(h, 0);
     }
-    rows.push({ index: i, radius, height, riser: i === 0 ? 0 : height - rows[i - 1].height });
+    list.push({ index: i, radius, height, riser: i === 0 ? 0 : height - list[i - 1].height });
   }
-  return rows;
+  return list;
 }
 
-/** C-value per row: clearance over the head of the row in front. Row 0 has nobody in front. */
-function computeCValues(rows) {
+/** C-value per row: clearance over the head of the row in front. Row 1 has nobody in front. */
+function computeCValues(list) {
   const { eyeHeightM: E, headHeightM: P } = human();
   const s = spec.stands;
-  return rows.map((row, i) => {
+  const f = focusH();
+  return list.map((row, i) => {
     if (i === 0) return null;
-    const dPrev = s.innerRadiusM + (i - 0.5) * s.rowDepthM;
-    const yPrev = rows[i - 1].height;
+    const dPrev = distToFocus(s.innerRadiusM + (i - 0.5) * s.rowDepthM);
+    const yPrev = list[i - 1].height;
     const eye = row.height + E;
-    const lineAtPrev = focusH + (eye - focusH) * (dPrev / row.radius);
-    return lineAtPrev - (yPrev + P);
+    return f + (eye - f) * (dPrev / distToFocus(row.radius)) - (yPrev + P);
+  });
+}
+
+// A negative C means the sightline to the FOCUS is blocked. It does NOT mean the row is blind -
+// "cannot see the focus point" and "cannot see the performer" are different statements, and the
+// independent review showed they differ by roughly a factor of six. So both are computed and the
+// page reports the second one, which is the one a viewer would actually care about.
+const TARGETS = [
+  { id: "performerHead", label: "表演者头部", radiusM: 0, yM: 3.3 },
+  { id: "performerFeet", label: "表演者脚部", radiusM: 0, yM: 1.6 },
+  { id: "screenTop", label: "LED 屏顶", radiusM: 10, yM: 8 },
+  { id: "screenBottom", label: "LED 屏底", radiusM: 10, yM: 0 },
+];
+
+function computeVisibility(list) {
+  const { eyeHeightM: E, headHeightM: P } = human();
+  return list.map((row, i) => {
+    if (i === 0) return Object.fromEntries(TARGETS.map((t) => [t.id, true]));
+    const prev = list[i - 1];
+    const headY = prev.height + P;
+    const eyeY = row.height + E;
+    const span = row.radius;
+    const visible = {};
+    for (const target of TARGETS) {
+      const run = span - target.radiusM;
+      const atHead =
+        run <= 0
+          ? Number.POSITIVE_INFINITY
+          : target.yM + (eyeY - target.yM) * ((prev.radius - target.radiusM) / run);
+      visible[target.id] = atHead >= headY;
+    }
+    return visible;
   });
 }
 
 let rows = buildRows();
 let cValues = computeCValues(rows);
+let visibility = computeVisibility(rows);
+
+/** Counts of rows that lose each target entirely, which is the number a viewer cares about. */
+function occlusionSummary() {
+  const started = visibility.slice(1);
+  const lostPerformer = started.filter((v) => !v.performerHead).length;
+  const lostFeetOnly = started.filter((v) => v.performerHead && !v.performerFeet).length;
+  const lostScreen = started.filter((v) => !v.screenTop).length;
+  return { lostPerformer, lostFeetOnly, lostScreen, total: started.length };
+}
 
 // A solved riser lands exactly on the target, so a bare `c < target` flags rows that are precisely
 // compliant as failures. Compare with a tolerance instead.
@@ -224,7 +278,16 @@ const seatSpacing = () => spec.crowd.seatSpacingM[posture];
 const maxDensity = () => 1 / (seatSpacing() * spec.stands.rowDepthM);
 
 let crowdMesh = null;
-let crowdStats = { people: 0, capacity: 0, seats: 0 };
+let crowdStats = {
+  people: 0,
+  capacity: 0,
+  occupiable: 0,
+  seatAreaM2: 0,
+  drawnDensity: 0,
+  parameterDensity: 0,
+  maxDensity: 0,
+  capped: false,
+};
 
 function buildCrowd() {
   if (crowdMesh) {
@@ -312,7 +375,19 @@ function buildCrowd() {
   mesh.frustumCulled = false;
   scene.add(mesh);
   crowdMesh = mesh;
-  crowdStats = { people: placements.length, capacity, seats };
+  crowdStats = {
+    people: placements.length,
+    capacity,
+    // `capacity` counts every layout position including the walkway rows and the radial aisles,
+    // which can never be sold. `occupiable` is the number a venue would actually quote, and it was
+    // computed here all along but never shown.
+    occupiable: seats,
+    seatAreaM2: seats * spacing * spec.stands.rowDepthM,
+    drawnDensity: seats > 0 ? placements.length / (seats * spacing * spec.stands.rowDepthM) : 0,
+    parameterDensity: densityOf(densityKey),
+    maxDensity: maxDensity(),
+    capped: placements.length >= instanceCap,
+  };
 }
 
 // ---------------------------------------------------------------- encirclement (from the stage)
@@ -401,7 +476,7 @@ function rebuildAids() {
 const overlayRow = document.getElementById("row-overlay");
 const viewRow = document.getElementById("row-view");
 const densityRow = document.getElementById("row-density");
-const buttons = { overlay: new Map(), view: new Map(), density: new Map() };
+const buttons = { overlay: new Map(), view: new Map(), density: new Map(), focus: new Map() };
 
 for (const o of spec.overlays) {
   const b = document.createElement("button");
@@ -438,6 +513,22 @@ for (const key of Object.keys(spec.crowd.densities)) {
   buttons.density.set(key, b);
 }
 
+// The focus point decides every sightline number on the page, so it is a visible control rather
+// than a constant buried in the config.
+const focusRow = document.getElementById("row-focus");
+for (const option of focusOptions) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = option.label;
+  b.title = option.note;
+  b.addEventListener("click", () => {
+    focusId = option.id;
+    rebuildStands();
+  });
+  focusRow.appendChild(b);
+  buttons.focus.set(option.id, b);
+}
+
 const rakeButton = document.createElement("button");
 rakeButton.type = "button";
 rakeButton.id = "btn-rake";
@@ -466,6 +557,7 @@ function syncButtons() {
   for (const [k, b] of buttons.overlay) b.setAttribute("aria-pressed", String(k === overlay));
   for (const [k, b] of buttons.view) b.setAttribute("aria-pressed", String(k === viewId));
   for (const [k, b] of buttons.density) b.setAttribute("aria-pressed", String(k === densityKey));
+  for (const [k, b] of buttons.focus) b.setAttribute("aria-pressed", String(k === focusId));
   rakeButton.setAttribute("aria-pressed", String(rakeMode === "sightline"));
   rakeButton.textContent =
     rakeMode === "constant"
@@ -480,6 +572,7 @@ function rebuildStands() {
   });
   rows = buildRows();
   cValues = computeCValues(rows);
+  visibility = computeVisibility(rows);
   bowl = buildBowl();
   scene.add(bowl);
   buildCrowd();
@@ -575,16 +668,20 @@ probe.style.display = "none";
 document.body.appendChild(probe);
 
 function updateHud() {
-  const density = densityOf(densityKey);
   const enc = computeEncirclement();
+  const occ = occlusionSummary();
   const minC = Math.min(...cValues.filter((c) => c !== null));
   const failIndex = cValues.findIndex((c, i) => i > 0 && failsSightline(c));
+  // PEOPLE reports what is DRAWN, and says so when the instance cap is truncating it - the
+  // published V1 stills were capped at 12,000 of 22,215 while their HUD printed the uncapped
+  // density, which is precisely the kind of quiet mismatch this layer is supposed to prevent.
   document.getElementById("m-people").textContent =
-    `${crowdStats.people.toLocaleString()} / 容量 ${crowdStats.capacity.toLocaleString()}`;
+    `${crowdStats.people.toLocaleString()}${crowdStats.capped ? " ⚠ 已截断" : ""} / 可占座 ${crowdStats.occupiable.toLocaleString()}`;
+  // DENSITY reports the density actually drawn, with the parameter in brackets for comparison.
   document.getElementById("m-density").textContent =
-    `${density} 人/m²（满座 ${maxDensity().toFixed(2)}）`;
+    `实际 ${crowdStats.drawnDensity.toFixed(2)} 人/m²（档位 ${crowdStats.parameterDensity}，上限 ${crowdStats.maxDensity.toFixed(2)}）`;
   document.getElementById("m-rows").textContent =
-    `${rows.length} 排 · ${posture === "standing" ? "站姿" : "坐姿"} · ${rakeMode === "constant" ? "等升阶" : "解算升阶"}`;
+    `${rows.length} 排 · ${posture === "standing" ? "站姿" : "坐姿"} · ${rakeMode === "constant" ? "等升阶" : "解算升阶"} · 焦点 ${focus().label}`;
   const cminEl = document.getElementById("m-cmin");
   cminEl.textContent = `最小 ${(minC * 1000).toFixed(0)}mm`;
   cminEl.className = minC >= targetC ? "good" : "warn";
@@ -597,19 +694,35 @@ function updateHud() {
     ? `水平 ${enc.percent.toFixed(0)}% · 垂直 ${enc.verticalFromDeg.toFixed(1)}°→${enc.verticalToDeg.toFixed(1)}° · 最近 ${enc.nearestM.toFixed(1)}m`
     : "—";
   document.getElementById("m-view").textContent = viewId;
+  // The most emotive number on the page, and the one V1 never actually computed.
+  const blockedEl = document.getElementById("m-blocked");
+  if (blockedEl) {
+    blockedEl.textContent =
+      occ.total > 0
+        ? `${occ.lostPerformer}/${occ.total} 排完全看不到表演者 · ${occ.lostFeetOnly} 排只丢脚部 · ${occ.lostScreen} 排完全看不到屏`
+        : "—";
+  }
 
   if (params.get("probe") === "1") {
     probe.textContent = JSON.stringify({
       people: crowdStats.people,
-      capacity: crowdStats.capacity,
-      densityPerM2: density,
-      maxDensityPerM2: maxDensity(),
+      occupiable: crowdStats.occupiable,
+      layoutPositions: crowdStats.capacity,
+      capped: crowdStats.capped,
+      drawnDensityPerM2: crowdStats.drawnDensity,
+      parameterDensity: crowdStats.parameterDensity,
+      maxDensityPerM2: crowdStats.maxDensity,
+      seatAreaM2: crowdStats.seatAreaM2,
       posture,
       rakeMode,
+      focus: focusId,
+      focusRadiusM: focusR(),
+      focusHeightM: focusH(),
       rows: rows.length,
       minCMm: minC * 1000,
       firstFailRow: failIndex > 0 ? failIndex + 1 : null,
       firstFailCMm: failIndex > 0 ? cValues[failIndex] * 1000 : null,
+      occlusion: occ,
       encirclement: enc,
       overlay,
       view: viewId,

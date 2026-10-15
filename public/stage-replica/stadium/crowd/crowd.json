@@ -21,9 +21,10 @@
   "crowd": {
     "densities": {
       "sparse": 0.6,
-      "normal": 1.6,
-      "packed": 2.5
+      "normal": 1.5,
+      "packed": 2.2
     },
+    "densityNote": "V1 的 packed 写成 2.5 人/m²，比模型自身能表达的上限 1/(0.5×0.85)=2.353 还大——界面于是自己打印出自相矛盾的一行「2.5 人/m²（满座 2.35）」。现在只保留可达的档位，并且界面报告**实际画出来的人数除以面积**，而不是回显这个参数。",
     "defaultDensity": "normal",
     "seatSpacingM": {
       "standing": 0.5,
@@ -34,8 +35,35 @@
   },
   "sightline": {
     "cValueTargetM": 0.06,
-    "focusHeightM": 0,
-    "focusNote": "焦点取舞台面高度（0m）。C 值 = 从本排眼位看向焦点的视线，在前一排头顶上方留出的垂直余量。",
+    "focus": {
+      "defaultId": "stage-edge",
+      "note": "视线焦点是这套计算里**唯一由人选定、且决定全部结论**的参数，所以它必须写在明面上并且可以切换。V1 把它隐式取在碗体轴线 r=0、高度 0m——那是全场离每位观众最远的一点，而且比本页面自己画出的台面（deck top y=1.60）还低 1.6m。独立评审实测：换到舞台边缘 r=15 之后，等升阶的首次不合格从第 13 排提前到第 2 排。默认改为舞台边缘 + 台面高度，即观众真正在看的位置。",
+      "options": [
+        {
+          "id": "stage-edge",
+          "label": "舞台边缘（默认）",
+          "radiusM": 15,
+          "heightM": 1.6,
+          "note": "观众实际注视的位置：⌀30m 舞台的边缘、台面高度。"
+        },
+        {
+          "id": "led-surface",
+          "label": "LED 屏面",
+          "radiusM": 10,
+          "heightM": 1.6,
+          "note": "圆柱 LED 的表面，即内容所在处。"
+        },
+        {
+          "id": "bowl-axis",
+          "label": "碗体轴线（V1 的隐式选择）",
+          "radiusM": 0,
+          "heightM": 0,
+          "note": "保留这一项是为了让评审能复现 V1 的数字，不是推荐值。"
+        }
+      ]
+    },
+    "criteriaMm": [30, 60, 90, 150],
+    "criteriaNote": "首次不合格的排号是判据的函数，不是一个场馆事实。独立评审实测：焦点取碗体轴线、判据取 30/60/90/150mm 时，首次不合格分别是第 18/13/9/3 排。60mm 是本项目采用的剧场常用值，体育场通常取更大。",
     "standing": { "eyeHeightM": 1.62, "headHeightM": 1.78 },
     "seated": { "eyeHeightM": 1.2, "headHeightM": 1.34 },
     "note": "站立/坐姿两套人体参数。C ≥ 60mm 是本项目采用的判据（剧场常用 60–75mm，体育场通常取更大值）。"

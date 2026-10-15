@@ -49,11 +49,13 @@
         <span>ROWS</span><strong id="m-rows">—</strong>
         <span>C MIN</span><strong id="m-cmin">—</strong>
         <span>FIRST FAIL</span><strong id="m-fail">—</strong>
+        <span>遮挡</span><strong class="warn" id="m-blocked">—</strong>
         <span>ENCIRCLE</span><strong id="m-encircle">—</strong>
         <span>VIEW</span><strong id="m-view">—</strong>
       </div>
       <div class="row" id="row-overlay"></div>
       <div class="row" id="row-view"></div>
+      <div class="row" id="row-focus"></div>
       <div class="row" id="row-density"></div>
       <div class="row">
         <button type="button" id="btn-posture">站姿</button>
@@ -61,9 +63,11 @@
     </div>
     <div class="badge">
       <b>教学预演 PROXY</b><br />
-      ⌀30m 圆形舞台 · ⌀20×8m 圆柱 LED <span>（STUFISH 官方逐字）</span><br />
-      观众席行距 / 升阶 / 座位间距 / 碗体 均为教学 proxy<br />
-      <span>C 值判据 60mm 是本项目采用的剧场常用值，非场馆规范引用</span><br />
+      ⌀30m 圆形舞台 · ⌀20m 圆柱 LED <span>（STUFISH 官方逐字）</span><br />
+      圆柱高度 8m · 观众席行距 / 升阶 / 座位间距 / 碗体 均为教学 proxy<br />
+      <span>⚠ 参考<u>未公布</u>圆柱高度。8m 是按 brief 的 4096×512 母版比例取的 proxy，与 stadium 页一致——V1 的角标误把 8m 写进「官方逐字」，已更正。</span><br />
+      <span>⚠ 本代理碗体可占座约 2.2 万（另 3,962 个布局位在通道上），<u>不是</u>参考的 95,000 人；后者含场地站立人群与 OAKA 更大的既有看台，均未建模。</span><br />
+      <span>C 值判据 60mm 是本项目采用的剧场常用值，非场馆规范引用；视线焦点可选，默认取舞台边缘（V1 隐式取碗体轴线，是最宽容的一点）</span><br />
       <a href="https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/stadium/crowd/README.md" target="_blank" rel="noreferrer">说明与已知限制 ↗</a>
     </div>
     <div class="chart-wrap">
