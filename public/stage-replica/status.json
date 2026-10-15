@@ -40,6 +40,53 @@
   ],
   "modules": [
     {
+      "id": "authoring",
+      "name": "Authoring（参与者建档流程）",
+      "kind": "P0 模块",
+      "issue": 42,
+      "issueUrl": "https://github.com/ewanqian/SceneForge/issues/42",
+      "role": "不改核心源码，建自己的场景",
+      "question": "一个参与者能不能建出自己的场景，而不是只能看四个官方 Demo？",
+      "done": "Issue #42 §3 的每一项都能在页面上完成，并且右侧有一个实时清单记录参与者做到了哪一步。",
+      "milestones": [
+        { "id": "编辑面 / 机位 / 状态", "state": "done" },
+        { "id": "替换素材", "state": "done" },
+        { "id": "V1 播放 + 批注", "state": "done" },
+        { "id": "V2 不覆盖 V1", "state": "done" },
+        { "id": "分享 URL / 导出", "state": "done" },
+        { "id": "P0.5 统一 schema", "state": "todo" },
+        { "id": "真人三小时实测", "state": "todo" }
+      ],
+      "run": { "label": "打开 Authoring", "url": "authoring/" },
+      "links": [
+        {
+          "label": "README（逐条验收状态与已知限制）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/authoring/README.md"
+        },
+        {
+          "label": "P0.5 字段级审计",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/vnext-manifest-audit.md"
+        }
+      ],
+      "states": [
+        { "id": "起始场景", "label": "2 面 / 3 机位 / 4 状态", "url": "authoring/?probe=1" },
+        { "id": "ST_3", "label": "cue 第 14 秒", "url": "authoring/?t=14" },
+        { "id": "适配 stadium", "label": "把官方 Demo 当起点", "url": "authoring/?demo=stadium" }
+      ],
+      "observations": [
+        "【实测】起始场景 2 个媒体面 / 3 个机位 / 4 个状态 / 24s；`?t=2` 与 `?t=14` 分别选中 ST_1 与 ST_3，画面亮度 max 111 → 220，说明 cue 真的在驱动渲染。",
+        "【实测】`?demo=stadium` 适配出 `stadium-adapted`：1 个 cylinder 面、4 个机位、4 个状态、32s、program BOWL_WIDE。",
+        "【实测】自造场景经 base64url 进 URL 后加载，逐字段一致（2 面 / 3 机位 / 3 状态 / 18s / program C2）。",
+        "【实测】实时清单：分享场景 5/9、stadium 适配场景 2/9；未通过的都是需要参与者动作的项——这个清单测的是参与者做了多少，不是页面有多完整。",
+        "【构建期修掉・值得记的一条】片元着色器**从来没编译成功**：我把 GLSL 变量命名为反引号 half 反引号，而它是 GLSL ES 的保留字。失败方式完全不可见——着色器拒绝编译，媒体面在所有时间都是黑的，很容易被当成「故意压暗的起始状态」。是捕获浏览器 console 才发现的（THREE.WebGLProgram: Shader Error 0 … Illegal use of reserved word）。",
+        "【构建期修掉】修上一条时我把反引号写进了 JS 模板字符串里的注释，导致着色器字符串被提前截断、整个模块坏掉（编辑器列表全空）。**这是修 bug 引入的 bug。**",
+        "【构建期修掉】平面分支用了反向的 smoothstep 边缘（a > b），GLSL 中未定义且返回 0，即使能编译也会把面画成黑纱。",
+        "【P0.5 的证据】`adaptDemo()` 必须按 shape 分别猜尺寸键，因为四份 manifest 确实不同（dome 是 radiusM+coverage 且没有 transform；cylinder 是 diameterM+circumferenceM+unwrappedAspect）。**能适配不等于统一。**",
+        "【仍未做到】没有真人测过三小时——这是本模块的核心承诺，也是唯一一条没有证据的；P0.5 未做；没有 undo/redo；没有多人协作与服务端；没有移动端布局；`?demo=` 的适配是有损的，四个 Demo 的 bespoke 状态行为在适配后退化成通用的亮度/覆盖/循环三个参数。"
+      ],
+      "next": "找真人做一次三小时实测（这是总验收）；之后是 P0.5 统一 schema，把四个 Demo 真正收敛到同一份 manifest。"
+    },
+    {
       "id": "replay",
       "name": "Multi-angle Replay",
       "kind": "P1 模块",
