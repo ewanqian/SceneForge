@@ -1,94 +1,178 @@
 {
+  "schemaVersion": 1,
   "sceneId": "installation-black-box-b",
   "units": "meters",
   "note": "主投影 10.24 × 5.4 m 是 Ryoji Ikeda 官方公布的 data-verse 最低展示尺寸；4096×2160 由已确认的 DCI-4K 器材换算。房间、观看距离与地面投影为教学 proxy。",
-  "v2Changes": {
-    "why": "V1 的独立 review 判定 does not hold up as the test it claims to be：四个变量里三个没被真正检验。V2 逐条回应。",
-    "aspect": "运行源从 1280×720（1.778）改为 2048×1080（1.8963），与 10.24×5.4 m 屏幕完全同比例，修掉 V1 约 6.7% 的横向拉伸；2048×1080 正好是声明母版 4096×2160 的一半，声明与实现对齐。",
-    "scale": "5 m 比例尺从相机身后移到投影面根部（z=−8.6），并在投影面两侧各加一根 1.7 m 人体高度参考柱——V1 实测四个机位里近白像素为 0。",
-    "floor": "地面投影改为与墙面共用同一 image 与同一坐标系：远边（贴墙）对齐墙面底边，向外镜像延续，中间不再有 2.3 m 未打光的缝。",
-    "cameras": "重排四个机位，让地面与房间侧墙进入画面；V1 的 CENTER 只看得见一块悬浮的投影面。"
-  },
-  "structure": {
-    "room": { "widthM": 14, "depthM": 18, "heightM": 7 },
-    "projectionMain": { "widthM": 10.24, "heightM": 5.4, "centerYM": 3.2, "planeZ": -9 },
-    "projectionFloor": { "widthM": 10.24, "depthM": 5.4, "enabledByDefault": false },
-    "viewerNearM": 6,
-    "viewerFarM": 12,
-    "performerHeightM": 1.7,
-    "eyeHeightM": 1.6,
-    "scaleBarM": 5,
-    "scaleBarZ": -8.6,
-    "referencePostHeightM": 1.7,
-    "referencePostXM": 5.6
-  },
-  "screens": [
+  "objects": [
+    {
+      "id": "ROOM",
+      "kind": "room",
+      "widthM": 14,
+      "depthM": 18,
+      "heightM": 7,
+      "positionM": [0, 0, 0]
+    }
+  ],
+  "performers": [],
+  "surfaces": [
     {
       "id": "WALL_MAIN",
       "shape": "plane",
-      "physicalSize": { "widthM": 10.24, "heightM": 5.4 },
-      "raster": { "master": "4096x2160", "runtime": "2048x1080" },
-      "transform": { "positionM": [0, 3.2, -9], "rotationDeg": [0, 0, 0] },
-      "source": { "type": "procedural", "id": "rule-based-accumulating", "state": "live" },
-      "fallback": { "type": "local-loop", "id": "projection-fallback-loop", "implemented": true }
+      "size": {
+        "widthM": 10.24,
+        "heightM": 5.4
+      },
+      "transform": {
+        "positionM": [0, 3.2, -9],
+        "rotationDeg": [0, 0, 0]
+      },
+      "raster": {
+        "master": "4096x2160",
+        "runtime": "2048x1080"
+      },
+      "source": {
+        "kind": "procedural",
+        "id": "rule-based-accumulating"
+      },
+      "fallback": {
+        "type": "local-loop",
+        "implemented": true,
+        "source": "manifest"
+      },
+      "fit": {
+        "modes": []
+      },
+      "opacity": 1
     },
     {
       "id": "FLOOR_OPTIONAL",
       "shape": "plane",
-      "physicalSize": { "widthM": 10.24, "heightM": 5.4 },
-      "raster": { "master": "4096x2160", "runtime": "2048x1080" },
-      "transform": { "positionM": [0, 0.02, -6.3], "rotationDeg": [-90, 0, 0] },
-      "source": { "type": "procedural", "id": "wall-mirror-continuation", "state": "live" },
-      "fallback": { "type": "local-loop", "id": "projection-fallback-loop", "implemented": true },
-      "note": "课程比较实验，不声称为 data-verse 原作配置。V2 起与墙面共享同一坐标系（贴墙边对齐后镜像延续）。"
+      "size": {
+        "widthM": 10.24,
+        "heightM": 5.4
+      },
+      "transform": {
+        "positionM": [0, 0.02, -6.3],
+        "rotationDeg": [-90, 0, 0]
+      },
+      "raster": {
+        "master": "4096x2160",
+        "runtime": "2048x1080"
+      },
+      "source": {
+        "kind": "procedural",
+        "id": "wall-mirror-continuation"
+      },
+      "fallback": {
+        "type": "local-loop",
+        "implemented": true,
+        "source": "manifest"
+      },
+      "fit": {
+        "modes": []
+      },
+      "opacity": 1
     }
   ],
   "cameras": [
     {
       "id": "CENTER",
       "label": "6m 正中",
-      "position": [0, 1.6, -3],
-      "target": [0, 2.8, -9],
+      "positionM": [0, 1.6, -3],
+      "targetM": [0, 2.8, -9],
       "fovDeg": 74,
       "eyeHeightM": 1.6,
-      "note": "6 m 观看距离（走廊近端）。fov 加宽到 74 才同时容纳投影面全高与地面——V1 用 58 时地面完全在画外。"
+      "role": "human"
     },
     {
       "id": "FAR",
       "label": "12m 正中",
-      "position": [0, 1.6, 3],
-      "target": [0, 2.8, -9],
+      "positionM": [0, 1.6, 3],
+      "targetM": [0, 2.8, -9],
       "fovDeg": 56,
       "eyeHeightM": 1.6,
-      "note": "12 m 观看距离（走廊远端）。"
+      "role": "human"
     },
     {
       "id": "LEFT",
       "label": "左侧 30°",
-      "position": [-5.2, 1.6, -1],
-      "target": [0, 2.8, -9],
+      "positionM": [-5.2, 1.6, -1],
+      "targetM": [0, 2.8, -9],
       "fovDeg": 66,
-      "eyeHeightM": 1.6
+      "eyeHeightM": 1.6,
+      "role": "human"
     },
     {
       "id": "FLOOR",
       "label": "低机位·看墙与地",
-      "position": [0, 0.7, -2.4],
-      "target": [0, 2.4, -9],
+      "positionM": [0, 0.7, -2.4],
+      "targetM": [0, 2.4, -9],
       "fovDeg": 70,
-      "eyeHeightM": 0.7
+      "eyeHeightM": 0.7,
+      "role": "human"
     }
   ],
   "cue": {
     "durationSec": 48,
-    "rampSec": 4.0,
-    "note": "48 秒：这个 Demo 验证的是 duration。V2 取消了每 6 秒的整场重排，改为持续累积。",
+    "rampSec": 4,
     "states": [
-      { "id": "SPARSE", "label": "铺垫", "start": 0, "end": 12 },
-      { "id": "ACCUMULATE", "label": "累积", "start": 12, "end": 24 },
-      { "id": "DENSE", "label": "密集", "start": 24, "end": 36 },
-      { "id": "AFTERIMAGE", "label": "余像", "start": 36, "end": 48 }
+      {
+        "id": "SPARSE",
+        "label": "铺垫",
+        "start": 0,
+        "end": 12
+      },
+      {
+        "id": "ACCUMULATE",
+        "label": "累积",
+        "start": 12,
+        "end": 24
+      },
+      {
+        "id": "DENSE",
+        "label": "密集",
+        "start": 24,
+        "end": 36
+      },
+      {
+        "id": "AFTERIMAGE",
+        "label": "余像",
+        "start": 36,
+        "end": 48
+      }
     ]
   },
-  "programCamera": "CENTER"
+  "programCamera": "CENTER",
+  "annotations": {
+    "v2Changes": {
+      "why": "V1 的独立 review 判定 does not hold up as the test it claims to be：四个变量里三个没被真正检验。V2 逐条回应。",
+      "aspect": "运行源从 1280×720（1.778）改为 2048×1080（1.8963），与 10.24×5.4 m 屏幕完全同比例，修掉 V1 约 6.7% 的横向拉伸；2048×1080 正好是声明母版 4096×2160 的一半，声明与实现对齐。",
+      "scale": "5 m 比例尺从相机身后移到投影面根部（z=−8.6），并在投影面两侧各加一根 1.7 m 人体高度参考柱——V1 实测四个机位里近白像素为 0。",
+      "floor": "地面投影改为与墙面共用同一 image 与同一坐标系：远边（贴墙）对齐墙面底边，向外镜像延续，中间不再有 2.3 m 未打光的缝。",
+      "cameras": "重排四个机位，让地面与房间侧墙进入画面；V1 的 CENTER 只看得见一块悬浮的投影面。"
+    },
+    "note": "主投影 10.24 × 5.4 m 是 Ryoji Ikeda 官方公布的 data-verse 最低展示尺寸；4096×2160 由已确认的 DCI-4K 器材换算。房间、观看距离与地面投影为教学 proxy。",
+    "migratedFrom": "legacy scene.json (schemaVersion 1)"
+  },
+  "scaleReference": {
+    "lengthM": 5,
+    "positionM": [0, 0.04, -8.6]
+  },
+  "behaviour": {
+    "module": "black-box",
+    "params": {
+      "accumulatingMarkPool": true,
+      "residualAfterimage": true,
+      "noFieldReseed": true,
+      "viewerNearM": 6,
+      "viewerFarM": 12,
+      "referencePostHeightM": 1.7,
+      "scaleBarZ": -8.6,
+      "referencePostXM": 5.6
+    }
+  },
+  "humanScale": {
+    "performerHeightM": 1.7,
+    "eyeHeightM": 1.6
+  }
 }

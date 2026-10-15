@@ -1,80 +1,162 @@
 {
+  "schemaVersion": 1,
   "sceneId": "sphere-dome-a",
   "units": "meters",
   "note": "教学预演 proxy。几何与分辨率均不代表 Sphere 真实场馆尺寸或 16K x 16K 母版规格。",
-  "structure": {
-    "domeRadiusM": 25,
-    "audienceFloorDiameterM": 34,
-    "stagePlatform": { "widthM": 14, "depthM": 8, "heightM": 0.9 },
-    "performerHeightM": 1.7,
-    "eyeHeightM": 1.6,
-    "gridRingM": 5,
-    "gridRadials": 12,
-    "scaleBarM": 5
-  },
-  "screens": [
+  "objects": [
+    {
+      "id": "STAGE_PLATFORM",
+      "kind": "platform",
+      "shape": "box",
+      "widthM": 14,
+      "depthM": 8,
+      "heightM": 0.9,
+      "positionM": [0, 0, 0]
+    },
+    {
+      "id": "AUDIENCE_FLOOR",
+      "kind": "disc",
+      "diameterM": 34,
+      "positionM": [0, 0, 0]
+    }
+  ],
+  "performers": [],
+  "surfaces": [
     {
       "id": "DOME_MAIN",
       "shape": "dome",
-      "physicalSize": { "radiusM": 25, "coverage": "hemisphere" },
-      "raster": { "master": "4096x4096", "fast": "2048x2048", "program": "1920x1080" },
-      "source": { "type": "procedural", "id": "local-generative", "state": "live" },
-      "fallback": { "type": "local-loop", "id": "dome-fallback-loop" }
+      "size": {
+        "radiusM": 25,
+        "coverage": "hemisphere"
+      },
+      "raster": {
+        "master": "4096x4096",
+        "runtime": "2048x2048"
+      },
+      "source": {
+        "kind": "procedural",
+        "id": "local-generative"
+      },
+      "fallback": {
+        "type": "local-loop",
+        "implemented": false,
+        "source": "verified-in-code"
+      },
+      "fit": {
+        "modes": [
+          {
+            "id": "front-window",
+            "label": "前区窗口",
+            "note": "16:9 源只占前方窗口，模拟「屏还没有打开」"
+          },
+          {
+            "id": "mirror-extend",
+            "label": "镜像延展",
+            "note": "低精度横向镜像补足周边"
+          },
+          {
+            "id": "shader-fill",
+            "label": "程序化补全",
+            "note": "用源亮度驱动全场程序化内容"
+          },
+          {
+            "id": "square-master",
+            "label": "1:1 母版",
+            "note": "把源当作方形母版铺满 dome"
+          }
+        ]
+      },
+      "opacity": 1
     }
-  ],
-  "adaptationModes": [
-    {
-      "id": "front-window",
-      "label": "前区窗口",
-      "note": "16:9 源只占前方窗口，模拟「屏还没有打开」"
-    },
-    { "id": "mirror-extend", "label": "镜像延展", "note": "低精度横向镜像补足周边" },
-    { "id": "shader-fill", "label": "程序化补全", "note": "用源亮度驱动全场程序化内容" },
-    { "id": "square-master", "label": "1:1 母版", "note": "把源当作方形母版铺满 dome" }
   ],
   "cameras": [
     {
       "id": "AUDIENCE_CENTER",
       "label": "观众正中",
-      "position": [0, 1.6, 10],
-      "target": [0, 5.5, -2],
+      "positionM": [0, 1.6, 10],
+      "targetM": [0, 5.5, -2],
       "fovDeg": 66,
-      "eyeHeightM": 1.6
+      "eyeHeightM": 1.6,
+      "role": "human"
     },
     {
       "id": "AUDIENCE_LEFT",
       "label": "观众偏左",
-      "position": [-6.5, 1.6, 10.5],
-      "target": [0, 5.5, -2],
+      "positionM": [-6.5, 1.6, 10.5],
+      "targetM": [0, 5.5, -2],
       "fovDeg": 66,
-      "eyeHeightM": 1.6
+      "eyeHeightM": 1.6,
+      "role": "human"
     },
     {
       "id": "STAGE_LOOKBACK",
       "label": "舞台回看观众",
-      "position": [0, 1.9, 0],
-      "target": [0, 3.2, 12],
+      "positionM": [0, 1.9, 0],
+      "targetM": [0, 3.2, 12],
       "fovDeg": 70,
-      "eyeHeightM": 1.9
+      "eyeHeightM": 1.9,
+      "role": "human"
     },
     {
       "id": "DEBUG_ORBIT",
       "label": "外部调试 / 剖切",
-      "position": [0, 30, 54],
-      "target": [0, 4, 0],
+      "positionM": [0, 30, 54],
+      "targetM": [0, 4, 0],
       "fovDeg": 45,
-      "eyeHeightM": null
+      "eyeHeightM": null,
+      "role": "technical"
     }
   ],
   "cue": {
     "durationSec": 32,
     "rampSec": 1.6,
     "states": [
-      { "id": "HORIZON", "label": "铺垫", "start": 0, "end": 8 },
-      { "id": "ENCLOSE", "label": "建立", "start": 8, "end": 16 },
-      { "id": "FULL_FIELD", "label": "爆发", "start": 16, "end": 24 },
-      { "id": "APERTURE", "label": "收束", "start": 24, "end": 32 }
+      {
+        "id": "HORIZON",
+        "label": "铺垫",
+        "start": 0,
+        "end": 8
+      },
+      {
+        "id": "ENCLOSE",
+        "label": "建立",
+        "start": 8,
+        "end": 16
+      },
+      {
+        "id": "FULL_FIELD",
+        "label": "爆发",
+        "start": 16,
+        "end": 24
+      },
+      {
+        "id": "APERTURE",
+        "label": "收束",
+        "start": 24,
+        "end": 32
+      }
     ]
   },
-  "programCamera": "AUDIENCE_CENTER"
+  "programCamera": "AUDIENCE_CENTER",
+  "annotations": {
+    "note": "教学预演 proxy。几何与分辨率均不代表 Sphere 真实场馆尺寸或 16K x 16K 母版规格。",
+    "migratedFrom": "legacy scene.json (schemaVersion 1)"
+  },
+  "scaleReference": {
+    "lengthM": 5,
+    "positionM": [0, 0.03, 6]
+  },
+  "behaviour": {
+    "module": "sphere-dome",
+    "params": {
+      "solidAngleCoverage": true,
+      "audienceWindowFollowsViewer": true,
+      "gridRingM": 5,
+      "gridRadials": 12
+    }
+  },
+  "humanScale": {
+    "performerHeightM": 1.7,
+    "eyeHeightM": 1.6
+  }
 }

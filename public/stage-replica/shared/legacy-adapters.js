@@ -57,6 +57,30 @@ export function adaptLegacy(raw, demoId, options = {}) {
   const carried = [];
   const dropped = [];
 
+  // Already migrated: pass through untouched. Without this the conformance page would adapt an
+  // already-unified manifest and report a schema mismatch against itself. The v1 variant is still
+  // synthesised, because the historical defect lives in the raster values rather than the shape.
+  if (raw?.schemaVersion === 1 && raw?.behaviour?.module) {
+    const scene = JSON.parse(JSON.stringify(raw));
+    if (variant === "v1") {
+      if (demoId === "festival")
+        for (const s of scene.surfaces) if (s.raster) s.raster.runtime = "1280x720";
+      if (demoId === "installation")
+        for (const s of scene.surfaces) if (s.raster) s.raster.runtime = "1280x720";
+    }
+    return {
+      scene,
+      report: {
+        demoId,
+        variant,
+        alreadyUnified: true,
+        mapped: [],
+        carried: ["已迁移：直接使用统一 manifest，未经过适配器"],
+        dropped: [],
+      },
+    };
+  }
+
   const base = {
     schemaVersion: 1,
     sceneId: raw.sceneId ?? `${demoId}-legacy`,

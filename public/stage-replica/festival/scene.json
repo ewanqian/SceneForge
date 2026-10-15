@@ -1,105 +1,189 @@
 {
+  "schemaVersion": 1,
   "sceneId": "festival-two-wall-b",
   "units": "meters",
   "note": "教学预演 proxy。参考（Vita Motus / Coachella Quasar 2024）确认了「两块对置 monolithic LED 墙 + 艺人在中央 + 实时内容播放 + 与场地景观共存」的关系，但未公布任何尺寸；本文件所有数字均为自定 proxy。",
-  "v2Changes": {
-    "why": "V1 的独立 review 指出三个空间问题，V2 直接改几何而不是改参数。",
-    "geometry": "① 两屏从「人身后 10m」移到「人两侧」，内缘收到 x=±1.64m，让合成后的两半接近相接（V1 的缺口 8.9m 比地标本身还宽）；② performer 与三角形平台移到两屏之间的 V 形喉部。",
-    "aspect": "③ 源改为 2048×1024（2:1），与 18×9m 屏幕一致，修掉 V1 横向拉伸约 12.5% 的问题——这同时让角标宣称的 2048×1024 proxy 变成真的。"
-  },
-  "structure": {
-    "stage": { "widthM": 44, "depthM": 20, "centerZ": -4 },
-    "djPlatform": {
+  "objects": [
+    {
+      "id": "DJ_PLATFORM",
+      "kind": "platform",
       "shape": "triangle",
       "widthM": 6,
       "depthM": 4,
       "heightM": 0.9,
-      "positionM": [0, 0, -5.5],
-      "note": "三角形有参考依据（The Desert Sun：triangular DJ stage in the center）；尺寸无依据。位置改为两屏之间的 V 形喉部。"
+      "positionM": [0, 0, -5.5]
     },
-    "performerHeightM": 1.7,
-    "eyeHeightM": 1.6,
-    "gridSpacingM": 4,
-    "scaleBarM": 5
-  },
-  "screens": [
+    {
+      "id": "STAGE_FLOOR",
+      "kind": "floor",
+      "widthM": 44,
+      "depthM": 20,
+      "positionM": [0, 0, -4]
+    }
+  ],
+  "performers": [],
+  "surfaces": [
     {
       "id": "SCREEN_L",
       "shape": "plane",
-      "physicalSize": { "widthM": 18, "heightM": 9 },
-      "raster": { "master": "2048x1024" },
-      "transform": { "positionM": [-10.2, 4.5, -4.0], "rotationDeg": [0, 18, 0] },
-      "source": { "type": "procedural", "id": "shared-generative", "state": "live" },
-      "fallback": { "type": "local-loop", "id": "fallback-loop", "implemented": true }
+      "size": {
+        "widthM": 18,
+        "heightM": 9
+      },
+      "transform": {
+        "positionM": [-10.2, 4.5, -4],
+        "rotationDeg": [0, 18, 0]
+      },
+      "raster": {
+        "master": "2048x1024",
+        "runtime": "2048x1024"
+      },
+      "source": {
+        "kind": "procedural",
+        "id": "shared-generative"
+      },
+      "fallback": {
+        "type": "local-loop",
+        "implemented": true,
+        "source": "manifest"
+      },
+      "fit": {
+        "modes": []
+      },
+      "opacity": 1
     },
     {
       "id": "SCREEN_R",
       "shape": "plane",
-      "physicalSize": { "widthM": 18, "heightM": 9 },
-      "raster": { "master": "2048x1024" },
-      "transform": { "positionM": [10.2, 4.5, -4.0], "rotationDeg": [0, -18, 0] },
-      "source": { "type": "procedural", "id": "shared-generative", "state": "live" },
-      "fallback": { "type": "local-loop", "id": "fallback-loop", "implemented": true }
+      "size": {
+        "widthM": 18,
+        "heightM": 9
+      },
+      "transform": {
+        "positionM": [10.2, 4.5, -4],
+        "rotationDeg": [0, -18, 0]
+      },
+      "raster": {
+        "master": "2048x1024",
+        "runtime": "2048x1024"
+      },
+      "source": {
+        "kind": "procedural",
+        "id": "shared-generative"
+      },
+      "fallback": {
+        "type": "local-loop",
+        "implemented": true,
+        "source": "manifest"
+      },
+      "fit": {
+        "modes": []
+      },
+      "opacity": 1
     }
   ],
-  "derivedGeometry": {
-    "innerEdgeXM": 1.64,
-    "innerEdgeZM": -6.78,
-    "centreGapM": 3.28,
-    "note": "内缘 x = 10.2 − 9·cos18° = 1.64；中央缺口 3.28m。V1 是 8.9m。"
-  },
-  "screenRelationship": {
-    "note": "核心变量：join=0 两块各显示不同内容（右屏在独立态做垂直翻转，读起来确实是两块不同画面）；join=1 两块各取同一张母版的一半，合成一张连续画面。地标为跨缝的**非对称斜线**，只有合成时才连成一条。",
-    "sharedSource": true,
-    "asymmetricLandmark": true
-  },
   "cameras": [
     {
       "id": "FOH_WIDE",
       "label": "FOH 大广角",
-      "position": [0, 5.5, 26],
-      "target": [0, 3.5, -5],
+      "positionM": [0, 5.5, 26],
+      "targetM": [0, 3.5, -5],
       "fovDeg": 46,
       "eyeHeightM": null,
-      "note": "技术广角：能看到两块屏的完整关系，不是人眼高度。"
+      "role": "technical"
     },
     {
       "id": "DJ_FRONT",
       "label": "中轴近景",
-      "position": [0, 2.2, 2],
-      "target": [0, 3.0, -5.5],
+      "positionM": [0, 2.2, 2],
+      "targetM": [0, 3, -5.5],
       "fovDeg": 56,
       "eyeHeightM": 2.2,
-      "note": "V1 的 DJ_FRONT 把两屏都裁出画外；V2 必须同时看到 performer 与两屏内缘。"
+      "role": "human"
     },
     {
       "id": "STAGE_LEFT",
       "label": "左前 35°",
-      "position": [-9, 2.6, 3],
-      "target": [0, 3.0, -5.5],
+      "positionM": [-9, 2.6, 3],
+      "targetM": [0, 3, -5.5],
       "fovDeg": 60,
       "eyeHeightM": 2.6,
-      "note": "舞台侧人眼高度，检查两屏夹角与人物关系。"
+      "role": "human"
     },
     {
       "id": "HIGH_WIDE",
       "label": "高位全景（技术机位）",
-      "position": [0, 12, 20],
-      "target": [0, 3, -5],
+      "positionM": [0, 12, 20],
+      "targetM": [0, 3, -5],
       "fovDeg": 50,
       "eyeHeightM": null,
-      "note": "明确标注为技术机位而非人眼视角——V1 有 3/4 机位浮空却没有说明。"
+      "role": "technical"
     }
   ],
   "cue": {
     "durationSec": 32,
     "rampSec": 1.6,
     "states": [
-      { "id": "LOW", "label": "铺垫", "start": 0, "end": 8 },
-      { "id": "BUILD", "label": "建立", "start": 8, "end": 16 },
-      { "id": "PEAK", "label": "爆发", "start": 16, "end": 24 },
-      { "id": "RELEASE", "label": "收束", "start": 24, "end": 32 }
+      {
+        "id": "LOW",
+        "label": "铺垫",
+        "start": 0,
+        "end": 8
+      },
+      {
+        "id": "BUILD",
+        "label": "建立",
+        "start": 8,
+        "end": 16
+      },
+      {
+        "id": "PEAK",
+        "label": "爆发",
+        "start": 16,
+        "end": 24
+      },
+      {
+        "id": "RELEASE",
+        "label": "收束",
+        "start": 24,
+        "end": 32
+      }
     ]
   },
-  "programCamera": "FOH_WIDE"
+  "programCamera": "FOH_WIDE",
+  "annotations": {
+    "v2Changes": {
+      "why": "V1 的独立 review 指出三个空间问题，V2 直接改几何而不是改参数。",
+      "geometry": "① 两屏从「人身后 10m」移到「人两侧」，内缘收到 x=±1.64m，让合成后的两半接近相接（V1 的缺口 8.9m 比地标本身还宽）；② performer 与三角形平台移到两屏之间的 V 形喉部。",
+      "aspect": "③ 源改为 2048×1024（2:1），与 18×9m 屏幕一致，修掉 V1 横向拉伸约 12.5% 的问题——这同时让角标宣称的 2048×1024 proxy 变成真的。"
+    },
+    "note": "教学预演 proxy。参考（Vita Motus / Coachella Quasar 2024）确认了「两块对置 monolithic LED 墙 + 艺人在中央 + 实时内容播放 + 与场地景观共存」的关系，但未公布任何尺寸；本文件所有数字均为自定 proxy。",
+    "migratedFrom": "legacy scene.json (schemaVersion 1)"
+  },
+  "scaleReference": {
+    "lengthM": 5,
+    "positionM": [0, 0.03, 6]
+  },
+  "behaviour": {
+    "module": "two-wall",
+    "params": {
+      "relationship": {
+        "note": "核心变量：join=0 两块各显示不同内容（右屏在独立态做垂直翻转，读起来确实是两块不同画面）；join=1 两块各取同一张母版的一半，合成一张连续画面。地标为跨缝的**非对称斜线**，只有合成时才连成一条。",
+        "sharedSource": true,
+        "asymmetricLandmark": true
+      },
+      "derivedGeometry": {
+        "innerEdgeXM": 1.64,
+        "innerEdgeZM": -6.78,
+        "centreGapM": 3.28,
+        "note": "内缘 x = 10.2 − 9·cos18° = 1.64；中央缺口 3.28m。V1 是 8.9m。"
+      },
+      "independentStateFlipsRightScreen": true,
+      "gridSpacingM": 4
+    }
+  },
+  "humanScale": {
+    "performerHeightM": 1.7,
+    "eyeHeightM": 1.6
+  }
 }

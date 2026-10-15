@@ -31,7 +31,12 @@ const SOURCE_WIDTH = 2048;
 const SOURCE_HEIGHT = 256;
 
 const params = new URLSearchParams(location.search);
-const sceneJson = await (await fetch("./scene.json")).json();
+// P0.5: the manifest on disk is the unified schema; the loader validates it and projects the shape
+// this renderer was written against. One line, one place - not four private conventions.
+const sceneJson = await (await import("../shared/load-scene.js")).legacyScene(
+  "./scene.json",
+  "stadium",
+);
 const structure = sceneJson.structure;
 const cueConfig = sceneJson.cue;
 const presetCameras = sceneJson.cameras;
