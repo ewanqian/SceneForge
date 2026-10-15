@@ -276,7 +276,7 @@
         "V1": "done",
         "REVIEW": "done",
         "V2": "done",
-        "DELIVERY": "active"
+        "DELIVERY": "done"
       },
       "states": [
         { "id": "SPARSE", "label": "铺垫", "url": "installation/?t=6" },
@@ -303,6 +303,14 @@
           "label": "▶ V2 走查 48s（干净 Program，无 HUD）",
           "url": "installation/delivery/v2-walkthrough-48s.mp4",
           "primary": true
+        },
+        {
+          "label": "对照图 reference → V1 → V2",
+          "url": "installation/delivery/reference-v1-v2-installation.png"
+        },
+        {
+          "label": "交付文档 README（含 7 问与仍未做到的项）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/installation/README.md"
         },
         {
           "label": "▶ V2 走查 48s（含读数，证据版）",
