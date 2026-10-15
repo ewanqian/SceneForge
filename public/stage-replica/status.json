@@ -17,11 +17,15 @@
     },
     {
       "label": "Sphere 参考冻结 reference.md（confirmed vs proxy）",
-      "url": "https://github.com/ewanqian/portfolio/blob/codex/stage-replica-sphere-20261015/lab/stage-replica/sphere/reference/reference.md"
+      "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/sphere/reference/reference.md"
     },
     {
       "label": "Sphere 灰盒说明 NOTES.md（S2）",
-      "url": "https://github.com/ewanqian/portfolio/blob/codex/stage-replica-sphere-20261015/lab/stage-replica/sphere/build/NOTES.md"
+      "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/graybox-sphere.md"
+    },
+    {
+      "label": "四个 Demo 的参考冻结（reference.md）",
+      "url": "https://github.com/ewanqian/SceneForge/tree/main/public/stage-replica"
     }
   ],
   "pipeline": ["REFERENCE", "GRAYBOX", "V1", "REVIEW", "V2", "DELIVERY"],
@@ -78,6 +82,10 @@
         { "id": "square-master", "url": "sphere/?t=20&mode=square-master&quad=0" }
       ],
       "artifacts": [
+        {
+          "label": "交付文档 README（含 7 问与仍未做到的项）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/sphere/README.md"
+        },
         {
           "label": "▶ 交付录屏 28s 宣传版",
           "url": "sphere/delivery/v2-promo-28s.mp4",
@@ -188,6 +196,10 @@
       ],
       "modes": [],
       "artifacts": [
+        {
+          "label": "交付文档 README（含 7 问与仍未做到的项）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/festival/README.md"
+        },
         {
           "label": "▶ V2 交付录屏 28s（干净 Program 输出）",
           "url": "festival/delivery/v2-delivery-28s.mp4",
