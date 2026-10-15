@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-15T07:20+08:00",
+  "updated": "2026-10-15T08:45+08:00",
   "title": "Stage Replica · Demo Sprint",
   "subtitle": "内部审核看板 / Internal review board",
   "brief": {
@@ -35,9 +35,10 @@
     "这个 Demo 是否可以作为工作坊案例，让参与者理解「为什么要预演」？"
   ],
   "globalGaps": [
-    "Festival / Installation / Stadium 的参考链接尚未逐条核验（各自 REFERENCE LOCK 阶段必须核验）。",
-    "dome / 双屏 / 圆柱屏 目前都不符合 SceneForge 的 venueManifestSchema（layout: box|arena，单一 screen）。Stage Replica 页面暂以独立静态页存在，schema 是否扩展待定。",
-    "S3 的录制通道（页面内 MediaRecorder 或 CDP 抓帧）尚未验证，V1/V2 录屏依赖它。"
+    "【已解决】四个 Demo 的参考链接均已逐条核验：Sphere / Festival（Vita Motus·Quasar，含一条 404 更正）/ Installation（Ryoji Ikeda data-verse）/ Stadium（STUFISH，DOM 抓取后逐字检索）。",
+    "【仍在】dome / 双屏 / 圆柱屏 都不符合 SceneForge 的 venueManifestSchema（layout: box|arena，单一 screen）。四个 Demo 目前以独立静态页存在；schema 是否扩展仍是待用户决定的开放问题。",
+    "【已解决】录制通道已用 tools/record-cdp.mjs（CDP 抓帧 + ffmpeg）落地，全部 V1/V2 录屏均由它产出，并以 __REPLICA_READY__ / __REPLICA_DONE__ 为闸门。",
+    "【仍在，且不打算掩盖】Installation 没有音频（该 Demo 的问题包含声音，因此这一项未被检验）；Stadium 圆柱 8m 高度与参考照片的高径比不符（已标注张力并写明需要与 raster 一起改）。"
   ],
   "demos": [
     {
@@ -397,7 +398,7 @@
         "V1": "done",
         "REVIEW": "done",
         "V2": "done",
-        "DELIVERY": "active"
+        "DELIVERY": "done"
       },
       "states": [
         { "id": "LOW", "label": "铺垫 · 覆盖 90°", "url": "stadium/?t=4&quad=0" },
@@ -422,6 +423,14 @@
           "label": "▶ V2 干净导演版 32s（无 HUD / 无四分屏）",
           "url": "stadium/delivery/v2-delivery-clean-32s.mp4",
           "primary": true
+        },
+        {
+          "label": "对照图 reference → V1 → V2",
+          "url": "stadium/delivery/reference-v1-v2-stadium.png"
+        },
+        {
+          "label": "交付文档 README（含 7 问、实测与已知张力）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/stadium/README.md"
         },
         {
           "label": "▶ V2 导演版 32s（含四分屏）",
@@ -495,7 +504,7 @@
         "16:9 输入的三种处理（前区窗口 / ×4 重复 / 拉伸填满）与 8:1 全景母版并列，直接暴露「同一条素材换到圆柱上比例会怎样崩」。",
         "PERFORMER_FRONT 里人物仍然偏小：相机在 22m 外、人只有 1.7m，符合真实看台关系，但读尺度仍需靠近。"
       ],
-      "next": "交付：把 v2-delivery-clean-32s.mp4、四种比例模式对照图、以及一份说明「摄像机也在编排演出」的 README 补齐，回答 brief §1.4 全部 7 问。",
+      "next": "已完成：四个 Demo 全部走完 reference → graybox → V1 → review → V2 → delivery。已知张力（8m 高度 vs 参考照片）写在 README §4 与 scene.json 的 heightTension 段，需要与 raster 一起改才算解决。",
       "notesKey": "stagereplica.review.stadium"
     }
   ]
