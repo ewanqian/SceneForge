@@ -275,17 +275,17 @@
         "GRAYBOX": "done",
         "V1": "done",
         "REVIEW": "done",
-        "V2": "active",
-        "DELIVERY": "todo"
+        "V2": "done",
+        "DELIVERY": "active"
       },
       "states": [
-        { "id": "SPARSE", "label": "铺垫 · 实际占用 2.0%", "url": "installation/?t=6" },
-        { "id": "ACCUMULATE", "label": "累积 · 实际占用 14.6%", "url": "installation/?t=18" },
-        { "id": "DENSE", "label": "密集 · 实际占用 44.6%", "url": "installation/?t=30" },
+        { "id": "SPARSE", "label": "铺垫", "url": "installation/?t=6" },
+        { "id": "ACCUMULATE", "label": "累积（池持续增长）", "url": "installation/?t=18" },
+        { "id": "DENSE", "label": "密集 · 771 条 / 28.7%", "url": "installation/?t=30" },
         {
           "id": "AFTERIMAGE",
-          "label": "余像 · 待 V2 重做（见 REVIEW）",
-          "url": "installation/?t=42"
+          "label": "余像 · 不再新增，缓慢消退",
+          "url": "installation/?t=46"
         }
       ],
       "views": [
@@ -296,17 +296,38 @@
       ],
       "modes": [
         { "id": "墙面 only", "url": "installation/?t=30&floor=0" },
-        { "id": "墙 + 地面", "url": "installation/?t=30&view=FLOOR&floor=1" }
+        { "id": "墙 + 地面（同一坐标系延续）", "url": "installation/?t=30&view=FLOOR&floor=1" }
       ],
       "artifacts": [
         {
-          "label": "▶ V1 walkthrough 48s（含 40s 丢源）",
-          "url": "installation/delivery/v1-walkthrough-48s.mp4",
+          "label": "▶ V2 走查 48s（干净 Program，无 HUD）",
+          "url": "installation/delivery/v2-walkthrough-48s.mp4",
           "primary": true
         },
-        { "label": "V1 DENSE（密度 58%）", "url": "installation/stills/v1-dense.png" },
-        { "label": "V1 SPARSE（密度 2%）", "url": "installation/stills/v1-sparse.png" },
-        { "label": "V1 AFTERIMAGE（残影）", "url": "installation/stills/v1-afterimage.png" },
+        {
+          "label": "▶ V2 走查 48s（含读数，证据版）",
+          "url": "installation/delivery/v2-walkthrough-hud-48s.mp4"
+        },
+        { "label": "V2 DENSE（771 条 / 28.7%）", "url": "installation/stills/v2-dense.png" },
+        { "label": "V2 AFTERIMAGE（无硬线残留）", "url": "installation/stills/v2-afterimage.png" },
+        { "label": "V2 FAR（尺度尺 + 两根参考柱入画）", "url": "installation/stills/v2-far.png" },
+        { "label": "V2 墙+地面（同一坐标系延续）", "url": "installation/stills/v2-floor.png" },
+        { "label": "V2 fallback（掉源仍可读）", "url": "installation/stills/v2-fallback.png" },
+        {
+          "label": "V1→V2 改动与实测（review-diff-installation-v1-v2.md）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-diff-installation-v1-v2.md"
+        },
+        {
+          "label": "独立 REVIEW（判定 does not hold up + 构建者裁定）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-installation-v1.md"
+        },
+        {
+          "label": "▶ V1 walkthrough 48s（保留不覆盖）",
+          "url": "installation/delivery/v1-walkthrough-48s.mp4"
+        },
+        { "label": "V1 DENSE（生成器参数 58%）", "url": "installation/stills/v1-dense.png" },
+        { "label": "V1 SPARSE", "url": "installation/stills/v1-sparse.png" },
+        { "label": "V1 AFTERIMAGE（硬线瑕疵）", "url": "installation/stills/v1-afterimage.png" },
         { "label": "V1 墙 + 地面 低机位", "url": "installation/stills/v1-floor-on.png" },
         { "label": "V1 12m 远观", "url": "installation/stills/v1-far.png" },
         {
@@ -339,9 +360,17 @@
         "【F7 已确认】`?t=30&drop=1` 得到近乎全黑的墙 + OFFLINE，而 `dropAt=20` 才是预期的 FALLBACK 亮度：`drop=1` 单独使用不能复现 fallback 画面。",
         "【D 已确认・最严重的一条】48 秒并没有「建立」：4 次 ramp 之间有 8 秒静止，而**全片最大的两次变化是每 6 秒的整场重排**（|Δ| 3.528 / 3.426），比状态切换本身（0.954）还大。在一个明确禁止快速导播的 Demo 里，最大的视觉事件是一次剪切。",
         "【评审同时确认做对的】confirmed / proxy 分离是三处一致的（reference.md、proxy 表、画面角标）；「暗房里不画边就看不出投影边界」这一点确实解决了（边框线约 26/255，可见）。",
-        "【方法论结论】Sphere 与 Festival 的变量是空间与构图，看画面就够；Installation 的变量是时间与距离，**必须靠测量**。V2 的每个状态都要给出可测的变化量，而不只是「看起来不一样」。"
+        "【方法论结论】Sphere 与 Festival 的变量是空间与构图，看画面就够；Installation 的变量是时间与距离，**必须靠测量**。V2 的每个状态都要给出可测的变化量，而不只是「看起来不一样」。",
+        "【V2 已修・余像硬线】用评审自己的方法复测：V1 在 t=44 存在一行 frac>10 = **1.000** 的整行均匀亮线（mean 39.77），V2 最均匀的一行只有 **0.585**——不存在整行饱和的行。根因（残留模式下每帧重画静态线条）已修：残留模式不再重画装饰线。",
+        "【V2 已修・累积】标记改为一个持续存在的池：DENSE t=30 为 771 条 / 去重占用 28.7%；AFTERIMAGE t=46 为 **1155 条**（不再新增、缓慢消退）。t=46 的条数大于 t=30，正是因为池一直增长到 t=36 才停止——这就是「有历史」的可测证据。",
+        "【V2 已修・重排】取消了每 6 秒的整场重排：全片最大的视觉事件从「重排」（|Δ| 3.528）变回状态切换本身。",
+        "【V2 已修・比例】运行时源 1280×720（1.778）→ **2048×1080（1.8963）**，与 10.24×5.4m 投影面完全同比例，修掉 6.7% 拉伸；同时 2048×1080 正好是声明母版 4096×2160 的一半，声明与实现对齐。",
+        "【V2 已修・坐标】地面不再是「同一张图的第二份拷贝」：贴墙边与投影面底边对齐、向外镜像延续，与墙面共享同一坐标系，2.3m 未打光的缝消失。",
+        "【V2 已修・尺度】5m 比例尺移到投影面根部，并在两侧各加一根 1.7m 参考柱：V1 四个机位实测 0 个近白像素，V2 起每次取景都有已知尺寸参照。CENTER 的 fov 从 58° 加到 74° 才能同时容纳投影面全高与地面。",
+        "【V2 已修・声明】`?hud=0` 真正实现（同一 t=30 带 HUD 190,012 B / 不带 145,471 B）；`drop=1` 掉源后仍可读；OCCUPANCY 改为报告**去重后的实际格占用**，不再打印生成器参数。",
+        "【V2 仍未做到】①声音仍然没有——brief 只要求「可以播放」，但本 Demo 的问题包含声音，这一项**依然没有被检验**，不因其他三项做了就算完成；②6m↔12m 的差别仍主要落在取景上，「像素间距/视力问题而非缩放」这一点**没有被证明**（本 Demo 是 200 px/m 的浏览器 proxy，真实 DCI-4K 投 10.24m 约 400 px/m）；③地面投影仍明确是课程实验，不是原作配置。"
       ],
-      "next": "V2 范围（详见 review-installation-v1.md 第二部分）：①观看关系——重排四个机位让地面与房间边线入画、把已知尺寸的参照物放进所有机位、让 6m↔12m 作用在细节与视场压力上；②构图面积——源改为与 10.24×5.4m 等比例（修掉 6.7% 拉伸）、墙与地共享同一坐标系统（否则只是第二块屏）、DENSITY 报告去重后的实际占用；③状态节奏——重写 AFTERIMAGE 为真正的累积缓冲（静态装饰线在残留模式不得重画）、取消每 6 秒整场重排、让 ACCUMULATE 真的累积。另需实现 `?hud=0`、让 `drop=1` 单独可复现可读的 fallback、并对齐 raster 声明。声音：brief 只要求「可以播放」，V2 可以加可选音轨，但不会声称它已被检验。",
+      "next": "交付：把 v2-walkthrough-48s.mp4、对照图（reference → graybox/V1 → V2）与 README 补齐，回答 §1.4 全部 7 问；交付文档必须写明上述三条仍未做到的项。",
       "notesKey": "stagereplica.review.installation"
     },
     {
@@ -358,8 +387,8 @@
         "REFERENCE": "done",
         "GRAYBOX": "done",
         "V1": "done",
-        "REVIEW": "active",
-        "V2": "todo",
+        "REVIEW": "done",
+        "V2": "active",
         "DELIVERY": "todo"
       },
       "states": [
@@ -381,6 +410,10 @@
         { "id": "16:9 拉伸填满", "url": "stadium/?t=20&pano=fill&quad=0" }
       ],
       "artifacts": [
+        {
+          "label": "独立 REVIEW（holds up with caveats + 构建者裁定与 V2 范围）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-stadium-v1.md"
+        },
         {
           "label": "▶ V1 导演版 32s（Wide→Performer→Orbit→Top→Wide，含四分屏）",
           "url": "stadium/delivery/v1-director-32s.mp4",
@@ -415,14 +448,22 @@
         "同一巡演在 Sheffield Arena 有 10m 直径 LED 旋转可变形版本，说明圆形方案在两种尺度上都成立"
       ],
       "v1Observations": [
+        "【独立 review 判定】holds up with caveats：**导播/机位层是真实可用的**（这确实是本 Demo 的主题），但「360° 当作旋转」的主张与三种 16:9 比例模式**没有被画面兑现**。",
+        "【B1 已确认・最严重】RING 的「旋转」在世界空间是**空操作**：着色器用未旋转的 az 计算覆盖弧，只有采样用了 `a = az - uRotate`。用 front-window 隔离该弧后，TOP 视角在 t=8/16/23 的弧像素数 71680/71855/71903、质心 (331,682)/(330,682)/(330,682)、30° 分箱角度直方图**三次完全相同**，而 HUD 同期显示旋转 55°→163°。一个状态变量驱动了不会移动的几何。",
+        "【B2 已确认】四种比例模式里三种是同一张画：t=20 PERFORMER_FRONT 平均绝对差 pano↔repeat 1.90、pano↔fill 3.01、repeat↔fill 2.38，而 pano↔front-window 15.27；TOP 视角下差异像素 0.00–0.02%。根因是 repeat/fill 采样的那条切片本身没有可辨识特征——声明「直接暴露比例会怎样崩」被自己的画面否证。",
+        "【B4 已确认】`structure.scaleBarM: 5` 声明了但 main.js 从未绘制（sphere 画了）；源里唯一的方位线索（4 个 8px 象限标记）在所有渲染里不可见。",
+        "【B5 已确认】performer 无法承担尺度：BOWL_WIDE t=20 在人物附近 max RGB (126,112,131)、框均值 (43,44,48)——完全分离不出人形；PERFORMER_FRONT 里只是暗剪影。",
+        "【D 已确认】四状态不是真的不同：唯一变量是覆盖弧角度，RELEASE 与 LOW 在 BOWL_WIDE 下几乎是同一帧，且「旋转」分量毫无可见效果。",
+        "【F 已确认】HUD「展开比 7.85:1」不分模式照打（repeat 下实际约 1.96:1）；「95,000」在页面上根本不出现，只用 r=60m 的一圈刻度表示，而该圈在除 BOWL_WIDE 外的机位都在画外。",
+        "【评审同时确认做对的・重要】**切机位是真的**：t=2/6/10/18/26/30 的帧显示 HUD 与按下的按钮在文档化时刻变化；**切换改变的是读法而非缩放**（BOWL_WIDE 看不出人、PERFORMER_FRONT 同时揭示人物与屏幕透明、ORBIT_45 给出另一组灯柱、TOP 是唯一读出同心关系的机位）；Program Out 与四分屏可区分。",
+        "【构建者对评审的两处修正】① F3 说「只照亮 ±7°」是误读——0.12 是**羽化宽度**，亮窗是 |az| ≤ 45°；② B3 说 front-window 偏心，但 `suv.u` 在 az=0 取的是切片中点，逻辑上以世界 +Z 为中心，它在 TOP 视角看到「弧在右侧」很可能来自 TOP 机位的方位约定——这是**可读性**问题，V2 应在 TOP 加方位标记而不是改映射。",
         "【构建期发现并已修】PERFORMER_FRONT 看不到人物：performer 在圆柱内部，而屏幕本来是不透明的。根因是 ShaderMaterial **不会自动应用 material.opacity**——V1 设了 opacity 0.86 却在着色器里写死 alpha=1.0，屏幕其实一直是不透明的。已改为用 uOpacity uniform 输出 alpha（0.55），这才真正复现了参考确认的 blow-through 透明性。",
         "【构建期发现并已修】屏后一根灯柱正好落在 0° 视线上，挡住了 PERFORMER_FRONT 唯一要展示的人。灯柱改为半格偏移（22.5°、67.5°…），中心视线让开。",
-        "360° 场地下没有单一「正面」——HUD 的「覆盖角度 + 旋转角度」是理解状态的必要读数，而不是装饰。",
         "95,000 人规模只用一圈围栏刻度表示（brief 明确不做人群模拟），因此「被环绕」是靠**几何**读出来的，不是靠人。",
         "16:9 输入的三种处理（前区窗口 / ×4 重复 / 拉伸填满）与 8:1 全景母版并列，直接暴露「同一条素材换到圆柱上比例会怎样崩」。",
         "PERFORMER_FRONT 里人物仍然偏小：相机在 22m 外、人只有 1.7m，符合真实看台关系，但读尺度仍需靠近。"
       ],
-      "next": "独立 REVIEW：让不参与构建的 agent 看 V1，重点核对「同一视觉进入 360° 圆柱后人物/观看位置/导播是否真的改变结果」，以及四状态是否只是覆盖角度的数值变化。之后 V2 至少改两项（brief 对 Stadium 的要求是改 camera sequence 与至少一个视觉状态）。",
+      "next": "V2 范围（详见 review-stadium-v1.md 第二部分）：①修 **B1 空操作**——`uRotate` 必须同时作用于覆盖弧（V1 只作用于采样，HUD 显示旋转 163° 而几何纹丝不动，实测弧像素数/质心/角度直方图三次完全相同）；②修 **B2 素材无法承载对照**——repeat / fill / panorama 在画面上等价（差异像素 0.00–0.02%），要换成高对比强非对称的切片素材，HUD 的「展开比」按模式显示实际值；③补上声明过的 5m 比例尺（V1 声明未绘制）；④让 performer 在广角机位可分离（B5：BOWL_WIDE 实测完全无人形）；⑤检讨 8m 圆柱高度 proxy 与参考照片高径比的矛盾并标注；⑥让四状态改变**关系**而非只换弧角（brief 要求改 camera sequence + 至少一个视觉状态）。评审同时确认**导播层是真的**：切机位改变的是读法而非缩放，Program Out 与四分屏可区分。",
       "notesKey": "stagereplica.review.stadium"
     }
   ]

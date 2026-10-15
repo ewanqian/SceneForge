@@ -10,13 +10,13 @@
       * { box-sizing: border-box; }
       html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #05070a; color: #f4f6f8; }
       canvas { display: block; }
-      .hud { position: fixed; z-index: 10; bottom: max(16px, env(safe-area-inset-bottom)); left: max(16px, env(safe-area-inset-left)); width: min(360px, calc(100vw - 32px)); padding: 12px; border: 1px solid rgba(255,255,255,.16); border-radius: 14px; background: rgba(6,8,12,.78); backdrop-filter: blur(18px); box-shadow: 0 18px 50px rgba(0,0,0,.28); }
+      .hud { position: fixed; z-index: 10; bottom: max(16px, env(safe-area-inset-bottom)); left: max(16px, env(safe-area-inset-left)); width: min(370px, calc(100vw - 32px)); padding: 12px; border: 1px solid rgba(255,255,255,.16); border-radius: 14px; background: rgba(6,8,12,.78); backdrop-filter: blur(18px); box-shadow: 0 18px 50px rgba(0,0,0,.28); }
       .hud h1 { font-size: 13px; margin: 0 0 2px; letter-spacing: .04em; }
       .hud .sub { font-size: 11px; color: #8d97a3; margin-bottom: 10px; }
       .meta { display: grid; grid-template-columns: 76px 1fr; gap: 4px 10px; font-size: 11.5px; color: #a9b0ba; }
       .meta strong { color: #eef1f4; font-weight: 600; overflow-wrap: anywhere; }
       .dens { color: #9fe0b4; }
-      .quiet { position: fixed; z-index: 10; top: max(16px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); max-width: 360px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; background: rgba(6,8,12,.78); backdrop-filter: blur(14px); font-size: 11px; line-height: 1.5; color: #f0c98a; text-align: right; }
+      .quiet { position: fixed; z-index: 10; top: max(16px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); max-width: 380px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; background: rgba(6,8,12,.78); backdrop-filter: blur(14px); font-size: 11px; line-height: 1.5; color: #f0c98a; text-align: right; }
       .quiet span { color: #8d97a3; }
       .quiet a { color: #cfe0f5; }
       .row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
@@ -25,6 +25,10 @@
       button[aria-pressed="true"] { background: #f3f5f7; color: #07090d; border-color: transparent; font-weight: 650; }
       .stream[data-state="fallback"], .stream[data-state="offline"] { color: #f0c98a; }
       .stream[data-state="live"] { color: #9ee6a8; }
+      .quad { position: fixed; z-index: 9; pointer-events: none; }
+      .quad-label { position: absolute; font: 650 10px/1 ui-monospace, monospace; color: #e8edf3; text-shadow: 0 1px 3px #000; letter-spacing: .04em; }
+      .quad-frame { position: absolute; border: 1px solid rgba(255,255,255,.28); }
+      .quad-frame[data-program="true"] { border-color: #7cc4ff; }
     </style>
     <script type="importmap">
       {
@@ -38,31 +42,34 @@
   <body>
     <div class="hud">
       <h1>STAGE REPLICA · INSTALLATION / BLACK BOX</h1>
-      <div class="sub">Issue #80 · P2 · Reference → Graybox → V1</div>
+      <div class="sub">Issue #80 · P2 · V2（累积不再重排，余像为真实残留）</div>
       <div class="meta">
         <span>STATE</span><strong id="hud-state">—</strong>
         <span>CUE</span><strong id="hud-cue">—</strong>
-        <span>DENSITY</span><strong class="dens" id="hud-density">—</strong>
+        <span>MARKS</span><strong class="dens" id="hud-marks">—</strong>
+        <span>OCCUPANCY</span><strong class="dens" id="hud-occ">—</strong>
         <span>STREAM</span><strong class="stream" id="hud-stream">—</strong>
-        <span>VIEW</span><strong id="hud-view">—</strong>
-        <span>ROOM</span><strong id="hud-room">—</strong>
+        <span>PROGRAM</span><strong id="hud-cam">—</strong>
+        <span>SCALE</span><strong id="hud-scale">—</strong>
       </div>
-      <div class="row" id="row-view"></div>
+      <div class="row" id="row-cam"></div>
       <div class="row">
-        <button type="button" id="btn-floor">地面投影：关</button>
-        <button type="button" id="btn-drop">模拟源中断</button>
-      </div>
-      <div class="row">
+        <button type="button" id="btn-floor" aria-pressed="false">地面投影：关</button>
         <button type="button" id="btn-cue">暂停 CUE</button>
+      </div>
+      <div class="row">
+        <button type="button" id="btn-drop">模拟源中断</button>
       </div>
     </div>
     <div class="quiet">
       <b>教学预演 PROXY</b><br />
       主投影 10.24×5.4m（官方最低展示尺寸）<br />
       黑盒 14×18×7m · 观看 6–12m · 地面投影为课程实验<br />
-      <span>房间与观看距离为 proxy；4096×2160 由已确认的 DCI-4K 器材换算</span><br />
+      <span>运行时源 2048×1080，与投影面同比例（1.896:1）；母版 4096×2160 = 其两倍，由已确认的 DCI-4K 器材换算</span><br />
+      <span>房间、观看距离与地面投影为 proxy</span><br />
       <a href="https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/installation/reference/reference.md" target="_blank" rel="noreferrer">参考来源与 confirmed / proxy 对照 ↗</a>
     </div>
+    <div class="quad" id="quad"></div>
     <script type="module" src="./main.js"></script>
   </body>
 </html>
