@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#05070a" />
+    <title>Stage Replica · Multi-angle Replay</title>
+    <style>
+      :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: #05070a; color: #f4f6f8; overflow: hidden; }
+      .app { display: grid; grid-template-columns: 1fr 300px; grid-template-rows: 1fr auto; height: 100%; }
+      .stagearea { position: relative; background: #000; overflow: hidden; }
+      video { width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+      #program { position: absolute; inset: 0; }
+      #freegrid { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 2px; background: #111; }
+      /* DIRECTOR PROGRAM: the same grid, but only the active camera is laid out */
+      #freegrid.director { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+      .tile { position: relative; overflow: hidden; background: #000; }
+      .tile video { width: 100%; height: 100%; }
+      /* placed after the base .tile rules so specificity increases downward */
+      #freegrid.director .tile { display: none; }
+      #freegrid.director .tile.active { display: block; }
+      .tag { position: absolute; left: 8px; top: 8px; font: 650 11px/1 ui-monospace, monospace; padding: 4px 6px; border-radius: 5px; background: rgba(6,8,12,.72); border: 1px solid rgba(255,255,255,.18); letter-spacing: .04em; }
+      .tag.hot { background: #f3f5f7; color: #07090d; border-color: transparent; }
+      .tile .local { position: absolute; right: 8px; bottom: 8px; font: 650 10px/1 ui-monospace, monospace; color: #cfe0f5; text-shadow: 0 1px 3px #000; }
+      aside { border-left: 1px solid rgba(255,255,255,.12); background: #080a0e; padding: 12px; overflow-y: auto; }
+      aside h1 { font-size: 13px; margin: 0 0 2px; letter-spacing: .04em; }
+      aside .sub { font-size: 11px; color: #8d97a3; margin-bottom: 10px; }
+      .meta { display: grid; grid-template-columns: 72px 1fr; gap: 3px 8px; font-size: 11.5px; color: #a9b0ba; margin-bottom: 10px; }
+      .meta strong { color: #eef1f4; font-weight: 600; overflow-wrap: anywhere; }
+      .ok { color: #9ee6a8; }
+      .bad { color: #f0c98a; }
+      .row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+      button { flex: 1 1 auto; min-height: 30px; border-radius: 8px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.07); color: #f4f6f8; padding: 5px 8px; font: inherit; font-size: 11px; cursor: pointer; }
+      button:hover { background: rgba(255,255,255,.13); }
+      button[aria-pressed="true"] { background: #f3f5f7; color: #07090d; border-color: transparent; font-weight: 650; }
+      .radar { width: 100%; height: auto; display: block; margin: 4px 0 10px; background: #0b0e14; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; }
+      .cams { font-size: 11px; }
+      .camrow { display: grid; grid-template-columns: 10px 1fr auto; gap: 6px; align-items: center; padding: 5px 6px; border-radius: 7px; cursor: pointer; }
+      .camrow:hover { background: rgba(255,255,255,.06); }
+      .camrow[data-active="true"] { background: rgba(124,196,255,.14); }
+      .dot { width: 9px; height: 9px; border-radius: 50%; background: #7cc4ff; }
+      .camrow .off { color: #8d97a3; font: 600 10px ui-monospace, monospace; }
+      footer { grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,.12); background: #080a0e; padding: 10px 14px; }
+      .scrub { display: flex; align-items: center; gap: 10px; }
+      input[type="range"] { flex: 1; accent-color: #7cc4ff; }
+      .time { font: 650 12px ui-monospace, monospace; color: #eef1f4; min-width: 96px; }
+      .note { font-size: 10.5px; color: #7d8794; margin-top: 6px; line-height: 1.45; }
+      label.file { flex: 1 1 auto; text-align: center; min-height: 30px; border-radius: 8px; border: 1px dashed rgba(255,255,255,.24); padding: 6px 8px; font-size: 11px; cursor: pointer; color: #cfe0f5; }
+      input[type="file"] { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="stagearea">
+        <div id="freegrid"></div>
+      </div>
+
+      <aside>
+        <h1>MULTI-ANGLE REPLAY</h1>
+        <div class="sub">Stage Replica vNext · P1 · V0（手工同步）</div>
+        <div class="meta">
+          <span>MASTER</span><strong id="m-time">0.00s</strong>
+          <span>OFFSET</span><strong id="m-off">—</strong>
+          <span>本地时间</span><strong id="m-local">—</strong>
+          <span>同步</span><strong id="m-sync">—</strong>
+          <span>置信度</span><strong id="m-conf">—</strong>
+        </div>
+        <div class="row">
+          <button type="button" id="btn-play">▶ 播放</button>
+          <button type="button" id="btn-mode">DIRECTOR PROGRAM</button>
+        </div>
+        <svg class="radar" id="radar" viewBox="-70 -70 140 140" aria-label="机位平面图"></svg>
+        <div class="cams" id="cams"></div>
+        <div class="row" style="margin-top:10px">
+          <label class="file">导入自己的素材（可多选）<input type="file" id="file" accept="video/*" multiple /></label>
+        </div>
+        <div class="note" id="note"></div>
+      </aside>
+
+      <footer>
+        <div class="scrub">
+          <button type="button" id="btn-back" style="flex:0 0 auto">−1s</button>
+          <input type="range" id="scrub" min="0" max="32" step="0.01" value="0" />
+          <button type="button" id="btn-fwd" style="flex:0 0 auto">+1s</button>
+          <span class="time" id="t-readout">0.00 / 32.00s</span>
+        </div>
+        <div class="note">
+          一个 master timeline 驱动所有素材：每条素材的本地时间 = master − 自己的 offset。
+          <b>切机位不会改变 master 时间</b>，所以任意时刻切过去都停在同一拍。数字键 1–3 切机位，空格播放/暂停。
+        </div>
+      </footer>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

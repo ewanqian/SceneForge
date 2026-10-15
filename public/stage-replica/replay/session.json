@@ -1,0 +1,53 @@
+{
+  "sessionId": "demo-stadium-3cam",
+  "title": "同一条 cue，三个机位",
+  "note": "V0 只有手工同步：每条素材只记录 url + timeOffset + 机位。这三条是同一场 Stadium cue 从三个机位分别录制的，后两条刻意从不同时刻开始（t=6 / t=14），用来复现「饭拍在不同时间按下录制」的对齐问题。",
+  "masterDurationSec": 32,
+  "masterOrigin": "cue t=0",
+  "plan": {
+    "arenaDiameterM": 120,
+    "stageDiameterM": 30,
+    "cylinderDiameterM": 20,
+    "note": "平面图用 Stadium 的真实 proxy 尺寸：⌀120m 碗体 / ⌀30m 圆形舞台 / ⌀20m 圆柱"
+  },
+  "cameras": [
+    {
+      "id": "CAM_A",
+      "label": "观众席高位",
+      "src": "clips/cam-a.mp4",
+      "offsetSec": 0,
+      "positionM": [0, 18, 54],
+      "targetM": [0, 5, 0],
+      "fovDeg": 44,
+      "confidence": 1,
+      "note": "完整 32s，作为 master 的基准"
+    },
+    {
+      "id": "CAM_B",
+      "label": "人物近景",
+      "src": "clips/cam-b.mp4",
+      "offsetSec": 6,
+      "positionM": [0, 2.4, 22],
+      "targetM": [0, 3, 0],
+      "fovDeg": 40,
+      "confidence": 1,
+      "note": "从 cue t=6 开始录，所以它的第 0 秒等于 master 的第 6 秒"
+    },
+    {
+      "id": "CAM_C",
+      "label": "45° 轨道",
+      "src": "clips/cam-c.mp4",
+      "offsetSec": 14,
+      "positionM": [19, 9, 19],
+      "targetM": [0, 4, 0],
+      "fovDeg": 46,
+      "confidence": 1,
+      "note": "从 cue t=14 开始录"
+    }
+  ],
+  "defaultCamera": "CAM_A",
+  "syncPolicy": {
+    "mode": "manual",
+    "note": "V0 不做音频指纹 / 闪光检测 / GPS。offset 由人填写；confidence 永远显示出来，不假装是自动同步。"
+  }
+}
