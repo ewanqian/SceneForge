@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-15T08:45+08:00",
+  "updated": "2026-10-15T22:20+08:00",
   "title": "Stage Replica · Demo Sprint",
   "subtitle": "内部审核看板 / Internal review board",
   "brief": {
@@ -38,7 +38,115 @@
     "自己的内容放进去以后，是否真的比静态效果图多获得了信息？",
     "这个 Demo 是否可以作为工作坊案例，让参与者理解「为什么要预演」？"
   ],
+  "modules": [
+    {
+      "id": "replay",
+      "name": "Multi-angle Replay",
+      "kind": "P1 模块",
+      "issue": 42,
+      "issueUrl": "https://github.com/ewanqian/SceneForge/issues/42",
+      "role": "把真实录像放回同一时间轴",
+      "question": "摄像机能不能不是一台虚拟机位，而是一段录像？",
+      "done": "同一场演出的多条录像共享一条 master 时间轴，任意时刻切机位都停在同一拍。",
+      "milestones": [
+        { "id": "V0 手工同步", "state": "done" },
+        { "id": "V1 自动同步", "state": "todo" }
+      ],
+      "run": { "label": "打开模块", "url": "replay/" },
+      "links": [
+        {
+          "label": "README（验收清单与已知限制）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/replay/README.md"
+        },
+        {
+          "label": "CDP 播放同步探针",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-tools/replay-probe.mjs"
+        }
+      ],
+      "states": [
+        { "id": "CAM_A", "label": "观众席高位（master 基准）", "url": "replay/?t=20&cam=CAM_A" },
+        { "id": "CAM_B", "label": "人物近景（offset +6s）", "url": "replay/?t=20&cam=CAM_B" },
+        { "id": "CAM_C", "label": "45° 轨道（offset +14s）", "url": "replay/?t=20&cam=CAM_C" },
+        { "id": "FREE", "label": "FREE VIEW 同刻看全部", "url": "replay/?t=20&mode=free" }
+      ],
+      "observations": [
+        "【实测】master=20s 时三条素材分别在 20.0 / 14.0 / 6.0s —— 三条不同的本地时间，同一拍，diff 全 0.000。",
+        "【实测】切到 CAM_C 后 master 仍为 20s：切机位保持同一时间点。",
+        "【实测】真实播放 7 秒后 master 11.48s、最大偏差 0.076s。",
+        "【探针抓出的 bug 1】首帧 seek 被静默丢弃：元数据未就绪时 video.duration 是 NaN，clamp 返回 NaN，赋值抛错被 try/catch 吞掉且没有重试——页面能不能定位取决于时序。",
+        "【探针抓出的 bug 2（由 bug 1 的修法引入）】改成每帧对账后产生 seek 抖动：素材还在缓冲时每帧重发 seek 会打断上一次，永远到不了目标时间。已加 !video.seeking 守卫。",
+        "【已知限制・未修复】冷启动首次加载在无头环境下三个片段停在 readyState=1，pending seek 无法完成；紧接着一次 CDP 调用唤醒页面后立刻变成 readyState=4 且 buffered:[0,32.02]。证据指向无头页面节流而非模块逻辑，但没有标记为已解决，界面上增加「缓冲中」提示而不是谎报 OK。",
+        "【口径】用 chrome --headless --virtual-time-budget 测播放会得到假失败——虚拟时间不推进媒体时钟，currentTime 永远是 0。探针因此改走 CDP 真实浏览器。",
+        "【已知限制】offset 完全靠人填，confidence 如实显示为「手工」，未做音频指纹 / 闪光检测 / GPS。内置素材是自己渲染的三个机位，不是真实饭拍。"
+      ],
+      "next": "V1 半自动同步：音频互相关 / 闪光瞬变 / confidence score / 人工校正。"
+    },
+    {
+      "id": "crowd",
+      "name": "Stadium 人群层",
+      "kind": "Stadium 深化（非新舞台类型）",
+      "issue": 79,
+      "issueUrl": "https://github.com/ewanqian/SceneForge/issues/79",
+      "role": "把「95,000 人环绕」从一句话变成可测量",
+      "question": "「很多人」到底改变了什么？",
+      "done": "人数与密度、逐排视线 C 值、以及从舞台位置量出的包围角，三者都可测且可复现。",
+      "milestones": [
+        { "id": "密度场", "state": "done" },
+        { "id": "视线 C 值", "state": "done" },
+        { "id": "包围角", "state": "done" },
+        { "id": "独立评审", "state": "active" },
+        { "id": "场地站立区", "state": "todo" }
+      ],
+      "run": { "label": "打开研究", "url": "stadium/crowd/" },
+      "links": [
+        {
+          "label": "README（口径、发现与已知限制）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/stadium/crowd/README.md"
+        },
+        {
+          "label": "构建期修掉的三个问题（见下方观察）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/stadium/crowd/README.md"
+        }
+      ],
+      "states": [
+        {
+          "id": "密度场",
+          "label": "按密度着色",
+          "url": "stadium/crowd/?overlay=density&density=packed"
+        },
+        {
+          "id": "视线",
+          "label": "逐排 C 值着色",
+          "url": "stadium/crowd/?overlay=sightline&rake=constant"
+        },
+        {
+          "id": "包围角",
+          "label": "从舞台往外看",
+          "url": "stadium/crowd/?view=STAGE_CENTER&overlay=encircle&density=packed"
+        }
+      ],
+      "views": [
+        { "id": "BOWL_WIDE", "url": "stadium/crowd/?view=BOWL_WIDE&rake=sightline" },
+        { "id": "STAGE_CENTER", "url": "stadium/crowd/?view=STAGE_CENTER&density=packed" },
+        { "id": "ROW_20", "url": "stadium/crowd/?view=ROW_20&rake=constant&overlay=sightline" },
+        { "id": "TOP", "url": "stadium/crowd/?view=TOP&rake=sightline" }
+      ],
+      "observations": [
+        "【这一层的核心发现】等升阶（0.45m × 52 排）会让 C 值随距离衰减并崩塌：最小 −59.1mm、第 13 排首次跌破判据（57.8mm），也就是后排观众的视线被前排头部完全挡住。**这个结论看渲染图完全看不出来**。",
+        "【解算对照】页面同时解算能保持目标的升阶剖面 h_i=[C−f+y_prev+P−k(y_prev+E−f)]/k，结果最小 C = 60.0mm、无不合格排。真实场馆上陡下缓的原因就在这张表里。",
+        "【包围角实测】舞台中心眼高 1.6m：水平 100% 的 360°、垂直 2.4°→19.0°、最近观众 18.4m。垂直 19° 比「95,000 人」更能说明被包围是什么感觉——要抬头才看得到最上面一排。",
+        "【构建期修掉・最值得说的一个】第一版把看台内缘放在半径 32m，艺人站在一条 32m 宽的护城河里，STAGE_CENTER 视角**根本看不到人**，而同屏指标仍显示「水平覆盖 99.7%」——数字全对、画面全错。看台已改为从半径 18m 起。",
+        "【构建期修掉】报出的容量会被实例上限截断，因为容量计数与实例收集在同一个会提前 break 的循环里。已改为独立计数。",
+        "【构建期修掉】解算升阶恰好落在 60.0mm，而 c < targetC 的浮点比较把完全合规的第 3 排误判为不合格。已加容差。",
+        "【口径・必须说清楚】代理碗体是 26,177 座，**不是 95,000**。参考的 95,000 包含场地内站立人群与 OAKA 既有的更大看台，两者都未建模。正确说法是「一个 2.6 万座碗体的密度与视线研究」，不是「复现了 9.5 万人」。",
+        "【已知限制】场地站立区只写了结论没有做；C 值只算垂直视线；观众没有个体行为（仅着色器轻摆）；人体参数是常量，因此 C 值对同一身高的人群成立；60mm 是选择而非规范引用。"
+      ],
+      "next": "独立评审（进行中）；之后是场地站立区（平地上的人群会自己挡住自己）与座位疏散/通行能力。"
+    }
+  ],
   "globalGaps": [
+    "【vNext 进行中】Issue #42 已把方向从「再做四个舞台」改为「证明一个参与者能在三小时内做出第五个」。P0（参与者 authoring flow）与 P0.5（统一 scene manifest）由另一个 agent 推进；本看板本轮新增两个**模块卡片**（见下方），它们不是 Demo，因此用里程碑而不是六阶段流水线表示。",
+    "【本轮新增・未做】Multi-angle Replay 的 V1 自动同步（音频指纹 / 闪光检测 / confidence）完全未做，V0 的 offset 全靠人填；Stadium 人群层的场地站立区只写了结论没有建（平地上的人群会自己挡住自己），上陡下缓的看台是否可建也还没有交给独立评审。",
     "【已解决】四个 Demo 的参考链接均已逐条核验：Sphere / Festival（Vita Motus·Quasar，含一条 404 更正）/ Installation（Ryoji Ikeda data-verse）/ Stadium（STUFISH，DOM 抓取后逐字检索）。",
     "【仍在】dome / 双屏 / 圆柱屏 都不符合 SceneForge 的 venueManifestSchema（layout: box|arena，单一 screen）。四个 Demo 目前以独立静态页存在；schema 是否扩展仍是待用户决定的开放问题。",
     "【已解决】录制通道已用 tools/record-cdp.mjs（CDP 抓帧 + ffmpeg）落地，全部 V1/V2 录屏均由它产出，并以 __REPLICA_READY__ / __REPLICA_DONE__ 为闸门。",

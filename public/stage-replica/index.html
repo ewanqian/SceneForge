@@ -45,6 +45,8 @@
       .pill.p1 { color: #ffd29f; border-color: rgba(255, 200, 120, 0.4); }
       .pill.p2 { color: #b9d5ff; border-color: rgba(140, 180, 255, 0.4); }
       .pill.p3 { color: #c9c9d6; }
+      .pill.mod { color: #b9f0d0; border-color: rgba(140, 240, 190, 0.4); }
+      .card.module { border-left: 3px solid rgba(140, 240, 190, 0.55); }
       .q { font-size: 12.5px; color: #c6cfd9; margin: 8px 0 0; padding-left: 10px; border-left: 2px solid rgba(124, 196, 255, 0.4); }
       .done-note { font-size: 12px; color: var(--dim); margin: 6px 0 0; }
       .stages { display: flex; flex-wrap: wrap; gap: 5px; margin: 11px 0 0; }
@@ -300,6 +302,108 @@
         return card;
       }
 
+      // Modules are not demos: they have milestones rather than the six-stage pipeline, and they
+      // may carry a different subset of sections. Rendered defensively so a module missing a field
+      // still shows up instead of breaking the board.
+      function renderModule(mod) {
+        const card = element("div", "card module");
+
+        const head = element("div", "card-head");
+        head.append(element("h2", null, mod.name));
+        head.append(element("span", "pill mod", mod.kind));
+        if (mod.issue) head.append(element("span", "pill", `Issue #${mod.issue}`));
+        if (mod.role) head.append(element("span", "pill", mod.role));
+        card.append(head);
+
+        if (mod.question) card.append(element("p", "q", mod.question));
+        if (mod.done) card.append(element("p", "done-note", `完成定义：${mod.done}`));
+
+        if (mod.milestones && mod.milestones.length > 0) {
+          const stages = element("div", "stages");
+          for (const milestone of mod.milestones) {
+            const chip = element("span", "stage", `${CHECK[milestone.state] ?? "○"} ${milestone.id}`);
+            chip.dataset.s = milestone.state;
+            chip.title = milestone.state;
+            stages.append(chip);
+          }
+          card.append(stages);
+        }
+
+        if (mod.run) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "入口"));
+          const chips = element("div", "chips");
+          chips.append(link(`▶ ${mod.run.label}`, mod.run.url, "run"));
+          if (mod.issueUrl) chips.append(link("GitHub Issue", mod.issueUrl, ""));
+          section.append(chips);
+          card.append(section);
+        }
+
+        if (mod.states && mod.states.length > 0) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "状态 / 机位直达（reviewer 逐个核对）"));
+          const chips = element("div", "chips");
+          renderChips(chips, mod.states, "");
+          section.append(chips);
+          card.append(section);
+        }
+
+        if (mod.views && mod.views.length > 0) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "视点"));
+          const chips = element("div", "chips");
+          renderChips(chips, mod.views, "");
+          section.append(chips);
+          card.append(section);
+        }
+
+        if (mod.links && mod.links.length > 0) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "文档 / 工具"));
+          const chips = element("div", "chips");
+          for (const item of mod.links) chips.append(link(item.label, item.url, ""));
+          section.append(chips);
+          card.append(section);
+        }
+
+        if (mod.observations && mod.observations.length > 0) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "实测与已知限制"));
+          const list = element("ul");
+          for (const item of mod.observations) list.append(element("li", "gap", item));
+          section.append(list);
+          card.append(section);
+        }
+
+        if (mod.next) {
+          const section = element("div", "section");
+          section.append(element("h3", null, "下一步"));
+          section.append(element("p", "done-note", mod.next));
+          card.append(section);
+        }
+
+        const noteSection = element("div", "section");
+        noteSection.append(element("h3", null, "我的批注（存在本机浏览器，可导出）"));
+        const area = element("textarea");
+        area.placeholder = "例：C 值的 60mm 判据是否该按体育场取值？解算升阶在最后一排的 riser 是多少？";
+        area.value = readNote(mod.id);
+        const row = element("div", "note-row");
+        const save = element("button", null, "保存本机批注");
+        const state = element("span", "saved", "");
+        save.addEventListener("click", () => {
+          writeNote(mod.id, area.value);
+          state.textContent = "已保存";
+          setTimeout(() => {
+            state.textContent = "";
+          }, 1800);
+        });
+        row.append(save, state);
+        noteSection.append(area, row);
+        card.append(noteSection);
+
+        return card;
+      }
+
       async function main() {
         let status;
         try {
@@ -337,9 +441,14 @@
         cards.innerHTML = "";
         for (const demo of status.demos) cards.append(renderDemo(demo));
 
+        // Modules come after the demos: they are vNext work (Issue #42), not part of the Demo Sprint.
+        const modules = status.modules ?? [];
+        for (const mod of modules) cards.append(renderModule(mod));
+
         document.getElementById("export").addEventListener("click", () => {
           const notes = {};
           for (const demo of status.demos) notes[demo.id] = readNote(demo.id);
+          for (const mod of status.modules ?? []) notes[mod.id] = readNote(mod.id);
           const payload = { exportedAt: new Date().toISOString(), board: status.title, notes };
           const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
           const url = URL.createObjectURL(blob);
@@ -353,6 +462,7 @@
 
         document.getElementById("clear").addEventListener("click", () => {
           for (const demo of status.demos) writeNote(demo.id, "");
+          for (const mod of status.modules ?? []) writeNote(mod.id, "");
           for (const area of document.querySelectorAll("textarea")) area.value = "";
           document.getElementById("save-state").textContent = "已清空";
         });
