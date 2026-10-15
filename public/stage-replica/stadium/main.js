@@ -1,12 +1,21 @@
-// Stage Replica — Stadium / 360° Concert (V1).
+// Stage Replica — Stadium / 360° Concert (V2).
 //
 // This is the technical demo: its subject is Camera / Director / Program Out rather than the
 // picture. A 360° room has no single front, so switching cameras is not a convenience here, it is
 // part of how the show gets arranged at all.
 //
 // Reference (STUFISH, Anna Vissi / OAKA): "a 20m cylindrical blow-through LED screen rises like a
-// beacon above a 30m circular stage", 360° in the round, 95,000 surrounding. The cylinder HEIGHT
-// is a teaching proxy — the reference gives no height.
+// beacon above a 30m circular stage", 360° in the round, 95,000 surrounding.
+//
+// V2 answers the V1 review, which found:
+//   - the ring's "rotation" was a NO-OP in world space. The cover arc was computed from unrotated
+//     `az` while only the sampling used uRotate, so the HUD reported 163 degrees of rotation while
+//     the arc's pixel count, centroid and angle histogram were identical at t=8/16/23.
+//   - the three 16:9 ratio modes rendered the same picture (0.00-0.02% of pixels differed), because
+//     the sampled slice had no recognisable features.
+//   - the declared 5 m scale bar was never drawn.
+//   - the performer was unseparable in the wide cameras (max RGB 126,112,131 at the performer).
+//   - four states differed only by the covered arc angle.
 //
 // Deterministic review entry points:
 //   ?t=<seconds>   ?view=<id>   ?pano=<id>   ?quad=0|1   ?hud=0|1   ?drop=1   ?dropAt=<sec>
@@ -33,13 +42,14 @@ const cylinderRadius = structure.ledCylinderDiameterM / 2;
 const cylinderHeight = structure.ledCylinderHeightM;
 
 // Cue behaviour lives here; venue geometry lives in scene.json (see AGENTS.md).
-// `wrap` is the half-angle of the ring that carries content - the 360° equivalent of the Sphere
-// demo's occupied area. `rotate` speed is integrated deterministically from the cue time.
+// `wrap` is the half-angle of the ring carrying content. `barLift` raises the blow-through bars
+// above the cylinder, and `crowd` lights the surrounding stand ring - both are RELATIONSHIP
+// changes, so the states are no longer just four arc angles.
 const STATE_PARAMS = {
-  LOW: { wrap: 0.79, density: 0.18, bright: 0.5 },
-  BUILD: { wrap: 1.57, density: 0.5, bright: 0.75 },
-  PEAK: { wrap: Math.PI, density: 0.92, bright: 1 },
-  RELEASE: { wrap: 0.7, density: 0.24, bright: 0.55 },
+  LOW: { wrap: 0.79, density: 0.18, bright: 0.5, barLift: 0, barBright: 0.5, crowd: 0.05 },
+  BUILD: { wrap: 1.57, density: 0.5, bright: 0.75, barLift: 0.25, barBright: 0.8, crowd: 0.2 },
+  PEAK: { wrap: Math.PI, density: 0.92, bright: 1, barLift: 1, barBright: 1, crowd: 0.45 },
+  RELEASE: { wrap: 0.7, density: 0.24, bright: 0.55, barLift: 0.1, barBright: 0.6, crowd: 1 },
 };
 const ROT_SPEED = { LOW: 0, BUILD: 0.12, PEAK: 0.22, RELEASE: 0.04 };
 
@@ -52,7 +62,7 @@ const pseudo = (seed) => {
 
 // ---------------------------------------------------------------- cue timeline
 function ringRotation(time) {
-  // Integrate the per-state rotation speed so that the ring angle is a pure function of cue time.
+  // Integrate the per-state rotation speed so the ring angle is a pure function of cue time.
   // Without this, ?t= stills and the recording would disagree about where the content sits.
   let total = 0;
   for (const state of cueConfig.states) {
@@ -84,13 +94,20 @@ function evaluateCue(time) {
     wrap: blend(from.wrap, to.wrap),
     density: blend(from.density, to.density),
     bright: blend(from.bright, to.bright),
+    barLift: blend(from.barLift, to.barLift),
+    barBright: blend(from.barBright, to.barBright),
+    crowd: blend(from.crowd, to.crowd),
     rotation: ringRotation(clamped),
     time: clamped,
   };
 }
 
 // ---------------------------------------------------------------- own source
-// A panorama: 8:1, matching the cylinder's unwrapped ratio (62.8 m circumference : 8 m height).
+// Four large, high-contrast glyphs, one per quadrant, all clearly different shapes. V1 used a
+// near-uniform noise field, which made "panorama / 16:9 repeated / 16:9 stretched" visually
+// identical: the reviewer measured 0.00-0.02% differing pixels. With four DIFFERENT glyphs, the
+// repeat test shows the same glyph four times and the stretch test smears one glyph around the
+// ring - both instantly distinguishable from the panorama.
 function createSource() {
   const canvas = document.createElement("canvas");
   canvas.width = SOURCE_WIDTH;
@@ -101,47 +118,92 @@ function createSource() {
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
 
-  const draw = (time, density, brightness, fallback) => {
+  const glyph = (kind, cx, cy, scale, bright) => {
+    const r = SOURCE_HEIGHT * 0.36 * scale;
+    ctx.strokeStyle = `rgba(236,244,255,${(0.55 + bright * 0.45).toFixed(3)})`;
+    ctx.fillStyle = `rgba(236,244,255,${(0.5 + bright * 0.5).toFixed(3)})`;
+    ctx.lineWidth = 12;
+    ctx.lineCap = "round";
+    if (kind === 0) {
+      // upward arrow
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - r);
+      ctx.lineTo(cx + r * 0.8, cy);
+      ctx.lineTo(cx + r * 0.28, cy);
+      ctx.lineTo(cx + r * 0.28, cy + r);
+      ctx.lineTo(cx - r * 0.28, cy + r);
+      ctx.lineTo(cx - r * 0.28, cy);
+      ctx.lineTo(cx - r * 0.8, cy);
+      ctx.closePath();
+      ctx.fill();
+    } else if (kind === 1) {
+      // X
+      ctx.beginPath();
+      ctx.moveTo(cx - r, cy - r);
+      ctx.lineTo(cx + r, cy + r);
+      ctx.moveTo(cx + r, cy - r);
+      ctx.lineTo(cx - r, cy + r);
+      ctx.stroke();
+    } else if (kind === 2) {
+      // diagonal stripes
+      for (let i = -2; i <= 2; i += 1) {
+        ctx.beginPath();
+        ctx.moveTo(cx - r + i * r * 0.5, cy + r);
+        ctx.lineTo(cx + i * r * 0.5, cy - r);
+        ctx.stroke();
+      }
+    } else {
+      // concentric circles
+      for (let i = 1; i <= 3; i += 1) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, (r * i) / 3, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+  };
+
+  const draw = (time, sample, fallback) => {
     ctx.fillStyle = "#04050a";
     ctx.fillRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
 
     if (fallback) {
       const x = ((time * 0.15) % 1) * SOURCE_WIDTH;
       const bar = ctx.createLinearGradient(x - 500, 0, x + 500, 0);
-      bar.addColorStop(0, "rgba(70,80,100,0)");
-      bar.addColorStop(0.5, "rgba(120,135,160,0.5)");
-      bar.addColorStop(1, "rgba(70,80,100,0)");
+      bar.addColorStop(0, "rgba(90,102,126,0)");
+      bar.addColorStop(0.5, "rgba(150,168,196,0.8)");
+      bar.addColorStop(1, "rgba(90,102,126,0)");
       ctx.fillStyle = bar;
       ctx.fillRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
       texture.needsUpdate = true;
       return;
     }
 
-    // four quadrant markers: on a 360° screen the viewer must be able to tell where they are, so
-    // the source carries an orientation cue that a flat screen never needs.
+    // four quadrant glyphs, deliberately all different
     for (let q = 0; q < 4; q += 1) {
-      const x = ((q + 0.5) / 4) * SOURCE_WIDTH;
-      ctx.fillStyle = q === 0 ? "rgba(255,210,120,0.8)" : "rgba(150,175,210,0.35)";
-      ctx.fillRect(x - 4, 0, 8, SOURCE_HEIGHT);
-      ctx.fillRect(x - 70, SOURCE_HEIGHT * 0.5 - 3, 140, 6);
+      glyph(q, ((q + 0.5) / 4) * SOURCE_WIDTH, SOURCE_HEIGHT * 0.5, 1, sample.bright);
     }
 
-    const bands = 6;
+    // quadrant separators so orientation is readable on a wrap-around screen
+    for (let q = 0; q < 4; q += 1) {
+      ctx.fillStyle = "rgba(120,150,190,0.5)";
+      ctx.fillRect((q / 4) * SOURCE_WIDTH - 2, 0, 4, SOURCE_HEIGHT);
+    }
+
+    const bands = 5;
     for (let i = 0; i < bands; i += 1) {
       const y = ((i + 0.5) / bands) * SOURCE_HEIGHT;
-      ctx.fillStyle = `rgba(190,210,240,${(0.05 + brightness * 0.12).toFixed(3)})`;
+      ctx.fillStyle = `rgba(190,210,240,${(0.04 + sample.bright * 0.08).toFixed(3)})`;
       ctx.fillRect(0, y - 1, SOURCE_WIDTH, 2);
     }
 
-    const count = Math.round(140 + density * 1600);
+    const count = Math.round(120 + sample.density * 1200);
     for (let i = 0; i < count; i += 1) {
       const seedX = pseudo(i * 1.7 + 3.1);
       const seedY = pseudo(i * 2.3 + 7.7);
       const x = (((seedX + time * (0.004 + seedX * 0.012)) % 1) + 1) % 1;
       const y = (((seedY + Math.sin(time * 0.22 + i) * 0.01) % 1) + 1) % 1;
-      ctx.fillStyle = `rgba(220,232,248,${(0.12 + brightness * 0.4).toFixed(3)})`;
-      const size = 1 + seedX * 2.4;
-      ctx.fillRect(x * SOURCE_WIDTH, y * SOURCE_HEIGHT, size, size);
+      ctx.fillStyle = `rgba(220,232,248,${(0.1 + sample.bright * 0.35).toFixed(3)})`;
+      ctx.fillRect(x * SOURCE_WIDTH, y * SOURCE_HEIGHT, 2, 2);
     }
     texture.needsUpdate = true;
   };
@@ -174,10 +236,15 @@ const ground = new THREE.Mesh(
 ground.rotation.x = -Math.PI / 2;
 scene.add(ground);
 
-// low-fi stands: a ring of short vertical ticks at the bowl radius, so "surrounded on all sides"
-// is legible without simulating 95,000 people (which the brief rules out).
+// The stand ring: "surrounded on all sides" is read from geometry, not from people (the brief
+// rules out simulating 95,000). It now lights up during RELEASE, so the crowd relationship
+// changes between states instead of the states only changing an arc angle.
 const standTicks = new THREE.Group();
-const tickMaterial = new THREE.LineBasicMaterial({ color: 0x2b3646, transparent: true });
+const tickMaterial = new THREE.LineBasicMaterial({
+  color: 0x2b3646,
+  transparent: true,
+  opacity: 0.5,
+});
 for (let i = 0; i < 96; i += 1) {
   const angle = (i / 96) * Math.PI * 2;
   const x = Math.cos(angle) * bowlRadius;
@@ -194,6 +261,19 @@ for (let i = 0; i < 96; i += 1) {
 }
 scene.add(standTicks);
 
+// 5 m scale bar on the ground in front of the stage. V1 declared structure.scaleBarM and never
+// drew it, so the reviewer measured zero near-white pixels across all four presets.
+const barHalf = structure.scaleBarM / 2;
+scene.add(
+  new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(-barHalf, 0.06, structure.scaleBarZ),
+      new THREE.Vector3(barHalf, 0.06, structure.scaleBarZ),
+    ]),
+    new THREE.LineBasicMaterial({ color: 0xffffff }),
+  ),
+);
+
 // ---------------------------------------------------------------- stage + performer
 const stageRadius = structure.mainStageDiameterM / 2;
 const stage = new THREE.Mesh(
@@ -202,19 +282,7 @@ const stage = new THREE.Mesh(
 );
 stage.position.y = 0.45;
 scene.add(stage);
-scene.add(
-  new THREE.LineLoop(
-    new THREE.BufferGeometry().setFromPoints(
-      Array.from({ length: 129 }, (_, i) => {
-        const a = (i / 128) * Math.PI * 2;
-        return new THREE.Vector3(Math.cos(a) * stageRadius, 0.92, Math.sin(a) * stageRadius);
-      }),
-    ),
-    new THREE.LineBasicMaterial({ color: 0x55657c }),
-  ),
-);
 
-// performer zone ⌀12 m marker
 const zoneRadius = structure.performerZoneDiameterM / 2;
 scene.add(
   new THREE.LineLoop(
@@ -228,15 +296,22 @@ scene.add(
   ),
 );
 
+// The performer: emissive so it separates from the screen behind it. The review measured
+// (126,112,131) at the performer's position in BOWL_WIDE, i.e. no separable figure at all.
 const performerHeight = structure.performerHeightM;
 const performer = new THREE.Mesh(
-  new THREE.CapsuleGeometry(0.28, performerHeight - 0.56, 8, 16),
-  new THREE.MeshStandardMaterial({ color: 0xffb86b, roughness: 0.8, metalness: 0 }),
+  new THREE.CapsuleGeometry(0.3, performerHeight - 0.6, 8, 16),
+  new THREE.MeshStandardMaterial({
+    color: 0xffb86b,
+    emissive: 0xff8a2b,
+    emissiveIntensity: 0.85,
+    roughness: 0.7,
+    metalness: 0,
+  }),
 );
 performer.position.set(0, 0.9 + performerHeight / 2, 0);
 scene.add(performer);
 
-// halo ring (lighting ring, not a screen)
 const haloRadius = structure.haloRingDiameterM / 2;
 const halo = new THREE.Mesh(
   new THREE.TorusGeometry(haloRadius, 0.1, 8, 96),
@@ -247,10 +322,9 @@ halo.position.y = cylinderHeight + 0.6;
 scene.add(halo);
 
 // ---------------------------------------------------------------- blow-through back light
-// STUFISH: the screen is transparent, so lighting sits BEHIND it and adds depth to both the
-// lighting and the content. Eight bars inside the cylinder, seen through the screen.
-const backLightGroup = new THREE.Group();
-const barCount = sceneJson.lightThroughScreen.backLightBars;
+// STUFISH: the screen is transparent, so lighting sits BEHIND it. The bars are unit-height boxes
+// scaled per frame, so that at PEAK they rise above the cylinder - the light crossing the screen
+// becomes the event, which is a relationship change rather than an angle change.
 const barMaterial = new THREE.MeshBasicMaterial({
   color: 0xffcf8a,
   toneMapped: false,
@@ -258,20 +332,19 @@ const barMaterial = new THREE.MeshBasicMaterial({
   opacity: 0.85,
   blending: THREE.AdditiveBlending,
 });
-for (let i = 0; i < barCount; i += 1) {
-  // half-step offset: with a bar at exactly 0° the front-centre bar sits on the sightline to the
-  // performer and hides the one thing PERFORMER_FRONT exists to show.
-  const angle = ((i + 0.5) / barCount) * Math.PI * 2;
-  const bar = new THREE.Mesh(new THREE.BoxGeometry(0.5, cylinderHeight - 0.8, 0.5), barMaterial);
+const backLightBars = [];
+for (let i = 0; i < sceneJson.lightThroughScreen.backLightBars; i += 1) {
+  const angle = ((i + 0.5) / sceneJson.lightThroughScreen.backLightBars) * Math.PI * 2;
+  const bar = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1, 0.5), barMaterial);
   bar.position.set(
     Math.cos(angle) * (cylinderRadius - 1.5),
-    cylinderHeight / 2,
+    0,
     Math.sin(angle) * (cylinderRadius - 1.5),
   );
   bar.renderOrder = 1;
-  backLightGroup.add(bar);
+  backLightBars.push(bar);
+  scene.add(bar);
 }
-scene.add(backLightGroup);
 
 // ---------------------------------------------------------------- cylinder LED
 const source = createSource();
@@ -285,10 +358,6 @@ const uniforms = {
   uTime: { value: 0 },
   uFeed: { value: 0 },
   uPano: { value: 0 },
-  // ShaderMaterial ignores material.opacity: the shader must output alpha itself. V1 set
-  // opacity: 0.86 but wrote alpha 1.0, so the screen was never actually transparent and the
-  // performer was invisible from outside — contradicting the blow-through property that the
-  // reference confirms and that this demo depends on.
   uOpacity: { value: sceneJson.lightThroughScreen.screenOpacity },
 };
 
@@ -296,7 +365,6 @@ const cylinderMaterial = new THREE.ShaderMaterial({
   uniforms,
   side: THREE.DoubleSide,
   transparent: true,
-  opacity: sceneJson.lightThroughScreen.screenOpacity,
   depthWrite: false,
   vertexShader: `
     varying vec3 vPos;
@@ -321,25 +389,25 @@ const cylinderMaterial = new THREE.ShaderMaterial({
     varying vec2 vUv;
 
     const float PI = 3.141592653589793;
+    // the 16:9 slice used by the three input-ratio modes, centred on the X glyph in quadrant 2
+    const float TILE_U0 = 0.25;
+    const float TILE_W = 0.22;
 
     float hash(vec2 p) {
       return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
     }
 
     void main() {
-      // azimuth measured from +Z, which is where the main bowl camera sits
+      // V1 BUG: the cover arc was computed from the UNROTATED azimuth, so uRotate moved only the
+      // sampling inside a world-fixed arc and the HUD reported a rotation that never happened.
       float az = atan(vPos.x, vPos.z);
       float a = az - uRotate;
       a = atan(sin(a), cos(a));
       float azAbs = abs(a);
 
-      // how much of the ring carries content (the 360-degree equivalent of occupied area)
       float cover = 1.0 - smoothstep(max(uWrap - 0.30, 0.0), uWrap, azAbs);
 
       vec2 pano = vec2((a + PI) / (2.0 * PI), vUv.y);
-      // a 16:9 tile inside the 8:1 panorama, used by the three input-ratio modes
-      const float TILE_U0 = 0.39;
-      const float TILE_W = 0.22;
       vec2 srcUv;
 
       if (uPano < 0.5) {
@@ -355,8 +423,6 @@ const cylinderMaterial = new THREE.ShaderMaterial({
       }
 
       if (cover < 0.002) {
-        // no content on this part of the ring: keep a faint scrim so the screen still reads as a
-        // surface, but stay see-through so the stage and audience behind are not hidden.
         gl_FragColor = vec4(0.006, 0.008, 0.013, uOpacity * 0.6);
         return;
       }
@@ -406,7 +472,6 @@ const debugCamera = cameraById.get("TOP");
 const controls = new OrbitControls(debugCamera, renderer.domElement);
 controls.enableDamping = true;
 controls.target.fromArray(presetCameras.find((preset) => preset.id === "TOP")?.target ?? [0, 0, 0]);
-
 let programId = cameraById.has(params.get("view")) ? params.get("view") : sceneJson.programCamera;
 const programFor = () => cameraById.get(programId) ?? cameraList[0];
 controls.enabled = programId === "TOP";
@@ -558,9 +623,9 @@ function setPano(index) {
 // ---------------------------------------------------------------- stream state
 let streamState = "idle";
 let dropRequested = params.get("drop") === "1";
-let dropTime = null;
+let dropTime = dropRequested ? 2 : null;
 const dropAt = params.has("dropAt") ? Number.parseFloat(params.get("dropAt")) : null;
-let feed = 0;
+let feed = 1;
 
 function updateStream(time) {
   if (dropAt !== null && dropTime === null && time >= dropAt) dropTime = time;
@@ -570,10 +635,10 @@ function updateStream(time) {
     else if (time < 1.2) streamState = "connecting";
     else streamState = "live";
   } else {
-    const elapsed = dropTime === null ? time : time - dropTime;
+    const elapsed = dropTime === null ? 0 : time - dropTime;
     streamState = elapsed > 2.5 ? "offline" : "fallback";
   }
-  feed = streamState === "live" ? 1 : streamState === "fallback" ? 0.5 : 0.25;
+  feed = streamState === "live" ? 1 : streamState === "fallback" ? 0.85 : 0.68;
 }
 
 // ---------------------------------------------------------------- clock
@@ -657,7 +722,16 @@ renderer.setAnimationLoop(() => {
   uniforms.uFeed.value = feed;
   uniforms.uPano.value = panoIndex;
 
-  source.draw(cueTime, sample.density, sample.bright, streamState !== "live");
+  // bars rise above the cylinder at PEAK: the light crossing the screen becomes the event
+  const barHeight = (cylinderHeight - 0.8) * (1 + sample.barLift * 0.55);
+  for (const bar of backLightBars) {
+    bar.scale.y = barHeight;
+    bar.position.y = barHeight / 2;
+  }
+  barMaterial.opacity = 0.35 + sample.barBright * 0.6;
+  tickMaterial.opacity = 0.22 + sample.crowd * 0.7;
+
+  source.draw(cueTime, sample, streamState !== "live");
 
   if (controls.enabled) controls.update();
 
@@ -669,17 +743,17 @@ renderer.setAnimationLoop(() => {
   if (quadEnabled) renderQuads(width, height);
 
   if (hudEnabled) {
-    hud.state.textContent = `${sample.id}｜${sample.label}  (${sample.local.toFixed(1)}s / ${
-      cueConfig.states[sample.index].end - cueConfig.states[sample.index].start
-    }s)`;
+    const stateLength = cueConfig.states[sample.index].end - cueConfig.states[sample.index].start;
+    hud.state.textContent = `${sample.id}｜${sample.label}  (${sample.local.toFixed(1)}s / ${stateLength}s)`;
     hud.cue.textContent = `${cueTime.toFixed(2)}s / ${cueConfig.durationSec}s${
       playing ? "" : "  ⏸"
     }`;
     const coveredDeg = Math.min(sample.wrap * 2 * 57.2958, 360);
     hud.wrap.textContent = `覆盖 ${coveredDeg.toFixed(0)}° / 360° · 旋转 ${(
       (sample.rotation * 180) / Math.PI
-    ).toFixed(0)}°`;
-    hud.pano.textContent = `${panoModes[panoIndex].label} · 展开比 ${screenSpec.physicalSize.unwrappedAspect}:1`;
+    ).toFixed(0)}° · 观众环 ${(sample.crowd * 100).toFixed(0)}%`;
+    // the ratio printed is the mode's ACTUAL ratio; V1 printed 7.85:1 for every mode
+    hud.pano.textContent = `${panoModes[panoIndex].label} · ${panoModes[panoIndex].ratio}`;
     hud.stream.textContent = streamState.toUpperCase();
     hud.stream.dataset.state = streamState;
     const preset = presetCameras.find((item) => item.id === programId);
@@ -706,6 +780,8 @@ window.__STAGE_REPLICA__ = {
       cueTime,
       wrap: sample.wrap,
       rotation: sample.rotation,
+      barLift: sample.barLift,
+      crowd: sample.crowd,
       pano: panoModes[panoIndex].id,
       stream: streamState,
       program: programId,

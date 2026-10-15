@@ -396,8 +396,8 @@
         "GRAYBOX": "done",
         "V1": "done",
         "REVIEW": "done",
-        "V2": "active",
-        "DELIVERY": "todo"
+        "V2": "done",
+        "DELIVERY": "active"
       },
       "states": [
         { "id": "LOW", "label": "铺垫 · 覆盖 90°", "url": "stadium/?t=4&quad=0" },
@@ -419,13 +419,37 @@
       ],
       "artifacts": [
         {
+          "label": "▶ V2 干净导演版 32s（无 HUD / 无四分屏）",
+          "url": "stadium/delivery/v2-delivery-clean-32s.mp4",
+          "primary": true
+        },
+        {
+          "label": "▶ V2 导演版 32s（含四分屏）",
+          "url": "stadium/delivery/v2-director-32s.mp4"
+        },
+        {
+          "label": "V2 四种比例模式对照（一眼可分）",
+          "url": "stadium/delivery/pano-modes-compare.png"
+        },
+        { "label": "V2 PEAK（灯柱升到圆柱之上）", "url": "stadium/stills/v2-peak.png" },
+        { "label": "V2 LOW（灯柱藏在圆柱内）", "url": "stadium/stills/v2-low.png" },
+        { "label": "V2 RELEASE（观众环点亮）", "url": "stadium/stills/v2-release.png" },
+        { "label": "V2 TOP（360° 几何）", "url": "stadium/stills/v2-top.png" },
+        {
+          "label": "V2 16:9 ×4 重复（同一个 X 出现四次）",
+          "url": "stadium/stills/v2-pano-repeat.png"
+        },
+        {
+          "label": "V1→V2 改动与实测（review-diff-stadium-v1-v2.md）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-diff-stadium-v1-v2.md"
+        },
+        {
           "label": "独立 REVIEW（holds up with caveats + 构建者裁定与 V2 范围）",
           "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-stadium-v1.md"
         },
         {
-          "label": "▶ V1 导演版 32s（Wide→Performer→Orbit→Top→Wide，含四分屏）",
-          "url": "stadium/delivery/v1-director-32s.mp4",
-          "primary": true
+          "label": "▶ V1 导演版 32s（保留不覆盖）",
+          "url": "stadium/delivery/v1-director-32s.mp4"
         },
         { "label": "V1 PEAK（覆盖 360°）", "url": "stadium/stills/v1-peak.png" },
         {
@@ -471,7 +495,7 @@
         "16:9 输入的三种处理（前区窗口 / ×4 重复 / 拉伸填满）与 8:1 全景母版并列，直接暴露「同一条素材换到圆柱上比例会怎样崩」。",
         "PERFORMER_FRONT 里人物仍然偏小：相机在 22m 外、人只有 1.7m，符合真实看台关系，但读尺度仍需靠近。"
       ],
-      "next": "V2 范围（详见 review-stadium-v1.md 第二部分）：①修 **B1 空操作**——`uRotate` 必须同时作用于覆盖弧（V1 只作用于采样，HUD 显示旋转 163° 而几何纹丝不动，实测弧像素数/质心/角度直方图三次完全相同）；②修 **B2 素材无法承载对照**——repeat / fill / panorama 在画面上等价（差异像素 0.00–0.02%），要换成高对比强非对称的切片素材，HUD 的「展开比」按模式显示实际值；③补上声明过的 5m 比例尺（V1 声明未绘制）；④让 performer 在广角机位可分离（B5：BOWL_WIDE 实测完全无人形）；⑤检讨 8m 圆柱高度 proxy 与参考照片高径比的矛盾并标注；⑥让四状态改变**关系**而非只换弧角（brief 要求改 camera sequence + 至少一个视觉状态）。评审同时确认**导播层是真的**：切机位改变的是读法而非缩放，Program Out 与四分屏可区分。",
+      "next": "交付：把 v2-delivery-clean-32s.mp4、四种比例模式对照图、以及一份说明「摄像机也在编排演出」的 README 补齐，回答 brief §1.4 全部 7 问。",
       "notesKey": "stagereplica.review.stadium"
     }
   ]
