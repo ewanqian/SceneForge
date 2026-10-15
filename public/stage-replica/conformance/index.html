@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#05070a" />
+    <title>Stage Replica · P0.5 Conformance</title>
+    <style>
+      :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: radial-gradient(1100px 520px at 15% -10%, #0d1622 0%, #05070a 60%); color: #eef1f4; padding: 20px max(14px, env(safe-area-inset-left)) 60px; line-height: 1.5; }
+      .wrap { max-width: 1040px; margin: 0 auto; }
+      h1 { font-size: 19px; margin: 0 0 4px; }
+      .sub { font-size: 12.5px; color: #8d97a3; }
+      .summary { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 4px; }
+      .stat { border: 1px solid rgba(255,255,255,.14); border-radius: 10px; padding: 8px 12px; background: rgba(255,255,255,.04); font-size: 12px; }
+      .stat b { font-size: 17px; display: block; }
+      .ok { color: #7fd69b; }
+      .bad { color: #ff8f8f; }
+      .warn { color: #f0c98a; }
+      .card { border: 1px solid rgba(255,255,255,.14); border-radius: 14px; background: rgba(12,15,20,.86); padding: 14px; margin-top: 14px; }
+      .card h2 { font-size: 15px; margin: 0 0 2px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+      .pill { font-size: 10.5px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,.16); color: #8d97a3; }
+      .pill.good { color: #06110a; background: #7fd69b; border-color: transparent; font-weight: 650; }
+      .pill.bad { color: #1a0606; background: #ff8f8f; border-color: transparent; font-weight: 650; }
+      h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: #8d97a3; margin: 14px 0 6px; }
+      ul { margin: 0; padding-left: 18px; font-size: 12px; color: #c6cfd9; }
+      li { margin-bottom: 3px; }
+      li.err { color: #ff9f9f; }
+      li.warnitem { color: #f0c98a; }
+      table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 4px; }
+      th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,.08); vertical-align: top; }
+      th { color: #8d97a3; font-weight: 500; white-space: nowrap; }
+      code { font: 600 11px ui-monospace, monospace; color: #cfe0f5; }
+      .note { font-size: 11.5px; color: #8d97a3; margin-top: 10px; }
+      .badge { border: 1px solid rgba(240,201,138,.35); border-radius: 12px; background: rgba(240,201,138,.06); padding: 12px 14px; margin-top: 16px; font-size: 12px; color: #e8dcc6; }
+      .badge b { color: #f0c98a; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Stage Replica · P0.5 一致性检查</h1>
+      <div class="sub">
+        把四个官方 Demo 的 legacy manifest 转成统一 schema，并**真的跑校验**。目的不是"能读四种文件"，
+        而是回答：一张 schema 能不能表达这四个 Demo，而不丢掉让它们各自成立的东西。
+      </div>
+      <div class="summary" id="summary"></div>
+      <div id="cards"></div>
+      <div class="badge">
+        <b>这张表也是校验器的测试。</b>
+        每个 Demo 都会用 <code>variant: "v1"</code> 再跑一遍——即它**被独立评审抓出缺陷之前**真实发布的
+        raster 值。如果 <code>runtime</code>/<code>master</code> 的比例规则有效，v1 那一遍必须报错。
+        报错即证明规则有牙齿；不报错则说明规则是装饰。
+      </div>
+      <div class="note" id="footer"></div>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
