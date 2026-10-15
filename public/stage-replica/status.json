@@ -40,6 +40,49 @@
   ],
   "modules": [
     {
+      "id": "conformance",
+      "name": "P0.5 统一 Schema + 一致性检查",
+      "kind": "P0.5 模块",
+      "issue": 42,
+      "issueUrl": "https://github.com/ewanqian/SceneForge/issues/42",
+      "role": "一张 schema 能不能表达四个 Demo，而不丢掉让它们各自成立的东西",
+      "question": "统一 manifest 是「能读四种文件」，还是真的带规则、真的不丢东西？",
+      "done": "四个 Demo 都由统一 schema 初始化、丢弃 0 个键、各自的 bespoke 行为被带走而不是压平，并且比例规则能抓出历史上真实发生过的缺陷。",
+      "milestones": [
+        { "id": "统一 schema（带校验规则）", "state": "done" },
+        { "id": "四份 legacy 适配器", "state": "done" },
+        { "id": "一致性检查页", "state": "done" },
+        { "id": "v1 反例验证规则", "state": "done" },
+        { "id": "四个 Demo 真正迁移", "state": "todo" },
+        { "id": "迁移后逐像素等價比对", "state": "todo" }
+      ],
+      "run": { "label": "打开一致性检查", "url": "conformance/" },
+      "links": [
+        {
+          "label": "README（五条规则、运行结果与仍未做到）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/conformance/README.md"
+        },
+        {
+          "label": "字段级审计（设计依据）",
+          "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/vnext-manifest-audit.md"
+        }
+      ],
+      "states": [
+        { "id": "一致性检查", "label": "四个 Demo 逐个跑校验", "url": "conformance/" },
+        { "id": "机器可读结果", "label": "?probe=1", "url": "conformance/?probe=1" }
+      ],
+      "observations": [
+        "【运行结果】用统一 schema 初始化成功 **4/4**；映射过程中丢弃的键 **0**（四个 Demo 都是空数组）；每个 Demo 都带 behaviour.module + params。",
+        "【规则有牙齿的证明】同一次运行用 `variant: \"v1\"` 再跑一遍——即四个 Demo 被独立评审抓出缺陷之前**真实发布的 raster 值**。结果恰好抓出两个真缺陷（Festival 1280×720=1.778 vs 屏 2.000；Installation 1280×720=1.778 vs 屏 1.896），并且**正确地对 Sphere（dome 无比例约束）与 Stadium（7.854 vs 8.0 本就一致）不报**。**2/4 才是正确结果**：4/4 说明规则乱叫，0/4 说明它是装饰。",
+        "【顺带查出・此前无人记录的真缺陷】校验器对 Sphere 报「fallback local-loop 声明了但没实现」——不是误报：sphere/main.js 第 701 行 `if (streamState !== \"offline\") { source.draw(...) }`，掉线时**跳过绘制、留下上一帧**，那是冻结不是 loop。这正是 Installation 评审在它自己身上抓到的那一类问题，Sphere 也有。Stadium 相反，代码里确实绘制了独立的 fallback 图案，两处判定依据都写进了适配器注释。",
+        "【最直接的收益】Sphere 的 adaptationModes 与 Stadium 的 panoramaModes 是**同一概念的两个名字**，现在都变成 fit.modes。",
+        "【五条校验规则】① aspect(runtime) ≈ aspect(physicalSize)（两个真 bug 都能被它拦下）；② aspect(master) ≈ unwrappedAspect（这条把 raster 与圆柱高度绑在一起，Stadium 之所以不能单独改高度就是因为它这条是过的）；③ fallback.implemented 必须是布尔；④ behaviour.module 必填（否则场景会被悄悄压平）；⑤ cue.states 必须连续且铺满 durationSec。",
+        "【仍未做到・重要】四个 Demo **还没有真的从统一 schema 初始化**。本模块证明的是设计可行且不丢东西，**不是**已经完成迁移。四份 scene.json 未换格式，各自的 main.js 未改。P0.5 的最后一条验收目前是「用适配器验证的」，不是「真的迁移」。",
+        "【仍未做到】适配器有 4 份分支逻辑，迁移后应只剩历史用途；schema 还没与主仓库的 zod 类型系统合一；没有证明迁移后渲染逐像素一致；curvedPlane / projection 两种 shape 定义了但没有实例。"
+      ],
+      "next": "把四个 Demo 真正迁移到统一 schema（改 scene.json + 各自 main.js 读它），然后用现有的 ?t= 确定性入口做迁移前后的逐像素静帧比对。"
+    },
+    {
       "id": "authoring",
       "name": "Authoring（参与者建档流程）",
       "kind": "P0 模块",
