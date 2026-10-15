@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#05070a" />
+    <title>Stage Replica · Stadium Crowd &amp; Sightlines</title>
+    <style>
+      :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #05070a; color: #f4f6f8; }
+      canvas { display: block; position: fixed; inset: 0; }
+      .hud { position: fixed; z-index: 10; top: 16px; left: 16px; width: min(392px, calc(100vw - 32px)); padding: 12px; border: 1px solid rgba(255,255,255,.16); border-radius: 14px; background: rgba(6,8,12,.8); backdrop-filter: blur(18px); }
+      .hud h1 { font-size: 13px; margin: 0 0 2px; letter-spacing: .04em; }
+      .hud .sub { font-size: 11px; color: #8d97a3; margin-bottom: 10px; }
+      .meta { display: grid; grid-template-columns: 92px 1fr; gap: 4px 10px; font-size: 11.5px; color: #a9b0ba; }
+      .meta strong { color: #eef1f4; font-weight: 650; overflow-wrap: anywhere; }
+      .meta strong.good { color: #9ee6a8; }
+      .meta strong.warn { color: #f0c98a; }
+      .row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+      button { flex: 1 1 auto; min-height: 30px; border-radius: 8px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.07); color: #f4f6f8; padding: 5px 8px; font: inherit; font-size: 10.5px; cursor: pointer; }
+      button:hover { background: rgba(255,255,255,.13); }
+      button[aria-pressed="true"] { background: #f3f5f7; color: #07090d; border-color: transparent; font-weight: 650; }
+      .badge { position: fixed; z-index: 10; top: 16px; right: 16px; max-width: 360px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.14); border-radius: 10px; background: rgba(6,8,12,.8); backdrop-filter: blur(14px); font-size: 11px; line-height: 1.5; color: #f0c98a; text-align: right; }
+      .badge span { color: #8d97a3; }
+      .badge a { color: #cfe0f5; }
+      .chart-wrap { position: fixed; z-index: 10; left: 16px; right: 16px; bottom: 16px; padding: 10px 12px 6px; border: 1px solid rgba(255,255,255,.14); border-radius: 12px; background: rgba(6,8,12,.82); backdrop-filter: blur(16px); }
+      .chart-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 11px; color: #a9b0ba; margin-bottom: 4px; }
+      .chart-head b { color: #eef1f4; font-size: 11.5px; }
+      .chart { width: 100%; height: 92px; display: block; }
+      .legend { font-size: 10.5px; color: #7d8794; margin-top: 2px; }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="hud">
+      <h1>STAGE REPLICA · STADIUM CROWD &amp; SIGHTLINES</h1>
+      <div class="sub">人群层 · 密度 / 视线 C 值 / 包围角</div>
+      <div class="meta">
+        <span>PEOPLE</span><strong id="m-people">—</strong>
+        <span>DENSITY</span><strong id="m-density">—</strong>
+        <span>ROWS</span><strong id="m-rows">—</strong>
+        <span>C MIN</span><strong id="m-cmin">—</strong>
+        <span>FIRST FAIL</span><strong id="m-fail">—</strong>
+        <span>ENCIRCLE</span><strong id="m-encircle">—</strong>
+        <span>VIEW</span><strong id="m-view">—</strong>
+      </div>
+      <div class="row" id="row-overlay"></div>
+      <div class="row" id="row-view"></div>
+      <div class="row" id="row-density"></div>
+      <div class="row">
+        <button type="button" id="btn-posture">站姿</button>
+      </div>
+    </div>
+    <div class="badge">
+      <b>教学预演 PROXY</b><br />
+      ⌀30m 圆形舞台 · ⌀20×8m 圆柱 LED <span>（STUFISH 官方逐字）</span><br />
+      观众席行距 / 升阶 / 座位间距 / 碗体 均为教学 proxy<br />
+      <span>C 值判据 60mm 是本项目采用的剧场常用值，非场馆规范引用</span><br />
+      <a href="https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/stadium/crowd/README.md" target="_blank" rel="noreferrer">说明与已知限制 ↗</a>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-head">
+        <b>逐排视线 C 值</b>
+        <span id="chart-note">—</span>
+      </div>
+      <svg class="chart" id="chart" viewBox="0 0 1000 92" preserveAspectRatio="none" aria-label="逐排 C 值"></svg>
+      <div class="legend">横轴 = 排号（近 → 远）；竖轴 = C 值（mm）。虚线为 60mm 判据；红线以下表示视线被前排头部遮挡。</div>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

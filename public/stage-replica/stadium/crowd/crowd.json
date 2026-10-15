@@ -1,0 +1,83 @@
+{
+  "studyId": "stadium-crowd-a",
+  "title": "Stadium / 360° — 观众席与视线",
+  "note": "把「95,000 人环绕」从一句话变成一个可测量的东西：人数、密度、逐排视线 C 值、以及从舞台上被包围的角度。",
+  "venue": {
+    "stageDiameterM": 30,
+    "cylinderDiameterM": 20,
+    "cylinderHeightM": 8,
+    "provenance": "⌀30m 圆形舞台与 ⌀20m 圆柱 LED 为 STUFISH 官方逐字确认；碗体几何为教学 proxy，参考未公布观众席形态。"
+  },
+  "stands": {
+    "innerRadiusM": 18,
+    "rows": 52,
+    "rowDepthM": 0.85,
+    "riserM": 0.45,
+    "startHeightM": 0.8,
+    "aisleEveryRows": 8,
+    "aisleEverySeats": 28,
+    "note": "教学 proxy：参考未公布任何观众席尺寸。看台从半径 18m 起（紧贴 ⌀30m 舞台之外），因为这正是 360° in-the-round 的关键——观众是围着舞台的，不是隔着一条 32m 宽的护城河（V1 就是这样，STAGE_CENTER 视角里看不到人）。等升阶取 0.45m，使「等升阶随距离失效」这条曲线有前半段合格、后半段崩塌的可读形状。每 8 排一条横向通道、每 28 座一条纵向通道，让密度场不是一块均匀的糊。"
+  },
+  "crowd": {
+    "densities": {
+      "sparse": 0.6,
+      "normal": 1.6,
+      "packed": 2.5
+    },
+    "defaultDensity": "normal",
+    "seatSpacingM": {
+      "standing": 0.5,
+      "seated": 0.55
+    },
+    "posture": "standing",
+    "maxInstances": 30000
+  },
+  "sightline": {
+    "cValueTargetM": 0.06,
+    "focusHeightM": 0,
+    "focusNote": "焦点取舞台面高度（0m）。C 值 = 从本排眼位看向焦点的视线，在前一排头顶上方留出的垂直余量。",
+    "standing": { "eyeHeightM": 1.62, "headHeightM": 1.78 },
+    "seated": { "eyeHeightM": 1.2, "headHeightM": 1.34 },
+    "note": "站立/坐姿两套人体参数。C ≥ 60mm 是本项目采用的判据（剧场常用 60–75mm，体育场通常取更大值）。"
+  },
+  "viewpoints": [
+    {
+      "id": "BOWL_WIDE",
+      "label": "碗体高位·看整片观众席",
+      "positionM": [0, 52, 118],
+      "targetM": [0, 12, 0],
+      "fovDeg": 42
+    },
+    {
+      "id": "STAGE_CENTER",
+      "label": "舞台中心·被包围",
+      "positionM": [0, 1.6, 0],
+      "targetM": [0, 10, 34],
+      "fovDeg": 82,
+      "note": "从艺人的位置往外看：这是「被 360° 包围」唯一能被肉眼验证的角度。看台从 18m 起，所以这个视角里应该是一圈向上延伸的人墙。"
+    },
+    {
+      "id": "ROW_20",
+      "label": "第 20 排·看视线",
+      "positionM": [0, 11.5, 36],
+      "targetM": [0, 2, 0],
+      "fovDeg": 52,
+      "note": "站在看台中段，视线贴着前排头顶看向舞台。"
+    },
+    {
+      "id": "TOP",
+      "label": "俯视·看环形几何",
+      "positionM": [0, 150, 0.5],
+      "targetM": [0, 0, 0],
+      "fovDeg": 52
+    }
+  ],
+  "overlays": [
+    { "id": "look", "label": "观看" },
+    { "id": "density", "label": "密度场" },
+    { "id": "sightline", "label": "视线 C 值" },
+    { "id": "encircle", "label": "包围角" }
+  ],
+  "defaultView": "BOWL_WIDE",
+  "defaultOverlay": "look"
+}
