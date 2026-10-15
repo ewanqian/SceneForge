@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "sceneId": "untitled-scene",
+  "units": "meters",
+  "note": "Authoring 起始场景。这是一个最小场景：一块平面屏、一个平台、三个机位、四个状态。参与者从它开始改成自己的。",
+  "objects": [
+    {
+      "id": "PLATFORM",
+      "kind": "platform",
+      "shape": "cylinder",
+      "diameterM": 12,
+      "heightM": 0.9,
+      "positionM": [0, 0, 0],
+      "color": "#1b212b"
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "SURF_1",
+      "shape": "plane",
+      "sizeM": { "widthM": 16, "heightM": 9 },
+      "transform": { "positionM": [0, 5, -8], "rotationDeg": [0, 0, 0] },
+      "source": { "kind": "procedural", "id": "testcard" },
+      "fit": "stretch",
+      "opacity": 1
+    },
+    {
+      "id": "SURF_2",
+      "shape": "plane",
+      "sizeM": { "widthM": 9, "heightM": 5.1 },
+      "transform": { "positionM": [-11, 3.5, -1], "rotationDeg": [0, 38, 0] },
+      "source": { "kind": "procedural", "id": "testcard" },
+      "fit": "stretch",
+      "opacity": 1
+    }
+  ],
+  "cameras": [
+    {
+      "id": "CAM_1",
+      "label": "观众席全景",
+      "positionM": [0, 7, 26],
+      "targetM": [0, 4.5, 0],
+      "fovDeg": 45
+    },
+    {
+      "id": "CAM_2",
+      "label": "中轴近景",
+      "positionM": [0, 2.4, 8],
+      "targetM": [0, 3.5, -8],
+      "fovDeg": 52
+    },
+    {
+      "id": "CAM_3",
+      "label": "侧后方",
+      "positionM": [-14, 6, 14],
+      "targetM": [0, 4, -4],
+      "fovDeg": 50
+    }
+  ],
+  "cue": {
+    "durationSec": 24,
+    "rampSec": 2,
+    "states": [
+      {
+        "id": "ST_1",
+        "label": "铺垫",
+        "start": 0,
+        "end": 6,
+        "brightness": 0.35,
+        "coverage": 0.35,
+        "cycle": 0
+      },
+      {
+        "id": "ST_2",
+        "label": "建立",
+        "start": 6,
+        "end": 12,
+        "brightness": 0.7,
+        "coverage": 0.65,
+        "cycle": 0.2
+      },
+      {
+        "id": "ST_3",
+        "label": "爆发",
+        "start": 12,
+        "end": 18,
+        "brightness": 1,
+        "coverage": 1,
+        "cycle": 0.5
+      },
+      {
+        "id": "ST_4",
+        "label": "收束",
+        "start": 18,
+        "end": 24,
+        "brightness": 0.4,
+        "coverage": 0.4,
+        "cycle": 0.7
+      }
+    ]
+  },
+  "programCamera": "CAM_1",
+  "review": {
+    "v1": { "notes": "" },
+    "v2": null
+  }
+}

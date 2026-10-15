@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#05070a" />
+    <title>Stage Replica · Authoring</title>
+    <style>
+      :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: #05070a; color: #eef1f4; overflow: hidden; }
+      .app { display: grid; grid-template-columns: 344px 1fr 300px; height: 100%; }
+      .pane { overflow-y: auto; border-right: 1px solid rgba(255,255,255,.12); background: #080a0e; padding: 12px; }
+      .pane.right { border-right: none; border-left: 1px solid rgba(255,255,255,.12); }
+      .stage { position: relative; background: #000; }
+      canvas { display: block; }
+      h1 { font-size: 13px; margin: 0 0 2px; letter-spacing: .04em; }
+      .sub { font-size: 11px; color: #8d97a3; margin-bottom: 10px; }
+      h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: #8d97a3; margin: 16px 0 7px; }
+      h2:first-of-type { margin-top: 4px; }
+      .item { border: 1px solid rgba(255,255,255,.13); border-radius: 10px; padding: 8px; margin-bottom: 7px; background: rgba(255,255,255,.03); }
+      .item[data-sel="true"] { border-color: #7cc4ff; background: rgba(124,196,255,.09); }
+      .item-head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+      .item-head b { font-size: 11.5px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .grid { display: grid; grid-template-columns: 62px 1fr 62px 1fr; gap: 4px 6px; align-items: center; font-size: 10.5px; color: #a9b0ba; }
+      .grid.n2 { grid-template-columns: 62px 1fr; }
+      input, select { width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16); color: #eef1f4; border-radius: 6px; padding: 4px 6px; font: inherit; font-size: 11px; }
+      button { border-radius: 8px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.07); color: #eef1f4; padding: 6px 9px; font: inherit; font-size: 11px; cursor: pointer; }
+      button:hover { background: rgba(255,255,255,.14); }
+      button.primary { background: #f3f5f7; color: #07090d; border-color: transparent; font-weight: 650; }
+      button.tiny { padding: 2px 6px; font-size: 10px; }
+      .row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+      .overlay { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 14px; background: linear-gradient(transparent, rgba(4,6,10,.92)); }
+      .time { font: 650 12px ui-monospace, monospace; }
+      input[type="range"] { accent-color: #7cc4ff; }
+      .cam-bar { position: absolute; top: 0; left: 0; right: 0; padding: 10px 14px; display: flex; gap: 6px; flex-wrap: wrap; background: linear-gradient(rgba(4,6,10,.9), transparent); }
+      .hint { font-size: 10.5px; color: #7d8794; line-height: 1.5; margin-top: 6px; }
+      .ok { color: #9ee6a8; }
+      .warn { color: #f0c98a; }
+      textarea { width: 100%; min-height: 90px; resize: vertical; font: inherit; font-size: 11.5px; color: #eef1f4; background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.16); border-radius: 9px; padding: 8px; }
+      .check { font-size: 11px; display: flex; gap: 6px; align-items: flex-start; margin-bottom: 4px; color: #c6cfd9; }
+      .check span.m { color: #9ee6a8; }
+      .check span.x { color: #f0c98a; }
+      .ver { font-size: 11px; color: #8d97a3; margin-bottom: 4px; }
+      .empty { font-size: 11px; color: #66707d; padding: 4px 0; }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="app">
+      <div class="pane left">
+        <h1>STAGE REPLICA · AUTHORING</h1>
+        <div class="sub">不改核心源码，建自己的场景（Issue #42 · P0）</div>
+
+        <div class="grid n2">
+          <span>场景名</span><input id="scene-id" type="text" />
+        </div>
+        <div class="row">
+          <button type="button" id="btn-load-demo">载入官方 Demo 作为起点</button>
+        </div>
+        <div class="row" id="demo-row"></div>
+        <div class="row">
+          <button type="button" id="btn-reset">重置为起始场景</button>
+        </div>
+
+        <h2>平台 / 物体</h2>
+        <div id="objects"></div>
+        <div class="row"><button type="button" id="add-object">+ 加一个平台</button></div>
+
+        <h2>媒体面（至少 2 个）</h2>
+        <div id="surfaces"></div>
+        <div class="row"><button type="button" id="add-surface">+ 加一个媒体面</button></div>
+
+        <h2>机位（至少 3 个）</h2>
+        <div id="cameras"></div>
+        <div class="row"><button type="button" id="add-camera">+ 加一个机位</button></div>
+
+        <h2>状态 / Cue（3–4 个）</h2>
+        <div id="states"></div>
+        <div class="row"><button type="button" id="add-state">+ 加一个状态</button></div>
+
+        <h2>导出 / 分享</h2>
+        <div class="row">
+          <button type="button" class="primary" id="btn-export">下载 scene.json</button>
+          <button type="button" id="btn-share">复制分享链接</button>
+        </div>
+        <div class="hint" id="share-hint">分享链接把整个场景编码进 URL，不需要服务器。</div>
+        <div class="row">
+          <button type="button" id="btn-save-v1">保存 V1</button>
+          <button type="button" id="btn-save-v2">保存 V2（不覆盖 V1）</button>
+        </div>
+      </div>
+
+      <div class="stage" id="stage">
+        <div class="cam-bar" id="cam-bar"></div>
+        <div class="overlay">
+          <div class="row" style="margin:0; align-items:center">
+            <button type="button" id="btn-play">▶ 播放 V1</button>
+            <input type="range" id="scrub" min="0" max="24" step="0.01" value="0" style="flex:1" />
+            <span class="time" id="t-readout">0.00 / 24.00s</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pane right">
+        <h1>验收清单</h1>
+        <div class="sub" id="check-sub">Issue #42 §3 的最低验收</div>
+        <div id="checklist"></div>
+
+        <h2>V1 回顾（写 3 个问题）</h2>
+        <div class="ver" id="v1-stamp">尚未保存</div>
+        <textarea id="v1-notes" placeholder="例：① 第 3 个机位看不到屏幕中心；② 状态 2→3 的过渡太突然；③ 平台尺寸让人失去尺度参考。"></textarea>
+
+        <h2>V2（保存时快照，V1 保持可读）</h2>
+        <div class="ver" id="v2-stamp">尚未保存</div>
+        <textarea id="v2-notes" placeholder="例：我具体改了：① 把机位 3 抬高 2m；② 状态 3 的 ramp 从 0.5s 改到 2s。"></textarea>
+        <div class="row">
+          <button type="button" id="btn-restore-v1">恢复 V1 场景</button>
+          <button type="button" id="btn-export-notes">导出两版批注</button>
+        </div>
+        <div class="hint">V1 快照在保存 V2 之后仍然保留，可随时恢复对比。</div>
+      </div>
+    </div>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
