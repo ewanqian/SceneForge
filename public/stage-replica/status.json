@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-15T22:20+08:00",
+  "updated": "2026-10-15T23:05+08:00",
   "title": "Stage Replica · Demo Sprint",
   "subtitle": "内部审核看板 / Internal review board",
   "brief": {
@@ -47,16 +47,41 @@
       "issueUrl": "https://github.com/ewanqian/SceneForge/issues/42",
       "role": "一张 schema 能不能表达四个 Demo，而不丢掉让它们各自成立的东西",
       "question": "统一 manifest 是「能读四种文件」，还是真的带规则、真的不丢东西？",
-      "done": "四个 Demo 都由统一 schema 初始化、丢弃 0 个键、各自的 bespoke 行为被带走而不是压平，并且比例规则能抓出历史上真实发生过的缺陷。",
+      "done": "四个 Demo 的 scene.json 已换成统一 schema，各自经由共享 loader 校验后初始化；迁移前后 **12/12 张确定性静帧逐字节一致**（SHA256），证明迁移没有改变任何渲染行为。",
       "milestones": [
-        { "id": "统一 schema（带校验规则）", "state": "done" },
-        { "id": "四份 legacy 适配器", "state": "done" },
-        { "id": "一致性检查页", "state": "done" },
-        { "id": "v1 反例验证规则", "state": "done" },
-        { "id": "四个 Demo 真正迁移", "state": "todo" },
-        { "id": "迁移后逐像素等價比对", "state": "todo" }
+        {
+          "id": "统一 schema（带校验规则）",
+          "state": "done"
+        },
+        {
+          "id": "四份 legacy 适配器",
+          "state": "done"
+        },
+        {
+          "id": "一致性检查页",
+          "state": "done"
+        },
+        {
+          "id": "v1 反例验证规则",
+          "state": "done"
+        },
+        {
+          "id": "四个 Demo 真正迁移",
+          "state": "done"
+        },
+        {
+          "id": "迁移后逐像素等價比对",
+          "state": "done"
+        },
+        {
+          "id": "删除 legacyView 兼容层",
+          "state": "todo"
+        }
       ],
-      "run": { "label": "打开一致性检查", "url": "conformance/" },
+      "run": {
+        "label": "打开一致性检查",
+        "url": "conformance/"
+      },
       "links": [
         {
           "label": "README（五条规则、运行结果与仍未做到）",
@@ -68,19 +93,27 @@
         }
       ],
       "states": [
-        { "id": "一致性检查", "label": "四个 Demo 逐个跑校验", "url": "conformance/" },
-        { "id": "机器可读结果", "label": "?probe=1", "url": "conformance/?probe=1" }
+        {
+          "id": "一致性检查",
+          "label": "四个 Demo 逐个跑校验",
+          "url": "conformance/"
+        },
+        {
+          "id": "机器可读结果",
+          "label": "?probe=1",
+          "url": "conformance/?probe=1"
+        }
       ],
       "observations": [
-        "【运行结果】用统一 schema 初始化成功 **4/4**；映射过程中丢弃的键 **0**（四个 Demo 都是空数组）；每个 Demo 都带 behaviour.module + params。",
-        "【规则有牙齿的证明】同一次运行用 `variant: \"v1\"` 再跑一遍——即四个 Demo 被独立评审抓出缺陷之前**真实发布的 raster 值**。结果恰好抓出两个真缺陷（Festival 1280×720=1.778 vs 屏 2.000；Installation 1280×720=1.778 vs 屏 1.896），并且**正确地对 Sphere（dome 无比例约束）与 Stadium（7.854 vs 8.0 本就一致）不报**。**2/4 才是正确结果**：4/4 说明规则乱叫，0/4 说明它是装饰。",
-        "【顺带查出・此前无人记录的真缺陷】校验器对 Sphere 报「fallback local-loop 声明了但没实现」——不是误报：sphere/main.js 第 701 行 `if (streamState !== \"offline\") { source.draw(...) }`，掉线时**跳过绘制、留下上一帧**，那是冻结不是 loop。这正是 Installation 评审在它自己身上抓到的那一类问题，Sphere 也有。Stadium 相反，代码里确实绘制了独立的 fallback 图案，两处判定依据都写进了适配器注释。",
-        "【最直接的收益】Sphere 的 adaptationModes 与 Stadium 的 panoramaModes 是**同一概念的两个名字**，现在都变成 fit.modes。",
-        "【五条校验规则】① aspect(runtime) ≈ aspect(physicalSize)（两个真 bug 都能被它拦下）；② aspect(master) ≈ unwrappedAspect（这条把 raster 与圆柱高度绑在一起，Stadium 之所以不能单独改高度就是因为它这条是过的）；③ fallback.implemented 必须是布尔；④ behaviour.module 必填（否则场景会被悄悄压平）；⑤ cue.states 必须连续且铺满 durationSec。",
-        "【仍未做到・重要】四个 Demo **还没有真的从统一 schema 初始化**。本模块证明的是设计可行且不丢东西，**不是**已经完成迁移。四份 scene.json 未换格式，各自的 main.js 未改。P0.5 的最后一条验收目前是「用适配器验证的」，不是「真的迁移」。",
-        "【仍未做到】适配器有 4 份分支逻辑，迁移后应只剩历史用途；schema 还没与主仓库的 zod 类型系统合一；没有证明迁移后渲染逐像素一致；curvedPlane / projection 两种 shape 定义了但没有实例。"
+        "【迁移已完成・逐像素证明】四个 Demo 的 scene.json 已换成统一 schema，各自经由 `shared/load-scene.js` 校验后初始化。**迁移前后各拍 12 张确定性静帧（四个 Demo × 三种 cue/view 组合，hud=0），SHA256 全部逐字节一致：12/12。** 也就是说这次迁移对渲染行为零改变。",
+        "【这次比对抓到了真问题】第一次迁移后，每个 Demo 的三张静帧**互相完全一样**——这是「时间和机位都不再生效」的信号。浏览器 console 给出 `Cannot read properties of undefined (reading 0)`，堆栈指向相机构造里的 `Vector3.fromArray`：统一 schema 写 `positionM`/`targetM`，而渲染器读 `preset.position`/`preset.target`。补上相机投影后 12/12 一致。**没有这次哈希比对，这个破坏会以「看起来正常」的形式发布出去。**",
+        "【迁移是一行一个 Demo】四个渲染器原本对四套 bespoke 形状有约 140 处字段访问。与其在时限内重写正在工作的渲染器，把「投影回旧形状」集中到一个有文档的函数（`legacyView`）里、由统一场景派生。**这是可见的集中债务，不是四套私有约定**；删掉它才是诚实的下一步。",
+        "【流程记录・代价真实】我用 PowerShell 做字符串改写时损坏了两个文件：嵌套数组字面量被展平，于是「替换这个字段名」变成了逐字符替换——installation/main.js 里所有 f 变成 l，stadium/main.js 里 s/l 变成 c/i。两个文件都从 git 还原，改用精确的单行 edit 重做。**在这里，PowerShell 整文件重写不适合做源码编辑。**",
+        "【流程记录】`npm run verify` 两次拦下提交：一次是 status.json 的引号未转义，一次是迁移工具里的表达式内赋值。两次都修好后才提交。",
+        "【迁移后一致性检查仍是】4/4 通过，v1 比例规则仍抓出同样两个历史缺陷（2/4，对 Sphere 与 Stadium 正确地不报）。",
+        "【仍未做到】`legacyView` 兼容层还在（每个 Demo 只有一行改动，但渲染器仍消费派生出来的旧形状）；迁移后渲染逐像素一致**只覆盖了 12 张静帧**，不是全部状态与全部机位；`curvedPlane` / `projection` 定义了但没有实例。"
       ],
-      "next": "把四个 Demo 真正迁移到统一 schema（改 scene.json + 各自 main.js 读它），然后用现有的 ?t= 确定性入口做迁移前后的逐像素静帧比对。"
+      "next": "删除 legacyView 兼容层：让四个渲染器直接读 objects[] / surfaces[]，不再经过派生出来的旧形状；并把逐像素一致性从 12 张静帧扩展到全部状态与全部机位。"
     },
     {
       "id": "authoring",
@@ -92,15 +125,39 @@
       "question": "一个参与者能不能建出自己的场景，而不是只能看四个官方 Demo？",
       "done": "Issue #42 §3 的每一项都能在页面上完成，并且右侧有一个实时清单记录参与者做到了哪一步。",
       "milestones": [
-        { "id": "编辑面 / 机位 / 状态", "state": "done" },
-        { "id": "替换素材", "state": "done" },
-        { "id": "V1 播放 + 批注", "state": "done" },
-        { "id": "V2 不覆盖 V1", "state": "done" },
-        { "id": "分享 URL / 导出", "state": "done" },
-        { "id": "P0.5 统一 schema", "state": "todo" },
-        { "id": "真人三小时实测", "state": "todo" }
+        {
+          "id": "编辑面 / 机位 / 状态",
+          "state": "done"
+        },
+        {
+          "id": "替换素材",
+          "state": "done"
+        },
+        {
+          "id": "V1 播放 + 批注",
+          "state": "done"
+        },
+        {
+          "id": "V2 不覆盖 V1",
+          "state": "done"
+        },
+        {
+          "id": "分享 URL / 导出",
+          "state": "done"
+        },
+        {
+          "id": "P0.5 统一 schema",
+          "state": "done"
+        },
+        {
+          "id": "真人三小时实测",
+          "state": "todo"
+        }
       ],
-      "run": { "label": "打开 Authoring", "url": "authoring/" },
+      "run": {
+        "label": "打开 Authoring",
+        "url": "authoring/"
+      },
       "links": [
         {
           "label": "README（逐条验收状态与已知限制）",
@@ -112,9 +169,21 @@
         }
       ],
       "states": [
-        { "id": "起始场景", "label": "2 面 / 3 机位 / 4 状态", "url": "authoring/?probe=1" },
-        { "id": "ST_3", "label": "cue 第 14 秒", "url": "authoring/?t=14" },
-        { "id": "适配 stadium", "label": "把官方 Demo 当起点", "url": "authoring/?demo=stadium" }
+        {
+          "id": "起始场景",
+          "label": "2 面 / 3 机位 / 4 状态",
+          "url": "authoring/?probe=1"
+        },
+        {
+          "id": "ST_3",
+          "label": "cue 第 14 秒",
+          "url": "authoring/?t=14"
+        },
+        {
+          "id": "适配 stadium",
+          "label": "把官方 Demo 当起点",
+          "url": "authoring/?demo=stadium"
+        }
       ],
       "observations": [
         "【实测】起始场景 2 个媒体面 / 3 个机位 / 4 个状态 / 24s；`?t=2` 与 `?t=14` 分别选中 ST_1 与 ST_3，画面亮度 max 111 → 220，说明 cue 真的在驱动渲染。",
@@ -139,10 +208,19 @@
       "question": "摄像机能不能不是一台虚拟机位，而是一段录像？",
       "done": "同一场演出的多条录像共享一条 master 时间轴，任意时刻切机位都停在同一拍。",
       "milestones": [
-        { "id": "V0 手工同步", "state": "done" },
-        { "id": "V1 自动同步", "state": "todo" }
+        {
+          "id": "V0 手工同步",
+          "state": "done"
+        },
+        {
+          "id": "V1 自动同步",
+          "state": "todo"
+        }
       ],
-      "run": { "label": "打开模块", "url": "replay/" },
+      "run": {
+        "label": "打开模块",
+        "url": "replay/"
+      },
       "links": [
         {
           "label": "README（验收清单与已知限制）",
@@ -154,10 +232,26 @@
         }
       ],
       "states": [
-        { "id": "CAM_A", "label": "观众席高位（master 基准）", "url": "replay/?t=20&cam=CAM_A" },
-        { "id": "CAM_B", "label": "人物近景（offset +6s）", "url": "replay/?t=20&cam=CAM_B" },
-        { "id": "CAM_C", "label": "45° 轨道（offset +14s）", "url": "replay/?t=20&cam=CAM_C" },
-        { "id": "FREE", "label": "FREE VIEW 同刻看全部", "url": "replay/?t=20&mode=free" }
+        {
+          "id": "CAM_A",
+          "label": "观众席高位（master 基准）",
+          "url": "replay/?t=20&cam=CAM_A"
+        },
+        {
+          "id": "CAM_B",
+          "label": "人物近景（offset +6s）",
+          "url": "replay/?t=20&cam=CAM_B"
+        },
+        {
+          "id": "CAM_C",
+          "label": "45° 轨道（offset +14s）",
+          "url": "replay/?t=20&cam=CAM_C"
+        },
+        {
+          "id": "FREE",
+          "label": "FREE VIEW 同刻看全部",
+          "url": "replay/?t=20&mode=free"
+        }
       ],
       "observations": [
         "【实测】master=20s 时三条素材分别在 20.0 / 14.0 / 6.0s —— 三条不同的本地时间，同一拍，diff 全 0.000。",
@@ -181,14 +275,35 @@
       "question": "「很多人」到底改变了什么？",
       "done": "人数与密度、逐排视线 C 值、以及从舞台位置量出的包围角，三者都可测且可复现。",
       "milestones": [
-        { "id": "密度场", "state": "done" },
-        { "id": "视线 C 值", "state": "done" },
-        { "id": "包围角", "state": "done" },
-        { "id": "独立评审", "state": "done" },
-        { "id": "V2（评审驱动）", "state": "done" },
-        { "id": "场地站立区", "state": "todo" }
+        {
+          "id": "密度场",
+          "state": "done"
+        },
+        {
+          "id": "视线 C 值",
+          "state": "done"
+        },
+        {
+          "id": "包围角",
+          "state": "done"
+        },
+        {
+          "id": "独立评审",
+          "state": "done"
+        },
+        {
+          "id": "V2（评审驱动）",
+          "state": "done"
+        },
+        {
+          "id": "场地站立区",
+          "state": "todo"
+        }
       ],
-      "run": { "label": "打开研究", "url": "stadium/crowd/" },
+      "run": {
+        "label": "打开研究",
+        "url": "stadium/crowd/"
+      },
       "links": [
         {
           "label": "README（口径、发现与已知限制）",
@@ -217,10 +332,22 @@
         }
       ],
       "views": [
-        { "id": "BOWL_WIDE", "url": "stadium/crowd/?view=BOWL_WIDE&rake=sightline" },
-        { "id": "STAGE_CENTER", "url": "stadium/crowd/?view=STAGE_CENTER&density=packed" },
-        { "id": "ROW_20", "url": "stadium/crowd/?view=ROW_20&rake=constant&overlay=sightline" },
-        { "id": "TOP", "url": "stadium/crowd/?view=TOP&rake=sightline" }
+        {
+          "id": "BOWL_WIDE",
+          "url": "stadium/crowd/?view=BOWL_WIDE&rake=sightline"
+        },
+        {
+          "id": "STAGE_CENTER",
+          "url": "stadium/crowd/?view=STAGE_CENTER&density=packed"
+        },
+        {
+          "id": "ROW_20",
+          "url": "stadium/crowd/?view=ROW_20&rake=constant&overlay=sightline"
+        },
+        {
+          "id": "TOP",
+          "url": "stadium/crowd/?view=TOP&rake=sightline"
+        }
       ],
       "observations": [
         "【独立评审判定】holds up with caveats：算术被独立复算并逐位确认正确（−59.08mm / 第 13 排 / 57.79mm；解算 60.000mm；递推式与标准构造代数等价，末排升阶 0.6014m 且增长率是对数而非发散）。评审找出六处实质问题，**全部接受**。",
@@ -256,7 +383,10 @@
       "role": "大型演唱会 / 沉浸式空间主视觉",
       "question": "同一个视觉从「前方一块屏」扩展到「包住整个观众」以后，构图、观看位置、音乐段落和视觉密度怎样改变？",
       "done": "预演的意义不是提前看一个 Dome 模型，而是提前发现「画面占据整个视野以后，原来的视觉为什么必须重新编排」。",
-      "run": { "label": "打开预演", "url": "sphere/" },
+      "run": {
+        "label": "打开预演",
+        "url": "sphere/"
+      },
       "stages": {
         "REFERENCE": "done",
         "GRAYBOX": "done",
@@ -266,22 +396,62 @@
         "DELIVERY": "done"
       },
       "states": [
-        { "id": "HORIZON", "label": "铺垫 · 穹顶覆盖 2.4%", "url": "sphere/?t=4&quad=0" },
-        { "id": "ENCLOSE", "label": "建立 · 穹顶覆盖 17%", "url": "sphere/?t=12&quad=0" },
-        { "id": "FULL_FIELD", "label": "爆发 · 穹顶覆盖 100%", "url": "sphere/?t=20&quad=0" },
-        { "id": "APERTURE", "label": "收束 · 穹顶覆盖 4.6%", "url": "sphere/?t=28&quad=0" }
+        {
+          "id": "HORIZON",
+          "label": "铺垫 · 穹顶覆盖 2.4%",
+          "url": "sphere/?t=4&quad=0"
+        },
+        {
+          "id": "ENCLOSE",
+          "label": "建立 · 穹顶覆盖 17%",
+          "url": "sphere/?t=12&quad=0"
+        },
+        {
+          "id": "FULL_FIELD",
+          "label": "爆发 · 穹顶覆盖 100%",
+          "url": "sphere/?t=20&quad=0"
+        },
+        {
+          "id": "APERTURE",
+          "label": "收束 · 穹顶覆盖 4.6%",
+          "url": "sphere/?t=28&quad=0"
+        }
       ],
       "views": [
-        { "id": "AUDIENCE_CENTER", "url": "sphere/?t=20&view=AUDIENCE_CENTER&quad=0" },
-        { "id": "AUDIENCE_LEFT", "url": "sphere/?t=20&view=AUDIENCE_LEFT&quad=0" },
-        { "id": "STAGE_LOOKBACK", "url": "sphere/?t=20&view=STAGE_LOOKBACK&quad=0" },
-        { "id": "DEBUG_ORBIT", "url": "sphere/?t=20&view=DEBUG_ORBIT&quad=1" }
+        {
+          "id": "AUDIENCE_CENTER",
+          "url": "sphere/?t=20&view=AUDIENCE_CENTER&quad=0"
+        },
+        {
+          "id": "AUDIENCE_LEFT",
+          "url": "sphere/?t=20&view=AUDIENCE_LEFT&quad=0"
+        },
+        {
+          "id": "STAGE_LOOKBACK",
+          "url": "sphere/?t=20&view=STAGE_LOOKBACK&quad=0"
+        },
+        {
+          "id": "DEBUG_ORBIT",
+          "url": "sphere/?t=20&view=DEBUG_ORBIT&quad=1"
+        }
       ],
       "modes": [
-        { "id": "front-window", "url": "sphere/?t=12&mode=front-window&quad=0" },
-        { "id": "mirror-extend", "url": "sphere/?t=20&mode=mirror-extend&quad=0" },
-        { "id": "shader-fill", "url": "sphere/?t=20&mode=shader-fill&quad=0" },
-        { "id": "square-master", "url": "sphere/?t=20&mode=square-master&quad=0" }
+        {
+          "id": "front-window",
+          "url": "sphere/?t=12&mode=front-window&quad=0"
+        },
+        {
+          "id": "mirror-extend",
+          "url": "sphere/?t=20&mode=mirror-extend&quad=0"
+        },
+        {
+          "id": "shader-fill",
+          "url": "sphere/?t=20&mode=shader-fill&quad=0"
+        },
+        {
+          "id": "square-master",
+          "url": "sphere/?t=20&mode=square-master&quad=0"
+        }
       ],
       "artifacts": [
         {
@@ -301,9 +471,18 @@
           "label": "▶ V2 导演版完整 32s（含切机位 + 丢源）",
           "url": "sphere/delivery/v2-director-32s.mp4"
         },
-        { "label": "V2 状态帧 HORIZON", "url": "sphere/stills/v2-horizon.png" },
-        { "label": "V2 状态帧 FULL_FIELD", "url": "sphere/stills/v2-full-field.png" },
-        { "label": "V2 状态帧 APERTURE", "url": "sphere/stills/v2-aperture.png" },
+        {
+          "label": "V2 状态帧 HORIZON",
+          "url": "sphere/stills/v2-horizon.png"
+        },
+        {
+          "label": "V2 状态帧 FULL_FIELD",
+          "url": "sphere/stills/v2-full-field.png"
+        },
+        {
+          "label": "V2 状态帧 APERTURE",
+          "url": "sphere/stills/v2-aperture.png"
+        },
         {
           "label": "V2 STAGE_LOOKBACK（V1 时几乎全黑）",
           "url": "sphere/stills/v2-lookback-full-field.png"
@@ -320,10 +499,22 @@
           "label": "▶ V1 原版录屏 32s（保留不覆盖）",
           "url": "sphere/delivery/v1-sphere-32s.mp4"
         },
-        { "label": "V1 状态帧 HORIZON", "url": "sphere/stills/v1-horizon.png" },
-        { "label": "V1 状态帧 ENCLOSE", "url": "sphere/stills/v1-enclose.png" },
-        { "label": "V1 状态帧 FULL_FIELD", "url": "sphere/stills/v1-full-field.png" },
-        { "label": "V1 状态帧 APERTURE", "url": "sphere/stills/v1-aperture.png" },
+        {
+          "label": "V1 状态帧 HORIZON",
+          "url": "sphere/stills/v1-horizon.png"
+        },
+        {
+          "label": "V1 状态帧 ENCLOSE",
+          "url": "sphere/stills/v1-enclose.png"
+        },
+        {
+          "label": "V1 状态帧 FULL_FIELD",
+          "url": "sphere/stills/v1-full-field.png"
+        },
+        {
+          "label": "V1 状态帧 APERTURE",
+          "url": "sphere/stills/v1-aperture.png"
+        },
         {
           "label": "V1 冻结记录 v1-freeze.json",
           "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/v1-freeze.json"
@@ -375,7 +566,10 @@
       "role": "最容易一眼看懂课程怎么玩的音乐节案例",
       "question": "两块巨型屏幕什么时候应该独立，什么时候应该连成一个整体？中央 performer 怎样保持视觉中心？",
       "done": "不是把两个屏幕都塞满，而是在预演里真正看出「什么时候分开、什么时候连接」会改变演出。",
-      "run": { "label": "打开预演", "url": "festival/" },
+      "run": {
+        "label": "打开预演",
+        "url": "festival/"
+      },
       "stages": {
         "REFERENCE": "done",
         "GRAYBOX": "done",
@@ -385,16 +579,44 @@
         "DELIVERY": "done"
       },
       "states": [
-        { "id": "LOW", "label": "铺垫 · 两块独立 5%", "url": "festival/?t=4&quad=0" },
-        { "id": "BUILD", "label": "建立 · 过渡 45%", "url": "festival/?t=12&quad=0" },
-        { "id": "PEAK", "label": "爆发 · 合成整体 100%", "url": "festival/?t=20&quad=0" },
-        { "id": "RELEASE", "label": "收束 · 回到 15%", "url": "festival/?t=28&quad=0" }
+        {
+          "id": "LOW",
+          "label": "铺垫 · 两块独立 5%",
+          "url": "festival/?t=4&quad=0"
+        },
+        {
+          "id": "BUILD",
+          "label": "建立 · 过渡 45%",
+          "url": "festival/?t=12&quad=0"
+        },
+        {
+          "id": "PEAK",
+          "label": "爆发 · 合成整体 100%",
+          "url": "festival/?t=20&quad=0"
+        },
+        {
+          "id": "RELEASE",
+          "label": "收束 · 回到 15%",
+          "url": "festival/?t=28&quad=0"
+        }
       ],
       "views": [
-        { "id": "FOH_WIDE", "url": "festival/?t=20&view=FOH_WIDE&quad=0" },
-        { "id": "DJ_FRONT", "url": "festival/?t=20&view=DJ_FRONT&quad=0" },
-        { "id": "STAGE_LEFT", "url": "festival/?t=20&view=STAGE_LEFT&quad=0" },
-        { "id": "HIGH_WIDE", "url": "festival/?t=20&view=HIGH_WIDE&quad=1" }
+        {
+          "id": "FOH_WIDE",
+          "url": "festival/?t=20&view=FOH_WIDE&quad=0"
+        },
+        {
+          "id": "DJ_FRONT",
+          "url": "festival/?t=20&view=DJ_FRONT&quad=0"
+        },
+        {
+          "id": "STAGE_LEFT",
+          "url": "festival/?t=20&view=STAGE_LEFT&quad=0"
+        },
+        {
+          "id": "HIGH_WIDE",
+          "url": "festival/?t=20&view=HIGH_WIDE&quad=1"
+        }
       ],
       "modes": [],
       "artifacts": [
@@ -415,14 +637,26 @@
           "label": "▶ V2 导演版 32s（无 HUD / 无四分屏）",
           "url": "festival/delivery/v2-director-clean-32s.mp4"
         },
-        { "label": "V2 PEAK（斜线跨缝连成一条）", "url": "festival/stills/v2-peak.png" },
+        {
+          "label": "V2 PEAK（斜线跨缝连成一条）",
+          "url": "festival/stills/v2-peak.png"
+        },
         {
           "label": "V2 DJ_FRONT（人眼机位终于看得到两屏）",
           "url": "festival/stills/v2-dj-peak.png"
         },
-        { "label": "V2 LOW（右屏翻转，两块确实不同）", "url": "festival/stills/v2-low.png" },
-        { "label": "V2 RELEASE 后期（左先退）", "url": "festival/stills/v2-release-late.png" },
-        { "label": "V2 fallback 本地 loop", "url": "festival/stills/v2-fallback.png" },
+        {
+          "label": "V2 LOW（右屏翻转，两块确实不同）",
+          "url": "festival/stills/v2-low.png"
+        },
+        {
+          "label": "V2 RELEASE 后期（左先退）",
+          "url": "festival/stills/v2-release-late.png"
+        },
+        {
+          "label": "V2 fallback 本地 loop",
+          "url": "festival/stills/v2-fallback.png"
+        },
         {
           "label": "V1→V2 改动与实测（review-diff-festival-v1-v2.md）",
           "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-diff-festival-v1-v2.md"
@@ -435,9 +669,18 @@
           "label": "▶ V1 导演版录屏 32s（保留不覆盖）",
           "url": "festival/delivery/v1-director-32s.mp4"
         },
-        { "label": "V1 PEAK（两屏合成一个环）", "url": "festival/stills/v1-peak.png" },
-        { "label": "V1 LOW（两块各自完整）", "url": "festival/stills/v1-low.png" },
-        { "label": "V1 PEAK 中轴近景", "url": "festival/stills/v1-dj-peak.png" },
+        {
+          "label": "V1 PEAK（两屏合成一个环）",
+          "url": "festival/stills/v1-peak.png"
+        },
+        {
+          "label": "V1 LOW（两块各自完整）",
+          "url": "festival/stills/v1-low.png"
+        },
+        {
+          "label": "V1 PEAK 中轴近景",
+          "url": "festival/stills/v1-dj-peak.png"
+        },
         {
           "label": "REFERENCE（三条链接全部核验）",
           "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/festival/reference/reference.md"
@@ -484,7 +727,10 @@
       "role": "证明 Stage Replica 不只适用于演唱会",
       "question": "当素材很少、变化很慢时，尺寸、观看距离、声音与持续时间能否共同形成完整现场？",
       "done": "少量素材也可以通过预演被组织成一个成立的现场；课程不是「做大屏模板」。",
-      "run": { "label": "打开预演", "url": "installation/" },
+      "run": {
+        "label": "打开预演",
+        "url": "installation/"
+      },
       "stages": {
         "REFERENCE": "done",
         "GRAYBOX": "done",
@@ -494,9 +740,21 @@
         "DELIVERY": "done"
       },
       "states": [
-        { "id": "SPARSE", "label": "铺垫", "url": "installation/?t=6" },
-        { "id": "ACCUMULATE", "label": "累积（池持续增长）", "url": "installation/?t=18" },
-        { "id": "DENSE", "label": "密集 · 771 条 / 28.7%", "url": "installation/?t=30" },
+        {
+          "id": "SPARSE",
+          "label": "铺垫",
+          "url": "installation/?t=6"
+        },
+        {
+          "id": "ACCUMULATE",
+          "label": "累积（池持续增长）",
+          "url": "installation/?t=18"
+        },
+        {
+          "id": "DENSE",
+          "label": "密集 · 771 条 / 28.7%",
+          "url": "installation/?t=30"
+        },
         {
           "id": "AFTERIMAGE",
           "label": "余像 · 不再新增，缓慢消退",
@@ -504,14 +762,32 @@
         }
       ],
       "views": [
-        { "id": "CENTER", "url": "installation/?t=30&view=CENTER" },
-        { "id": "FAR", "url": "installation/?t=30&view=FAR" },
-        { "id": "LEFT", "url": "installation/?t=30&view=LEFT" },
-        { "id": "FLOOR", "url": "installation/?t=30&view=FLOOR&floor=1" }
+        {
+          "id": "CENTER",
+          "url": "installation/?t=30&view=CENTER"
+        },
+        {
+          "id": "FAR",
+          "url": "installation/?t=30&view=FAR"
+        },
+        {
+          "id": "LEFT",
+          "url": "installation/?t=30&view=LEFT"
+        },
+        {
+          "id": "FLOOR",
+          "url": "installation/?t=30&view=FLOOR&floor=1"
+        }
       ],
       "modes": [
-        { "id": "墙面 only", "url": "installation/?t=30&floor=0" },
-        { "id": "墙 + 地面（同一坐标系延续）", "url": "installation/?t=30&view=FLOOR&floor=1" }
+        {
+          "id": "墙面 only",
+          "url": "installation/?t=30&floor=0"
+        },
+        {
+          "id": "墙 + 地面（同一坐标系延续）",
+          "url": "installation/?t=30&view=FLOOR&floor=1"
+        }
       ],
       "artifacts": [
         {
@@ -531,11 +807,26 @@
           "label": "▶ V2 走查 48s（含读数，证据版）",
           "url": "installation/delivery/v2-walkthrough-hud-48s.mp4"
         },
-        { "label": "V2 DENSE（771 条 / 28.7%）", "url": "installation/stills/v2-dense.png" },
-        { "label": "V2 AFTERIMAGE（无硬线残留）", "url": "installation/stills/v2-afterimage.png" },
-        { "label": "V2 FAR（尺度尺 + 两根参考柱入画）", "url": "installation/stills/v2-far.png" },
-        { "label": "V2 墙+地面（同一坐标系延续）", "url": "installation/stills/v2-floor.png" },
-        { "label": "V2 fallback（掉源仍可读）", "url": "installation/stills/v2-fallback.png" },
+        {
+          "label": "V2 DENSE（771 条 / 28.7%）",
+          "url": "installation/stills/v2-dense.png"
+        },
+        {
+          "label": "V2 AFTERIMAGE（无硬线残留）",
+          "url": "installation/stills/v2-afterimage.png"
+        },
+        {
+          "label": "V2 FAR（尺度尺 + 两根参考柱入画）",
+          "url": "installation/stills/v2-far.png"
+        },
+        {
+          "label": "V2 墙+地面（同一坐标系延续）",
+          "url": "installation/stills/v2-floor.png"
+        },
+        {
+          "label": "V2 fallback（掉源仍可读）",
+          "url": "installation/stills/v2-fallback.png"
+        },
         {
           "label": "V1→V2 改动与实测（review-diff-installation-v1-v2.md）",
           "url": "https://github.com/ewanqian/SceneForge/blob/main/systems/stage-replica/review-diff-installation-v1-v2.md"
@@ -548,11 +839,26 @@
           "label": "▶ V1 walkthrough 48s（保留不覆盖）",
           "url": "installation/delivery/v1-walkthrough-48s.mp4"
         },
-        { "label": "V1 DENSE（生成器参数 58%）", "url": "installation/stills/v1-dense.png" },
-        { "label": "V1 SPARSE", "url": "installation/stills/v1-sparse.png" },
-        { "label": "V1 AFTERIMAGE（硬线瑕疵）", "url": "installation/stills/v1-afterimage.png" },
-        { "label": "V1 墙 + 地面 低机位", "url": "installation/stills/v1-floor-on.png" },
-        { "label": "V1 12m 远观", "url": "installation/stills/v1-far.png" },
+        {
+          "label": "V1 DENSE（生成器参数 58%）",
+          "url": "installation/stills/v1-dense.png"
+        },
+        {
+          "label": "V1 SPARSE",
+          "url": "installation/stills/v1-sparse.png"
+        },
+        {
+          "label": "V1 AFTERIMAGE（硬线瑕疵）",
+          "url": "installation/stills/v1-afterimage.png"
+        },
+        {
+          "label": "V1 墙 + 地面 低机位",
+          "url": "installation/stills/v1-floor-on.png"
+        },
+        {
+          "label": "V1 12m 远观",
+          "url": "installation/stills/v1-far.png"
+        },
         {
           "label": "REFERENCE（两条官方链接核验，尺寸逐字确认）",
           "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/installation/reference/reference.md"
@@ -605,7 +911,10 @@
       "role": "Camera / Director / Program Out 技术强化",
       "question": "同一条视觉进入 360° 圆柱媒体面以后，人物、观看位置和导播切换怎样改变最终观看结果？",
       "done": "舞台预演不只是在看模型；摄像机本身也在重新编排演出。",
-      "run": { "label": "打开预演", "url": "stadium/" },
+      "run": {
+        "label": "打开预演",
+        "url": "stadium/"
+      },
       "stages": {
         "REFERENCE": "done",
         "GRAYBOX": "done",
@@ -615,22 +924,62 @@
         "DELIVERY": "done"
       },
       "states": [
-        { "id": "LOW", "label": "铺垫 · 覆盖 90°", "url": "stadium/?t=4&quad=0" },
-        { "id": "BUILD", "label": "建立 · 覆盖 180°", "url": "stadium/?t=12&quad=0" },
-        { "id": "PEAK", "label": "爆发 · 覆盖 360°", "url": "stadium/?t=20&quad=0" },
-        { "id": "RELEASE", "label": "收束 · 退回 80°", "url": "stadium/?t=28&quad=0" }
+        {
+          "id": "LOW",
+          "label": "铺垫 · 覆盖 90°",
+          "url": "stadium/?t=4&quad=0"
+        },
+        {
+          "id": "BUILD",
+          "label": "建立 · 覆盖 180°",
+          "url": "stadium/?t=12&quad=0"
+        },
+        {
+          "id": "PEAK",
+          "label": "爆发 · 覆盖 360°",
+          "url": "stadium/?t=20&quad=0"
+        },
+        {
+          "id": "RELEASE",
+          "label": "收束 · 退回 80°",
+          "url": "stadium/?t=28&quad=0"
+        }
       ],
       "views": [
-        { "id": "BOWL_WIDE", "url": "stadium/?t=20&view=BOWL_WIDE&quad=0" },
-        { "id": "PERFORMER_FRONT", "url": "stadium/?t=20&view=PERFORMER_FRONT&quad=0" },
-        { "id": "ORBIT_45", "url": "stadium/?t=20&view=ORBIT_45&quad=0" },
-        { "id": "TOP", "url": "stadium/?t=20&view=TOP&quad=0" }
+        {
+          "id": "BOWL_WIDE",
+          "url": "stadium/?t=20&view=BOWL_WIDE&quad=0"
+        },
+        {
+          "id": "PERFORMER_FRONT",
+          "url": "stadium/?t=20&view=PERFORMER_FRONT&quad=0"
+        },
+        {
+          "id": "ORBIT_45",
+          "url": "stadium/?t=20&view=ORBIT_45&quad=0"
+        },
+        {
+          "id": "TOP",
+          "url": "stadium/?t=20&view=TOP&quad=0"
+        }
       ],
       "modes": [
-        { "id": "8:1 全景母版", "url": "stadium/?t=20&pano=panorama&quad=0" },
-        { "id": "16:9 前区窗口", "url": "stadium/?t=20&pano=front-window&quad=0" },
-        { "id": "16:9 ×4 重复", "url": "stadium/?t=20&pano=repeat&quad=0" },
-        { "id": "16:9 拉伸填满", "url": "stadium/?t=20&pano=fill&quad=0" }
+        {
+          "id": "8:1 全景母版",
+          "url": "stadium/?t=20&pano=panorama&quad=0"
+        },
+        {
+          "id": "16:9 前区窗口",
+          "url": "stadium/?t=20&pano=front-window&quad=0"
+        },
+        {
+          "id": "16:9 ×4 重复",
+          "url": "stadium/?t=20&pano=repeat&quad=0"
+        },
+        {
+          "id": "16:9 拉伸填满",
+          "url": "stadium/?t=20&pano=fill&quad=0"
+        }
       ],
       "artifacts": [
         {
@@ -654,10 +1003,22 @@
           "label": "V2 四种比例模式对照（一眼可分）",
           "url": "stadium/delivery/pano-modes-compare.png"
         },
-        { "label": "V2 PEAK（灯柱升到圆柱之上）", "url": "stadium/stills/v2-peak.png" },
-        { "label": "V2 LOW（灯柱藏在圆柱内）", "url": "stadium/stills/v2-low.png" },
-        { "label": "V2 RELEASE（观众环点亮）", "url": "stadium/stills/v2-release.png" },
-        { "label": "V2 TOP（360° 几何）", "url": "stadium/stills/v2-top.png" },
+        {
+          "label": "V2 PEAK（灯柱升到圆柱之上）",
+          "url": "stadium/stills/v2-peak.png"
+        },
+        {
+          "label": "V2 LOW（灯柱藏在圆柱内）",
+          "url": "stadium/stills/v2-low.png"
+        },
+        {
+          "label": "V2 RELEASE（观众环点亮）",
+          "url": "stadium/stills/v2-release.png"
+        },
+        {
+          "label": "V2 TOP（360° 几何）",
+          "url": "stadium/stills/v2-top.png"
+        },
         {
           "label": "V2 16:9 ×4 重复（同一个 X 出现四次）",
           "url": "stadium/stills/v2-pano-repeat.png"
@@ -674,14 +1035,26 @@
           "label": "▶ V1 导演版 32s（保留不覆盖）",
           "url": "stadium/delivery/v1-director-32s.mp4"
         },
-        { "label": "V1 PEAK（覆盖 360°）", "url": "stadium/stills/v1-peak.png" },
+        {
+          "label": "V1 PEAK（覆盖 360°）",
+          "url": "stadium/stills/v1-peak.png"
+        },
         {
           "label": "V1 PERFORMER_FRONT（透过 blow-through 屏看见人）",
           "url": "stadium/stills/v1-performer-front.png"
         },
-        { "label": "V1 TOP（360° 几何）", "url": "stadium/stills/v1-top.png" },
-        { "label": "V1 Quad Preview", "url": "stadium/stills/v1-quad.png" },
-        { "label": "V1 16:9 前区窗口", "url": "stadium/stills/v1-pano-front-window.png" },
+        {
+          "label": "V1 TOP（360° 几何）",
+          "url": "stadium/stills/v1-top.png"
+        },
+        {
+          "label": "V1 Quad Preview",
+          "url": "stadium/stills/v1-quad.png"
+        },
+        {
+          "label": "V1 16:9 前区窗口",
+          "url": "stadium/stills/v1-pano-front-window.png"
+        },
         {
           "label": "REFERENCE（STUFISH 逐字核验）",
           "url": "https://github.com/ewanqian/SceneForge/blob/main/public/stage-replica/stadium/reference/reference.md"
