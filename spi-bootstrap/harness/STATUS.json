@@ -1,0 +1,21 @@
+{
+  "project": "Spatial Performance Instrument",
+  "updated": "2026-10-25",
+  "deadline": "2026-12-03",
+  "phase": "P0",
+  "phase_name": "Harness bootstrap + minimum end-to-end proof",
+  "objective": "Demonstrate one real input event controlling both sound and visual through the intended realtime chain.",
+  "current_bottleneck": "No proven Vision Pro/WebXR to Mac realtime route has been validated end-to-end.",
+  "next_task": "SPI-001",
+  "show_artifact": "SPATIAL SCORE 01",
+  "status": "active",
+  "canonical_controls": ["energy", "density", "space", "tension"],
+  "discrete_controls": ["pattern", "fill", "break", "safe"],
+  "authoritative_memory": [
+    "STATE.md",
+    "ROADMAP.md",
+    "harness/STATUS.json",
+    "harness/TASKS.md",
+    "harness/CRITIC.md"
+  ]
+}
