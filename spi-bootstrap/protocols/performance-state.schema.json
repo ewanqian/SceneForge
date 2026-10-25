@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/spi/performance-state.schema.json",
+  "title": "Spatial Performance Instrument State",
+  "type": "object",
+  "required": ["version", "timestamp", "connection", "continuous", "discrete"],
+  "properties": {
+    "version": {"const": "0.1"},
+    "timestamp": {"type": "number"},
+    "connection": {
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": {"enum": ["connected", "degraded", "disconnected", "safe"]},
+        "latencyMs": {"type": ["number", "null"], "minimum": 0}
+      }
+    },
+    "continuous": {
+      "type": "object",
+      "required": ["energy", "density", "space", "tension"],
+      "properties": {
+        "energy": {"type": "number", "minimum": 0, "maximum": 1},
+        "density": {"type": "number", "minimum": 0, "maximum": 1},
+        "space": {"type": "number", "minimum": 0, "maximum": 1},
+        "tension": {"type": "number", "minimum": 0, "maximum": 1}
+      },
+      "additionalProperties": false
+    },
+    "discrete": {
+      "type": "object",
+      "properties": {
+        "pattern": {"type": ["string", "null"]},
+        "fill": {"type": "boolean"},
+        "break": {"type": "boolean"},
+        "safe": {"type": "boolean"},
+        "event": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "device": {"type": ["string", "null"]},
+        "gesture": {"type": ["string", "null"]}
+      }
+    }
+  },
+  "additionalProperties": false
+}
