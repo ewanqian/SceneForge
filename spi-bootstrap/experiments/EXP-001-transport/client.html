@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SPI EXP-001 Transport Probe</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; background: #0b0b0b; color: #f4f4f4; }
+    main { max-width: 760px; margin: 0 auto; padding: 32px 20px; }
+    .card { border: 1px solid #333; border-radius: 18px; padding: 20px; margin: 18px 0; background: #141414; }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    button { font: inherit; padding: 12px 18px; border-radius: 12px; border: 1px solid #555; background: #202020; color: white; }
+    input[type="range"] { width: 100%; }
+    .big { font-size: 42px; font-weight: 700; }
+    .muted { color: #999; }
+    code { color: #ddd; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>SPI EXP-001</h1>
+  <p class="muted">Browser / Vision Pro → Mac transport probe</p>
+
+  <section class="card">
+    <div class="row"><strong>Connection</strong><span id="status">connecting…</span></div>
+    <p>WebSocket: <code id="endpoint"></code></p>
+    <p>Ack age: <strong id="ackAge">—</strong> ms · sent: <strong id="sent">0</strong></p>
+  </section>
+
+  <section class="card">
+    <strong>Continuous semantic value: energy</strong>
+    <div class="big" id="energyLabel">0.50</div>
+    <input id="energy" type="range" min="0" max="1" step="0.001" value="0.5" />
+    <div class="row">
+      <button id="auto">Start 30 Hz auto stream</button>
+      <span class="muted">Auto mode sweeps the value for the 10-minute test.</span>
+    </div>
+  </section>
+
+  <section class="card">
+    <strong>Discrete semantic event</strong>
+    <p><button id="trigger">Send FILL event</button></p>
+    <p class="muted">Each press must arrive once, with its sequence number preserved.</p>
+  </section>
+</main>
+<script>
+  const endpoint = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}`;
+  document.querySelector('#endpoint').textContent = endpoint;
+
+  const statusEl = document.querySelector('#status');
+  const sentEl = document.querySelector('#sent');
+  const ackAgeEl = document.querySelector('#ackAge');
+  const energy = document.querySelector('#energy');
+  const energyLabel = document.querySelector('#energyLabel');
+  const autoBtn = document.querySelector('#auto');
+  const triggerBtn = document.querySelector('#trigger');
+
+  let socket;
+  let seq = 0;
+  let sent = 0;
+  let autoTimer = null;
+  let phase = 0;
+
+  function connect() {
+    statusEl.textContent = 'connecting…';
+    socket = new WebSocket(endpoint);
+    socket.addEventListener('open', () => statusEl.textContent = 'connected');
+    socket.addEventListener('close', () => {
+      statusEl.textContent = 'disconnected — retrying';
+      setTimeout(connect, 1000);
+    });
+    socket.addEventListener('message', (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === 'ack') {
+          ackAgeEl.textContent = String(Date.now() - message.receiveTime);
+        }
+      } catch {}
+    });
+  }
+
+  function send(payload) {
+    if (!socket || socket.readyState !== WebSocket.OPEN) return;
+    const message = { ...payload, seq: ++seq, clientTime: Date.now() };
+    socket.send(JSON.stringify(message));
+    sentEl.textContent = String(++sent);
+  }
+
+  function sendEnergy() {
+    const value = Number(energy.value);
+    energyLabel.textContent = value.toFixed(2);
+    send({ type: 'continuous', control: 'energy', value });
+  }
+
+  energy.addEventListener('input', sendEnergy);
+
+  autoBtn.addEventListener('click', () => {
+    if (autoTimer) {
+      clearInterval(autoTimer);
+      autoTimer = null;
+      autoBtn.textContent = 'Start 30 Hz auto stream';
+      return;
+    }
+    autoTimer = setInterval(() => {
+      phase += 0.045;
+      energy.value = String((Math.sin(phase) + 1) / 2);
+      sendEnergy();
+    }, 33);
+    autoBtn.textContent = 'Stop auto stream';
+  });
+
+  triggerBtn.addEventListener('click', () => {
+    send({ type: 'event', event: 'fill', id: `fill-${Date.now()}` });
+  });
+
+  connect();
+</script>
+</body>
+</html>
