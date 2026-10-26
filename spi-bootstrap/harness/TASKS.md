@@ -3,7 +3,7 @@
 Status: `READY` / `ACTIVE` / `BLOCKED` / `DONE` / `REJECTED`
 
 ## SPI-001 — Prove browser/Vision Pro → Mac transport
-Status: READY
+Status: ACTIVE
 Priority: P0
 
 Goal:
@@ -11,6 +11,9 @@ Send one continuous semantic value and one discrete event from a WebXR/browser c
 
 Why now:
 Every later Vision Pro performance feature depends on a reliable transport path.
+
+Execution packet:
+`experiments/EXP-001-transport/README.md`
 
 Acceptance:
 - continuous value updates at >= 30 Hz where device/browser permits
@@ -28,6 +31,7 @@ Non-goals:
 - visual polish
 - Ableton mapping
 - Max patch complexity
+- WebXR hand tracking before the transport probe itself passes
 
 ---
 
