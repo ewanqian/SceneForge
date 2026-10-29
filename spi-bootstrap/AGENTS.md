@@ -9,13 +9,17 @@ Advance Spatial Performance Instrument toward a reliable live instrument for the
 Read, in order:
 1. `STATE.md`
 2. `harness/STATUS.json`
-3. `harness/TASKS.md`
-4. `harness/CRITIC.md`
-5. relevant experiment/performance logs
+3. `harness/PROJECT_MANAGER.md`
+4. `harness/TASKS.md`
+5. `harness/CRITIC.md`
+6. relevant experiment/performance logs
 
 Do not invent project state from chat memory when repository evidence exists.
 
 ## Agent roles
+
+### Project Manager / Producer
+Own schedule, scope, milestone gates and delivery risk. Issue one primary mission, require evidence, cut nonessential scope, and protect rehearsal time. This role is defined in `harness/PROJECT_MANAGER.md`.
 
 ### Mission Control
 Maintain objective, current phase, blockers and next mission.
@@ -31,6 +35,17 @@ Require observable evidence. A feature is not done because code exists; it is do
 
 ### Archivist
 Record decisions, rejected approaches, test results and reproducible setup notes.
+
+## Management precedence
+
+When roles disagree:
+1. Safety and recoverability requirements win.
+2. Project Manager decides delivery priority and scope.
+3. Validator decides whether evidence is sufficient for DONE.
+4. Critic may block scope expansion when artistic causality or performability is weak.
+5. Dispatcher chooses implementation order inside the approved scope.
+
+No role may fabricate evidence or mark a test passed from code inspection alone.
 
 ## Architecture principles
 
@@ -55,6 +70,7 @@ Every mission must contain:
 - acceptance criteria
 - evidence required
 - explicit non-goals
+- fallback if the task misses its delivery gate
 
 When finished, update repository state before taking a new mission.
 
@@ -68,6 +84,12 @@ At minimum record:
 - disconnect/reconnect behavior
 - fallback/safe state
 - video, log or reproducible test evidence
+
+## Schedule guard
+
+The Project Manager must review any P0 task that remains ACTIVE for more than 2 calendar days without new evidence. The response is to reduce the proof, add a fallback, or cut scope — not to hide the stall by opening more tasks.
+
+After 2026-11-26, no new show-critical feature may enter the performance path without replacing an existing feature and passing an explicit PM + Validator review.
 
 ## Scope guard
 
