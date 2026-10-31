@@ -1,0 +1,87 @@
+[
+  {
+    "file": "course-kit/assets/revision-research/daito-agent-club.webp",
+    "original_url": "https://projects.daito.ws/agent-club/thumbnail.webp?v=ad96aacfb866",
+    "page_url": "https://projects.daito.ws/agent-club/",
+    "credit": "Daito Manabe / VJ Agent Club",
+    "caption": "项目页面缩略图，非本课运行截图",
+    "license": "版权归原作者，原页面未提供可再分发开放许可；本地教学引用，公开发布需另核授权",
+    "checked": "2026-10-30",
+    "bytes": 27842,
+    "sha256": "ad96aacfb8662930582fb50fd7d0c97f4e2c2510623b9ed2e16cdee170a26ffd",
+    "recommended_for_deck": true
+  },
+  {
+    "file": "course-kit/assets/revision-research/daito-beyond-generation.webp",
+    "original_url": "https://projects.daito.ws/beyond-generation/thumbnail.webp?v=e297cc6b7e67",
+    "page_url": "https://projects.daito.ws/beyond-generation/",
+    "credit": "Daito Manabe / Beyond Generation",
+    "caption": "作者文章缩略图，仅作原文入口",
+    "license": "版权归原作者，原页面未提供可再分发开放许可；本地教学引用，公开发布需另核授权",
+    "checked": "2026-10-30",
+    "bytes": 12582,
+    "sha256": "e297cc6b7e6766fc6b983f94e501fb2dc89205476882d77bfda827bae8322077",
+    "recommended_for_deck": true
+  },
+  {
+    "file": "course-kit/assets/revision-research/syn-projection.jpg",
+    "original_url": "https://rhizomatiks.com/wp-content/uploads/2023/12/DSC05324-1200x800.jpg",
+    "page_url": "https://rhizomatiks.com/work/behind-the-scene-syn/",
+    "credit": "Rhizomatiks × ELEVENPLAY / photo by Muryo Homma",
+    "caption": "Gallery B 投影系统现场图",
+    "license": "版权归原作者，原页面未提供可再分发开放许可；本地教学引用，公开发布需另核授权",
+    "checked": "2026-10-30",
+    "bytes": 425430,
+    "sha256": "39e5d214345021e70ac65baffd48ba534a27e526970cd5f5beb6e5f088db376d",
+    "recommended_for_deck": true
+  },
+  {
+    "file": "course-kit/assets/revision-research/syn-plan.png",
+    "original_url": "https://rhizomatiks.com/wp-content/uploads/2023/12/230830_02_tokyonode_white-1200x596.png",
+    "page_url": "https://rhizomatiks.com/work/behind-the-scene-syn/",
+    "credit": "Rhizomatiks × ELEVENPLAY",
+    "caption": "官方幕后页空间分区图",
+    "license": "版权归原作者，原页面未提供可再分发开放许可；本地教学引用，公开发布需另核授权",
+    "checked": "2026-10-30",
+    "bytes": 415109,
+    "sha256": "d1928db654d77cbf1269800b991a636e631e907a75e4a339786079b02b3b59f4",
+    "recommended_for_deck": true
+  },
+  {
+    "file": "course-kit/assets/revision-research/perspective-lyrique.jpg",
+    "original_url": "https://cdn.sanity.io/images/fdic53fd/production/dddceb9415e386871d6e5df39289f184312aae04-4880x3254.jpg?auto=format&w=1800",
+    "page_url": "https://www.1024architecture.net/projects/perspective-lyrique/",
+    "credit": "1024 architecture / Perspective Lyrique",
+    "caption": "官方项目页照片，摄影者未单独标明",
+    "license": "版权归原作者，原页面未提供可再分发开放许可；本地教学引用，公开发布需另核授权",
+    "checked": "2026-10-30",
+    "bytes": 233440,
+    "sha256": "4d152d073e46d1f5ef06d43114e439af2072afdaa5427f83d94a53f5866ea9ec",
+    "recommended_for_deck": true
+  },
+  {
+    "file": "course-kit/assets/revision-research/sphere-exterior.jpg",
+    "original_url": "https://refikanadol.com/wp-content/uploads/2023/10/RefikAnadolStudio-X-TheSphere_Page_09-2400x1350.jpg",
+    "page_url": "https://refikanadol.com/works/machine-hallucinations-sphere/",
+    "credit": "Refik Anadol Studio / Machine Hallucinations — Sphere",
+    "caption": "官方技术示意图，非现场照片；画面带 CONFIDENTIAL 字样，不纳入课堂展示",
+    "license": "版权归原作者，原页面未提供可再分发开放许可；本地教学引用，公开发布需另核授权",
+    "checked": "2026-10-30",
+    "bytes": 340000,
+    "sha256": "e010557ea3879ae9f13e5ea156288ac76556ca595edfe5e210afb23f5f275b68",
+    "recommended_for_deck": false,
+    "download_status": "excluded_from_delivery_after_visual_review"
+  },
+  {
+    "file": "course-kit/assets/revision-research/ocean-of-air.jpg",
+    "original_url": "https://marshmallowlaserfeast.com/app/uploads/2023/11/Marshmallow-Laser-Feast_We-Live-in-an-Ocean-of-Air-©Stelios-Tzetzias_19A7099-copy-1024x683.jpg",
+    "page_url": "https://marshmallowlaserfeast.com/project/we-live-in-an-ocean-of-air/",
+    "credit": "Marshmallow Laser Feast / photo © Stelios Tzetzias",
+    "caption": "Video Edition / Plásmata, Athens 2022；勿标为VR体验画面",
+    "license": "版权归原作者，原页面未提供可再分发开放许可；本地教学引用，公开发布需另核授权",
+    "checked": "2026-10-30",
+    "bytes": 238147,
+    "sha256": "d01570a88ad3a2a196ede4be1b7b97a54acb9ca8c4ba07d9ab14006b84567375",
+    "recommended_for_deck": true
+  }
+]

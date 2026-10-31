@@ -1,0 +1,697 @@
+[
+  {
+    "layout": "cover",
+    "title": "舞台复刻",
+    "body": [
+      "从一个想法，到一座数字舞台",
+      "AI 辅助的空间预演与创作实践",
+      "钱誉文 Ewan Qian　/　MANA",
+      "2026.10.31　13:30–16:30"
+    ],
+    "notes": "开场不讲软件清单。说：今天我们试着把脑子里的舞台放到眼前，换几个位置看，再改一次。第一次可以粗糙，但要能运行。今天既欢迎已有作品，也欢迎只有一个想法的人。\n本轮封面改用本地屏幕实验图，不再展示旧海报。",
+    "section": "01 / 想法",
+    "image": "assets/revision-lab/fold-stage.png",
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "question",
+    "title": "你带来了什么，想试什么？",
+    "body": [
+      "我带来了什么？",
+      "我想尝试什么？",
+      "三小时后，什么会让我觉得值得？"
+    ],
+    "notes": "先给大家一分钟想。约14人，每人20秒，控制在5分钟内。可以说一段音乐、一个演出记忆或一个想象。把需求口头归为影像进空间、屏幕关系、实时输入三类，后续演示按现场最多的需求侧重，不强制分组或互助。",
+    "section": "01 / 想法",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）"
+    ],
+    "task": "每人口头说20秒 / 不填写网页",
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "statement",
+    "title": "把时间还给作品",
+    "body": [
+      "先敢于做出第一个灰盒。",
+      "找到有效的部分，再继续叠加。"
+    ],
+    "notes": "这是主讲者的核心立场。传统Blender流程仍然有用，AI网页预演降低了一些搭建和改版的周转成本。节省下来的时间用于观看、选择和深化，不承诺网页可以代替所有CG或现场工程。",
+    "section": "01 / 想法",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "agenda",
+    "title": "今天的共同任务",
+    "body": [
+      "搭建一次，完整看一次，再改一次。"
+    ],
+    "notes": "沿用招生承诺的六段时间。讲解与操作约各一半，操作时可以穿插短讲，但每次都把注意力拉回当前任务。最后10分钟每人30秒，14人约7分钟，余3分钟收束；16:30后可自愿继续聊。",
+    "section": "01 / 想法",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）"
+    ],
+    "task": null,
+    "table": [
+      [
+        "13:30–14:00",
+        "前情、彼此目标、拆参考"
+      ],
+      [
+        "14:00–14:40",
+        "共同演示与第一座灰盒"
+      ],
+      [
+        "14:40–15:30",
+        "自己的内容、状态与V1"
+      ],
+      [
+        "15:30–15:50",
+        "完整观看、记录问题"
+      ],
+      [
+        "15:50–16:20",
+        "修改与复查V2"
+      ],
+      [
+        "16:20–16:30",
+        "每人展示一个发现"
+      ]
+    ],
+    "appendix": false
+  },
+  {
+    "layout": "photo",
+    "title": "ENTROPY：顶屏值得做吗？",
+    "body": [
+      "原本嫌麻烦的屏幕关系，在草稿里值得再试一次。"
+    ],
+    "notes": "用本人讲述，不补写没发生的过程。展示你认可的在线图片，问大家：这条线如果从顶屏流向主屏，哪里必须衔接？然后讲原本不想折腾顶屏，AI草稿使你愿意尝试。预演与现场来自不同片段，不作逐帧还原对比。不要说ENTROPY整场由固定时间线控制。",
+    "section": "01 / 想法",
+    "image": "assets/revision/entropy-afterloop.jpg",
+    "image2": null,
+    "credit": "图源：AfterLoop活动页 / ENTROPY现场片段，非逐帧预演对照",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）",
+      "https://www.afterloop.co.uk/team-1-1-3",
+      "https://derivative.ca/event/entropy-immersive-audio-visual-live-performance-performed-using-touchdesigner/75227"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "image",
+    "title": "TIMER：画面怎样围绕身体？",
+    "body": [
+      "屏幕形状怎样改变\n内容的展开？"
+    ],
+    "notes": "给大家20秒看图，先不解释。问：你觉得这种环幕该交付什么比例的画面？再说自己的尝试：全宽画布，以及1:1的圆形内容经过重映射成为长条。这里是个人工程经验，不把它套成所有环幕的统一交付规格。",
+    "section": "01 / 想法",
+    "image": "assets/revision/timer-main.jpg",
+    "image2": null,
+    "credit": "TIMER《控时者》/ 本人作品归档图片组，含不同呈现片段",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）",
+      "本地作品归档 timer-main-clean.jpg"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "split",
+    "title": "两种草稿，各有用途",
+    "body": [
+      "空间草稿",
+      "看比例、朝向、遮挡和观看位置。",
+      "内容草稿",
+      "试运动、节奏、构图与情绪。"
+    ],
+    "notes": "用TIMER经验说明：一类工程帮助看舞台，一类帮助组织内容。某些环节仍需要Blender或其他CG工具。问大家：你现在最卡的是内容怎么做，还是内容进空间以后会怎样？两者可以相互返回。",
+    "section": "01 / 想法",
+    "image": null,
+    "image2": null,
+    "credit": "TIMER / 本人创作经验",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "editorial",
+    "title": "真鍋大度：实现变快之后",
+    "body": [
+      "多个想法可以同时试。",
+      "人的注意力和选择仍然有限。",
+      "你想留下什么，为什么？"
+    ],
+    "notes": "控制在3分钟。他2026年8月访谈讨论AI降低实现成本、并行试验及人的注意限制。这里直接转述作者观点，不宣称所有创作都如此。主讲者承接：我们今天借这种低成本试验能力，做一个小舞台。理论仍在理解中，可以把疑问开放给大家。",
+    "section": "01 / 想法",
+    "image": "assets/revision-research/daito-agent-club.webp",
+    "image2": null,
+    "credit": "Daito Manabe / VJ Agent Club 官方原型缩略图，非本课运行结果",
+    "sources": [
+      "https://projects.daito.ws/ai-production-and-human-experience/",
+      "https://projects.daito.ws/agent-club/"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "context",
+    "title": "给 AI 一份可工作的委托",
+    "body": [
+      "我要验证什么？",
+      "它需要知道哪些资料？",
+      "改完以后，我在哪里检查？"
+    ],
+    "notes": "联系本人《从Prompt到Skill》：单次请求、项目上下文和可复用经验，是三层不同东西。本课不教Skill安装，也不讲Swift。先让学员把目标、资料、边界和判断写清。持续上下文有用，信息也需要整理，不能把越长越好当原则。",
+    "section": "01 / 想法",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）",
+      "assets/revision/Ewan_从Prompt到Skill_原文.txt",
+      "https://www.avanderlee.com/ai-development/agent-skills-replacing-agents-md-with-reusable-ai-knowledge/"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "brief",
+    "title": "同一个任务，更清楚地说",
+    "body": [
+      "目标：让线条跨过两面折屏，形成一个动作。",
+      "资料：参考图、屏幕方向、已有视频与工程。",
+      "保留：人物尺度、原素材和已有机位。",
+      "本次只改：画面分配与方向。",
+      "检查：从正面和侧面各看一轮。"
+    ],
+    "notes": "这是教学示例，不是真实用户工程的测绘描述。请大家指出：哪一行是意图，哪一行是约束，哪一行告诉AI怎样检查？自然语言或语音输入都可以。把口述整理成这几项即可，不要求写得像程序员。",
+    "section": "01 / 想法",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）"
+    ],
+    "task": "把自己的想法改写成一次委托",
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "chapter",
+    "title": "第一座灰盒",
+    "body": [
+      "屏幕、人物、机位，\n放在同一个空间里。"
+    ],
+    "notes": "过渡到实操。14:00开始，先共同跑通基础入口。教师边做边解释，每做一步就停一下让大家确认。准备好成品兜底，不能让14个人各自安装依赖。",
+    "section": "02 / 搭建",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "steps",
+    "title": "从 DeepSeek Harness 开始",
+    "body": [
+      "1　打开课程工程文件夹。",
+      "2　进入一个专用会话，提供参考与目标。",
+      "3　先做最少的屏幕、人物和机位。",
+      "4　实际预览，把看见的问题带回同一会话。"
+    ],
+    "notes": "本机已核对官方桌面版0.2.0-rc.2，但学员版本可能不同。现场按工作区、新会话和模型菜单对应项示范，不投出密钥或个人聊天记录。已有工程先另存。统一材料的网页可直接运行；安装或API卡住时先使用成品继续学习，课后再处理环境。",
+    "section": "02 / 搭建",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "https://github.com/deepseek-ai/deepseek-harness/blob/master/apps/desktop/README.md",
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "split",
+    "title": "Flash 与 Pro，怎样选？",
+    "body": [
+      "先做简单、可检查的改动",
+      "用当前可用的Flash起步，确认输入与运行路径。",
+      "遇到复杂问题",
+      "先给报错与约束、缩小任务，再比较是否换模型。"
+    ],
+    "notes": "这是课堂操作策略，不是性能榜单。官方2026-10-30当前API名是deepseek-flash与deepseek-v4-pro；本机旧会话显示旧别名，不让学生照抄旧名称。新会话UI已看到DeepSeek-V41-Flash / Low。按现场版本选择可用项，不保证所有账号都有相同模型，不用模型切换替代分析。",
+    "section": "02 / 搭建",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "https://api-docs.deepseek.com/quick_start/pricing/",
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "lab",
+    "title": "灰盒里先看见什么？",
+    "body": [
+      "一块屏幕，一个人物，两个观看位置。"
+    ],
+    "notes": "打开统一工程或空间实验室。选平面，先用测试图案。问：人物与画面的比例怎样？从侧面是否还能看到主体？不要求先做桁架、材质和复杂灯光。首个灰盒失败时，教师立即用稳定成品让大家继续观察。",
+    "section": "02 / 搭建",
+    "image": "assets/revision-lab/flat.png",
+    "image2": null,
+    "credit": "SceneForge 本地教学实验室 / 示意尺寸",
+    "sources": [],
+    "task": "两分钟：切换一个机位",
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "mapping",
+    "title": "动态画面如何进入空间？",
+    "body": [
+      "画面来源",
+      "视频、程序画布、摄像头、共享窗口。",
+      "对应关系",
+      "纹理通过UV等坐标，对应到表面。",
+      "观看结果",
+      "同一帧进入不同形状，从不同位置观看。"
+    ],
+    "notes": "用去魅的语言讲：屏幕本身是模型的一部分，动态画面是一张不断更新的图。UV像一套对应地址，说明图上的哪里落到模型哪里。Unity里可用RenderTexture，网页里可用CanvasTexture或VideoTexture。工具名称不同，逻辑能迁移。此处不讲图形管线细节。",
+    "section": "03 / 映射",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）",
+      "https://threejs.org/docs/#api/en/textures/VideoTexture",
+      "https://docs.unity3d.com/Manual/class-RenderTexture.html"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "lab",
+    "title": "一张画面，还是每屏各一张？",
+    "body": [
+      "先预测转角处的动作，再切换分配方式。"
+    ],
+    "notes": "L形屏先选连续，指出同一画布的左右部分如何被分配。再选每屏重复，观察运动与信息量变化。请学员先说预测，再看结果。连续UV不保证观众在任何位置都觉得连续，透视与机位仍参与结果。",
+    "section": "03 / 映射",
+    "image": "assets/revision-lab/fold.png",
+    "image2": null,
+    "credit": "两块教学平面组成L形，非真实场馆",
+    "sources": [],
+    "task": "预测 / 操作 / 对照",
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "lab",
+    "title": "宽画布进入弧形环幕",
+    "body": [
+      "屏幕怎样展开？观众站在哪里？"
+    ],
+    "notes": "结合TIMER经验。180度环幕是表面形状；内容可能是一张超宽画布。画布长宽比应看实际屏幕与展开方式，不能看到弧形就直接制作360视频。让学员从中心、侧面与全景机位查看接缝和主体拉伸。",
+    "section": "03 / 映射",
+    "image": "assets/revision-lab/arc.png",
+    "image2": null,
+    "credit": "SceneForge / 180°教学环幕",
+    "sources": [],
+    "task": "选一个你希望观众停留的位置",
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "comparison",
+    "title": "“全景”先说清楚",
+    "body": [
+      "三种不同的问题"
+    ],
+    "notes": "这是格式辨析，可按学员需求展开。球面示例只帮助理解等距柱状经纬媒体，不代替真实球幕投影设计。正方形创意内容也可重新映射，但不天然成为360经纬视频。每次先问内容如何编码、表面怎样展开、观看点在哪里。",
+    "section": "03 / 映射",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）",
+      "https://threejs.org/examples/#webgl_video_panorama_equirectangular"
+    ],
+    "task": null,
+    "table": [
+      [
+        "超宽画布",
+        "内容长宽比",
+        "看屏幕展开和重要信息区域"
+      ],
+      [
+        "180°环幕",
+        "三维表面形状",
+        "看机位、弧度和边界"
+      ],
+      [
+        "360°经纬媒体",
+        "球面方向的二维编码",
+        "常见2:1经纬展开，需相应采样"
+      ]
+    ],
+    "appendix": false
+  },
+  {
+    "layout": "lab",
+    "title": "实时内容也可以成为纹理",
+    "body": [
+      "把正在运行的网页或程序窗口放进舞台。"
+    ],
+    "notes": "优先演示自己控制的网页或Processing窗口，点屏幕分享，由主讲亲自选择源。鼠标或参数变化以后，看它是否出现在空间表面。摄像头作为另一种来源。停止输入才释放设备，暂停画面不等于停止采集。权限失败改用本地视频，不延伸为WebRTC网络课。",
+    "section": "03 / 映射",
+    "image": "assets/revision-lab/camera-fold.png",
+    "image2": null,
+    "credit": "本地自动化摄像头替身测试截图，非真人摄像头现场验收",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）",
+      "https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia"
+    ],
+    "task": "扩展演示：由主讲选择共享源",
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "distinction",
+    "title": "预演与输出校准",
+    "body": [
+      "虚拟空间预演",
+      "看内容、人物与空间的关系。",
+      "实际输出校准",
+      "让画面对齐实际表面。\n还需现场设备检查。"
+    ],
+    "notes": "四角校准是平面输出的一个起点。环形与异形还可能需要UV、网格变形或视点投射，不把当前单平面输出说成全能校准。学员先理解动态纹理与表面关系，今天只需完成可运行数字舞台。",
+    "section": "03 / 映射",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）",
+      "https://resolume.com/support/advanced-output"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "task",
+    "title": "你的第一版",
+    "body": [
+      "选一个想法，做出能运行的舞台。",
+      "放入自己的内容，或从测试图案开始。",
+      "安排几个播放状态，连续看一轮。",
+      "保存V1，留下一个待验证的问题。"
+    ],
+    "notes": "给大家自由探索。可以复刻喜欢的演出，也可做虚构音乐节或活动舞台。教师巡视时只问：你现在要验证什么？卡在哪一步？最快者可尝试实时输入，未完成者用统一工程。场景规模主动压小，15:30必须进入完整观看。",
+    "section": "04 / 制作",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [],
+    "task": "14:40–15:30 / 中间安排5分钟休息",
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "statement",
+    "title": "先让它运行",
+    "body": [
+      "精细可以晚一点。",
+      "你要先知道，哪些关系值得继续。"
+    ],
+    "notes": "这个页面在操作时停留。讲师可简短分享：AI快不等于判断已经完成；粗糙灰盒能提前暴露一些问题，但不会给出真实亮度、工程安全或全部现场感受。不要因为大家开始沉默就继续增加理论。",
+    "section": "04 / 制作",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "task",
+    "title": "完整观看，暂时不改",
+    "body": [
+      "选定一个机位，完整看一轮。",
+      "换到另一个位置，再看一次。",
+      "记下：何时、何处、看到了什么。"
+    ],
+    "notes": "15:30–15:50。至少先有一轮不停下来修。可两人交换观看，不强制担任助教。对音乐或情绪导向的作品，也允许描述注意力、张力和感受，再回到能定位的片段讨论。",
+    "section": "05 / 判断",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [],
+    "task": "20分钟 / 保留完整观看",
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "feedback",
+    "title": "把感受说到具体位置",
+    "body": [
+      "“这里不够有冲击力。”",
+      "可以继续问：",
+      "哪个时刻？哪个位置？",
+      "你希望观众注意什么？"
+    ],
+    "notes": "避免把艺术判断简化成“物理准确”。情绪、节奏和模糊性可以是目的。请对方先描述实际感受，再说作者意图，分清技术阻碍与审美选择。不要要求所有作品满足同一个视觉风格。",
+    "section": "05 / 判断",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "task",
+    "title": "第二版，只改关键处",
+    "body": [
+      "保留第一版。",
+      "选一个值得解决的问题。",
+      "改一至三个相关变量。",
+      "用原来的机位与片段，再看一轮。"
+    ],
+    "notes": "15:50–16:20。可以改屏幕方向、比例、运动分配或段落时长。若做的是更好的情绪而非技术修复，也请说清你改了什么、为什么保留。学员不必全做同样的屏幕。16:15提醒导出参数和原素材。",
+    "section": "05 / 判断",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [],
+    "task": "30分钟 / 修改、复查、留存",
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "steps",
+    "title": "回到 Blender，看同一个关系",
+    "body": [
+      "网页先把想法跑起来。",
+      "打开 Blender：看屏幕、UV 和观看位置。",
+      "需要细做的地方，回到熟悉的工具。"
+    ],
+    "notes": "在这一段打开自己熟悉的Blender工程，沿用刚才的屏幕关系讲空间、UV和人物尺度。网页与Blender不是互相取代。没有承诺网页自动导出Blender或两边实时同步。现场用已打开的工程，不进行耗时建模。本段压在V2完成后、分享前约3分钟；原练习方法留讲述中。",
+    "section": "06 / 分享",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "https://zachlieberman.medium.com/i-spent-10-years-making-a-sketch-in-code-every-day-and-heres-what-i-learned-b845e811160d"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "share",
+    "title": "每人，展示一个发现",
+    "body": [
+      "我原来想让观众看到什么。",
+      "第一版让我发现了什么。",
+      "我改了什么，准备怎样继续。"
+    ],
+    "notes": "16:20开始，约14人，每人30秒；用一张截图或当前工程，不换复杂设备。7分钟覆盖全员，3分钟教师收束。若有人还没成功，可展示卡住的问题和已经理解的逻辑，明确后续获得帮助的方法。16:30后为自愿深入分享，不能用课后时间补掉课内承诺。",
+    "section": "06 / 分享",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [],
+    "task": "每人30秒 / 约7分钟，全员可见",
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "steps",
+    "title": "把你的舞台，留在这张网络里",
+    "body": [
+      "给自己的屏幕组合起一个名字。",
+      "保留尺寸、位置、朝向和内容对应关系。",
+      "后续一起整理真实屏幕规格与场景。"
+    ],
+    "notes": "这是SceneForge下一阶段共建计划，不是已上线的上传功能。未来希望大家分享实际项目的屏幕规格、场景和自己的独立网站链接；也可以归档已拆除但值得保留的舞台。今天先保存自己的工程、素材与屏幕说明。仓库：https://github.com/ewanqian/SceneForge 。不要编造项目接收链接或承诺已有多人后台。",
+    "section": "06 / 分享",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "主讲者2026-10-30口述及MANA招生正文（用户提供）"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": false
+  },
+  {
+    "layout": "appendix",
+    "title": "附录 / 一份完整委托",
+    "body": [
+      "这是我的工程和参考图。请先读已有文件。",
+      "用基础平面、方块、1.7m人物建立舞台，单位米。",
+      "保留两个观看位置，用测试图案先跑通。",
+      "这次只调整顶屏高度和方向，不添加复杂灯光。",
+      "列出修改文件，保留原版；完成后启动预览。",
+      "如果失败，报告具体报错和最小修复方案。"
+    ],
+    "notes": "供课后回看和现场复制。参照实际工程增删。不要要求AI安装所有工具或把用户机器当全新环境。若会话上下文已很大，可另存简短项目说明和当前问题，在新会话继续。",
+    "section": "附录 / 回看",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [],
+    "task": null,
+    "table": null,
+    "appendix": true
+  },
+  {
+    "layout": "appendix",
+    "title": "附录 / 音乐进入空间",
+    "body": [
+      "先选一个短段落。",
+      "标出你关心的节拍、变化或呼吸。",
+      "让一个视觉变量回应它，再看是否有意义。",
+      "音频响应、生成式AI和实时传输各有不同作用。"
+    ],
+    "notes": "给带音乐的参与者的路径。今天没有自动作曲、自动频谱分析或生成式AI音频服务作为统一依赖。可以先用手动Cue与已有音乐并置，之后才做真正的音频输入映射。",
+    "section": "附录 / 回看",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [],
+    "task": null,
+    "table": null,
+    "appendix": true
+  },
+  {
+    "layout": "appendix",
+    "title": "附录 / 今天的能力边界",
+    "body": [
+      "能看：比例、方向、分配、部分遮挡与时间组织。",
+      "需另测：现场亮度、实际投影、网络、设备延迟。",
+      "需继续制作：精细CG、复杂曲面、多机融合与演出控制。",
+      "网页发布与作品完成，各自需要检查。"
+    ],
+    "notes": "避免“跑起来”被理解为真实演出已验收。当前实验室的球体、L屏与环幕是教学预设。场馆尺寸是假设；mac与Windows均走浏览器，但本轮主要在本机Chrome验证。",
+    "section": "附录 / 回看",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [],
+    "task": null,
+    "table": null,
+    "appendix": true
+  },
+  {
+    "layout": "appendix",
+    "title": "附录 / 卡住时的顺序",
+    "body": [
+      "灰盒失败：打开统一成品，先继续观察。",
+      "模型失败：保存报错，缩小改动，保留可运行版。",
+      "视频失败：换短H.264 MP4，或回测试图案。",
+      "实时输入失败：停止并释放，改用本地文件。"
+    ],
+    "notes": "主讲只用两三分钟处理一个人的环境，避免其他13人等待；记录问题，给可继续的替代路径。没有助教时，救场方案必须简单、可见、可逆。",
+    "section": "附录 / 回看",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [],
+    "task": null,
+    "table": null,
+    "appendix": true
+  },
+  {
+    "layout": "references",
+    "title": "案例与延伸阅读",
+    "body": [
+      "钱誉文：ENTROPY、TIMER与《从Prompt到Skill》",
+      "真鍋大度：AI制作环境与人的体验，2026.08.31",
+      "Zach Lieberman：十年每日草图，2026.01.02",
+      "Three.js / Unity：动态纹理与表面",
+      "详细链接、图片署名和工程指南随课堂包提供。"
+    ],
+    "notes": "外部案例仅作方法参照，不代表合作或机构背书。图片来源保留在每页备注及素材清单。课件中的原型截图、作品归档图与真实现场照片分别标明，不混用。",
+    "section": "附录 / 回看",
+    "image": null,
+    "image2": null,
+    "credit": "",
+    "sources": [
+      "https://projects.daito.ws/ai-production-and-human-experience/",
+      "https://zachlieberman.medium.com/i-spent-10-years-making-a-sketch-in-code-every-day-and-heres-what-i-learned-b845e811160d",
+      "https://www.avanderlee.com/ai-development/agent-skills-replacing-agents-md-with-reusable-ai-knowledge/",
+      "https://threejs.org/docs/",
+      "https://docs.unity3d.com/Manual/class-RenderTexture.html"
+    ],
+    "task": null,
+    "table": null,
+    "appendix": true
+  }
+]

@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "kind": "sceneforge-classroom",
+  "venueId": "bo-live-house",
+  "cameraId": "front",
+  "screen": {
+    "width": 14,
+    "height": 7
+  },
+  "mapping": {
+    "fit": "contain",
+    "flipX": false,
+    "flipY": false
+  },
+  "projection": {
+    "corners": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        1
+      ]
+    ],
+    "mode": "grid"
+  },
+  "cueIndex": 0,
+  "mediaName": "",
+  "notes": ""
+}
