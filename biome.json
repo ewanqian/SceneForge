@@ -9,7 +9,8 @@
       "!**/_local",
       "!**/_review_frames",
       "!**/_review_shots",
-      "!**/_review_scratch"
+      "!**/_review_scratch",
+      "!public/workshop"
     ]
   },
   "formatter": {
