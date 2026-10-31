@@ -1,4 +1,4 @@
-import { chapters } from './chapters.js';
+import { chapters } from './chapters.js?v=20261031-2';
 
 let active=0,teacher=false;const $=id=>document.getElementById(id);const buttons=chapters.map((c,i)=>{let b=document.createElement('button');b.innerHTML=`<span>0${i+1}</span>${c.name}`;b.onclick=()=>select(i);$('stations').append(b);return b});let focusStage=()=>{};
 function select(i){active=Math.max(0,Math.min(5,i));let c=chapters[active];for(let k of ['title','time','line','body','reminder','question','check'])$(k).textContent=c[k];$('number').textContent=`ACT 0${active+1} / ${c.name}`;$('progress').textContent=`${active+1} / 6`;$('links').replaceChildren(...c.links.map(([text,href])=>{let a=document.createElement('a');a.textContent=text+' ↗';a.href=href;return a}));buttons.forEach((b,j)=>b.setAttribute('aria-pressed',String(j===active)));$('prev').disabled=active===0;$('next').disabled=active===5;focusStage(active)}
