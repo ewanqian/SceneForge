@@ -1,5 +1,12 @@
 # SceneForge
 
+## 工作坊：直接打开即可体验
+
+[打开数字课程地图](https://ewanqian.github.io/SceneForge/workshop/20261031/) · [课前准备](https://ewanqian.github.io/SceneForge/workshop/20261031/web/prepare.html) · [下载可编辑舞台草稿](https://ewanqian.github.io/SceneForge/workshop/20261031/Stage_Replica_Starter.zip)
+
+浏览器体验无需安装环境。需要修改源码时，使用[官方 Harness 桌面安装包](https://www.deepseek.com/download/)，打开草稿文件夹并让 Agent 启动预览。无需 Docker 或自行构建 Harness；下方开发命令供维护完整应用使用。
+
+
 SceneForge 是一个面向演出空间、装置现场与沉浸式内容的**网页场景查看器和舞台预演工具**。
 
 当前仓库已经从概念文档转为可运行的第一版应用骨架：

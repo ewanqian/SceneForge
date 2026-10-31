@@ -1,21 +1,21 @@
-# 我的第一座数字舞台
+# 舞台草稿 · 快速上手
 
-这是可复制、可交给AI实际修改的源工程，和只改参数的课堂成品分开。先复制本文件夹，以自己的名字命名，再在DeepSeek Harness中选择该文件夹。
+## 先体验
 
-## 打开
+打开 https://ewanqian.github.io/SceneForge/workshop/20261031/ 。浏览器即可操作课程地图和屏幕演示，无需安装环境。
 
-主课程服务器已运行时，直接访问 http://localhost:8765/starter/ 。独立使用时，电脑需Python 3：在本目录运行 `python3 serve.py`（Windows可用 `py -3 serve.py`），打开 http://localhost:8766/ 。网页不能替代HTTP服务，不保证双击index.html可用。
+## 修改自己的工程
 
-## 文件
+1. 从 https://www.deepseek.com/download/ 下载系统支持的 DeepSeek Harness 桌面安装包，按课堂引导配置 DeepSeek API。无需自行构建 Harness 源码。
+2. 下载并解压课堂的 Stage_Replica_Starter.zip，在 Harness 中打开这个文件夹。
+3. 发送下面的委托，让 Agent 启动预览并做一处修改：
 
-index.html是界面，scene.js包含空间、屏幕、人物、机位与时间逻辑，style.css是界面样式，vendor/包含本地Three.js和MIT许可。无API密钥，不需要Node安装依赖。
+> 请先读 AGENTS.md、README.md 和 scene.js，不读取 vendor 中的引擎源码。先使用应用自带或电脑现有的 Node 运行 preview.mjs，打开本地预览；也可使用现有 Python 运行 serve.py。不安装 Docker，不新增框架，不运行 npm install。保留原版，只调整主屏宽度和一个侧面机位。完成后说明怎样比较人物、屏幕和画面的比例。若现有运行时不可用，给出具体情况，先用公开网页继续体验。
 
-## 第一条委托
+不需要参加者先手动配置终端工具。preview.mjs 仅用 Node 内置模块，无依赖安装；serve.py 是已有 Python 时的另一个入口。预览使用 http://localhost:8766/ ，窗口/进程保持运行。
 
-请先读AGENTS.md与scene.js。保留原版，只把主屏变宽，并调整侧面机位，让我比较人物与画面的比例。不增加灯光或模型。告诉我改了哪些文件，启动本地预览，用正面与侧面检查；若启动失败，给实际报错。
+## 文件与保存
 
-## 第二条委托
+index.html 是界面，scene.js 是空间、屏幕、人物、机位和时间逻辑，style.css 是样式，vendor/ 是已附带的 Three.js 与许可。修改主要在 scene.js；不必阅读引擎文件。
 
-保留主屏与人物，把顶屏改到另一个高度和倾角，使线条从顶屏向主屏延续。先说明动态纹理与表面的对应，再只改相关位置/方向，保留V1，用同一机位复查。这个例子是教学假设，不是ENTROPY准确重建。
-
-原文件固定有主屏、顶屏和人物。新增其他屏幕是代码任务，不会自动出现在参数JSON中。保存参数只能恢复原有字段，不能保存新加几何代码；分享时要带整个源文件夹和原始媒体。
+工程固定提供主屏、顶屏和人物。增加屏幕需要修改源码；参数JSON不包含新增几何或视频文件。保存整个工程目录、原始媒体与两个版本，课后可以继续发展。
