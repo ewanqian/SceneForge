@@ -14,7 +14,7 @@
 
 以观众视角自左向右排列。技术页列 P1.8、亮度 ≥700 cd/m²、面板刷新 ≥3840 Hz、对比度 ≥4000:1、视角 H≥160°/V≥140°，为资料中的标称信息，**不是素材帧率、现场电平、亮度设置或验收实测**。照片可能有物理曲率、屏体分段或透视混合；不能反推曲率半径、展开宽度以及折角。
 
-[机器可读屏幕配置](led-profile.json) 是独立屏幕配置，不是可直接传给 `venueManifestSchema` 的场地对象。先不改现有 schema；后续在 `src/data/venues.ts` 中按 `src/domain/scene.ts` 用 `status: "illustrative"` 注册，获得可追溯实测后才改标识。
+[机器可读屏幕配置](led-profile.json) 是独立屏幕配置，不是可直接传给 `venueManifestSchema` 的场地对象。先不改现有 schema；后续在 `src/data/venues.ts` 中按 `src/domain/scene.ts` 在 `manifests` 数组里用 `status: "illustrative"` 注册，获得可追溯实测后才改标识。
 
 ## 02｜Windows / Blender 任务交接
 
@@ -28,7 +28,7 @@
 - 节点与材质：`LED_SCREEN`、独立 UV0、RGB 角标 `TL/TR/BR/BL`。程序原生输出保留 6540×1824；Web 预览可用等比 1635×456 或 3270×912，不因预览档变更源尺寸。手机兼顾可用性；桌面/Mac 与真实硬件分别记录。
 - 适配默认 `contain`，明示留黑。需要裁切时启用 `cover` 并显示边界；**不把 full frame 拉成 16:4 或按现场物理比直接改色条像素宽度**。有现场处理器所有权的操作员才确认有效画布、显示映射、输入格式/帧率/色彩、余量和安全亮度。
 - 用一份 6540×1824 诊断图：四角文字、中心靶、尺寸刻度、圆形/正方形、灰阶、红绿蓝，再按模式显示二分/三分边界。验收四角不反转、正确 0–100% UV、边缘不出框、媒体降档不改比例。现场拍照判断圆形一致性；不擅自以 0.84% 的物理/栅格偏差决定处理器补偿。
-- 原型先走静态 HTTPS；媒体用有权素材的同源 URL 或 CORS 受控访问，支持 Range；本地视频用文件选择 + object URL，不能上传/外传。主网站可在合并后沿用 Pages 既有管线；独立练习站保持独立发布，验通过才登记它的正式 URL。NDI/OSC、真灯、真实内容时码、6.5K PLAYBACK 性能以及 Quest/Vision Pro 分别是单独验收，不是浏览器可开的同义词。
+- 原型先走静态 HTTPS；媒体用有权素材的同源 URL 或 CORS 受控访问，支持 Range；本地视频用文件选择 + object URL，不能上传/外传。SceneForge 的 [现有 Pages 工作流](../../../.github/workflows/deploy-pages.yml) 在 `main` push 或手动触发时执行 `npm run verify`，打包发布 `dist/`。独立入口后续可用 `public/stage-replica/supernatural-workshop/index.html`（相对资源路径），构建后应映射为 `/SceneForge/stage-replica/supernatural-workshop/`；这是**拟定路径，不是已发布 URL**。演出练习站可先独立托管，部署验过后才回填其地址。NDI/OSC、真灯、真实内容时码、6.5K PLAYBACK 性能以及 Quest/Vision Pro 分别是单独验收，不是浏览器可开的同义词。
 
 ## 04｜把旧作品的操作变成新乐器
 
