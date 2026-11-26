@@ -1,0 +1,111 @@
+{
+  "schema": "sceneforge-led-profile/v0.1",
+  "id": "mana-supernatural-workshop-led",
+  "status": "reference-only",
+  "venueLabel": "超自然工坊",
+  "source": {
+    "rasterAndDimensions": "operator-provided reference sheets",
+    "geometry": "not surveyed"
+  },
+  "raster": {
+    "width": 6540,
+    "height": 1824,
+    "origin": "top-left",
+    "mapping": "continuous",
+    "defaultFit": "contain",
+    "modes": [
+      {
+        "id": "full",
+        "panels": [
+          {
+            "x": 0,
+            "y": 0,
+            "width": 6540,
+            "height": 1824
+          }
+        ]
+      },
+      {
+        "id": "split-2",
+        "panels": [
+          {
+            "x": 0,
+            "y": 0,
+            "width": 3270,
+            "height": 1824
+          },
+          {
+            "x": 3270,
+            "y": 0,
+            "width": 3270,
+            "height": 1824
+          }
+        ]
+      },
+      {
+        "id": "split-3",
+        "panels": [
+          {
+            "x": 0,
+            "y": 0,
+            "width": 1647,
+            "height": 1824
+          },
+          {
+            "x": 1647,
+            "y": 0,
+            "width": 3246,
+            "height": 1824
+          },
+          {
+            "x": 4893,
+            "y": 0,
+            "width": 1647,
+            "height": 1824
+          }
+        ]
+      }
+    ]
+  },
+  "screen": {
+    "widthM": 12.16,
+    "heightM": 3.42,
+    "curvature": null,
+    "position": null,
+    "assetNode": "LED_SCREEN",
+    "projectionCoordinates": {
+      "u": "audience left to right",
+      "v": "top to bottom for program raster; verify export texture conventions"
+    }
+  },
+  "referenceHardware": {
+    "panelClass": "P1.8",
+    "maximumRatedBrightnessAtLeastCdPerM2": 700,
+    "panelRefreshAtLeastHz": 3840,
+    "contrastAtLeast": "4000:1",
+    "viewAngleAtLeastDeg": {
+      "horizontal": 160,
+      "vertical": 140
+    }
+  },
+  "webPreview": {
+    "assetScale": 0.25,
+    "preferredPreviewRasters": [
+      [
+        1635,
+        456
+      ],
+      [
+        3270,
+        912
+      ]
+    ],
+    "screenProfiles": [
+      "native",
+      "interim-16x4-letterbox"
+    ],
+    "contentFps": null,
+    "streaming": "browser-local file first; HTTPS managed hosting for approved assets only",
+    "roomGeometry": "illustrative"
+  }
+}
