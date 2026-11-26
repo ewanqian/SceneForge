@@ -76,7 +76,8 @@
     "projectionCoordinates": {
       "u": "audience left to right",
       "v": "top to bottom for program raster; verify export texture conventions"
-    }
+    },
+    "edgeRelation": "Audience-left and audience-right LED edges touch the two side-wall interior faces; no framing strip. Numeric 0.045m bottom clearance is a proxy, not measured."
   },
   "referenceHardware": {
     "panelClass": "P1.8",
