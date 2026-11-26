@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "id": "mana-supernatural-workshop-led",
+  "name": "超自然工坊 · LED 舞台预演",
+  "city": "上海",
+  "status": "illustrative",
+  "description": "基于参考屏幕尺寸的演示场地。屏幕宽高来自参考页；房壳、台面、屏幕位置、机位以及平面表示都是未测量占位。不是施工或送屏配置。",
+  "layout": "box",
+  "dimensions": {
+    "width": 15,
+    "depth": 18,
+    "height": 5.5
+  },
+  "stage": {
+    "width": 11,
+    "depth": 3,
+    "height": 0.2,
+    "position": [
+      0,
+      0.1,
+      -6.3
+    ]
+  },
+  "screen": {
+    "width": 12.16,
+    "height": 3.42,
+    "position": [
+      0,
+      2.2,
+      -8.65
+    ],
+    "curvature": 0
+  },
+  "cameras": [
+    {
+      "id": "foh-center",
+      "name": "观众中区",
+      "position": [
+        0,
+        1.65,
+        3.5
+      ],
+      "target": [
+        0,
+        2.2,
+        -8.65
+      ]
+    },
+    {
+      "id": "foh-far",
+      "name": "观众最后方",
+      "position": [
+        0,
+        1.65,
+        8.25
+      ],
+      "target": [
+        0,
+        2.2,
+        -8.65
+      ]
+    },
+    {
+      "id": "stage-left",
+      "name": "台左回看",
+      "position": [
+        -5.8,
+        1.8,
+        -3.8
+      ],
+      "target": [
+        0,
+        2.2,
+        -8.65
+      ]
+    },
+    {
+      "id": "performer-eye",
+      "name": "演奏者视角 · 排练机位",
+      "position": [
+        0,
+        1.82,
+        -5.6
+      ],
+      "target": [
+        0,
+        2.2,
+        -8.65
+      ]
+    }
+  ],
+  "cues": [
+    {
+      "id": "work-light",
+      "name": "工作照明",
+      "actions": [
+        {
+          "type": "set-screen",
+          "color": "#d8d2c3",
+          "emissiveIntensity": 0.8
+        },
+        {
+          "type": "set-house-lights",
+          "intensity": 1.7
+        },
+        {
+          "type": "set-reflection",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "id": "show",
+      "name": "演出",
+      "actions": [
+        {
+          "type": "set-screen",
+          "color": "#e0d4b9",
+          "emissiveIntensity": 1.7
+        },
+        {
+          "type": "set-house-lights",
+          "intensity": 0.28
+        },
+        {
+          "type": "set-reflection",
+          "enabled": false
+        }
+      ]
+    },
+    {
+      "id": "blackout-preview",
+      "name": "画面暗场 · 仅模拟",
+      "actions": [
+        {
+          "type": "set-screen",
+          "color": "#050505",
+          "emissiveIntensity": 0
+        },
+        {
+          "type": "set-house-lights",
+          "intensity": 0.08
+        },
+        {
+          "type": "set-reflection",
+          "enabled": false
+        }
+      ]
+    }
+  ]
+}
