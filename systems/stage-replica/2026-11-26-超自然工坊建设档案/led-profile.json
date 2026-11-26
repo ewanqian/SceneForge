@@ -80,13 +80,13 @@
   },
   "referenceHardware": {
     "panelClass": "P1.8",
-    "maximumRatedBrightnessAtLeastCdPerM2": 700,
     "panelRefreshAtLeastHz": 3840,
     "contrastAtLeast": "4000:1",
     "viewAngleAtLeastDeg": {
       "horizontal": 160,
       "vertical": 140
-    }
+    },
+    "ratedBrightnessAtLeastCdPerM2": 700
   },
   "webPreview": {
     "assetScale": 0.25,
