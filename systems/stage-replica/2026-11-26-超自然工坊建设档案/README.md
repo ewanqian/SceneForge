@@ -14,7 +14,7 @@
 
 以观众视角自左向右排列。技术页列 P1.8、亮度 ≥700 cd/m²、面板刷新 ≥3840 Hz、对比度 ≥4000:1、视角 H≥160°/V≥140°，为资料中的标称信息，**不是素材帧率、现场电平、亮度设置或验收实测**。照片可能有物理曲率、屏体分段或透视混合；不能反推曲率半径、展开宽度以及折角。
 
-[机器可读屏幕配置](led-profile.json) 是独立屏幕配置，不是可直接传给 `venueManifestSchema` 的场地对象。先不改现有 schema；后续在 `src/data/venues.ts` 中按 `src/domain/scene.ts` 在 `manifests` 数组里用 `status: "illustrative"` 注册，获得可追溯实测后才改标识。
+[机器可读屏幕配置](led-profile.json) 是独立屏幕配置，不是可直接传给 `venueManifestSchema` 的场地对象。另附 [`venue-manifest.draft.json`](venue-manifest.draft.json)，按实际 v1 schema 写的**未注册**平面灰盒。屏体 12.16 × 3.42 m 是参考值；15 × 18 × 5.5 m 房壳、台面、屏体位置、曲率=0、各机位皆为便于开场的占位，不是图中实测。Windows 验证后，把 JSON 内容放入 `src/data/venues.ts` 的 `manifests` 数组，由 `src/domain/scene.ts` 的 `venueManifestSchema.parse()` 入库；`npm run verify` 后运行本地预览，与原生栅格测试一起复核。参照 repo 的 `src/components/VenueScene.tsx`：box 布局使用平面。双/三分屏属于程序分区，勿伪造多个施工屏面。不要升级为 `surveyed`。
 
 ## 02｜Windows / Blender 任务交接
 
